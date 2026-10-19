@@ -46,6 +46,12 @@ def assign_split(source: str, group_id: str, policy: dict, official_split: str |
         digest = hashlib.sha256(f"swissmetro|respondent-v1|42|{group_id}".encode()).digest()
         bucket = int.from_bytes(digest[:8], "big") % 100
         return "train" if bucket < 80 else "validation" if bucket < 85 else "calibration" if bucket < 90 else "test"
+    if source == "sushi3_2016":
+        if policy_id != "sushi3-2016-respondent-v1-calibration" or official_split is not None:
+            raise ValueError("SUSHI requires respondent hash split")
+        digest = hashlib.sha256(f"sushi3-2016|respondent-v1|42|{group_id}".encode()).digest()
+        bucket = int.from_bytes(digest[:8], "big") % 100
+        return "train" if bucket < 80 else "validation" if bucket < 85 else "calibration" if bucket < 90 else "test"
     raise ValueError(f"no registered split policy for {source}")
 
 
@@ -116,7 +122,7 @@ def write_dataset(episodes: Iterable[DecisionEpisode], output: Path, policy: dic
                 if episode["episode_id"] in seen:
                     raise ValueError(f"duplicate episode {episode['episode_id']}")
                 seen.add(episode["episode_id"])
-                retained_rows += 1 if episode["source"] == "swissmetro" else len(episode["alternatives"])
+                retained_rows += 1 if episode["source"] in ("swissmetro", "sushi3_2016") else len(episode["alternatives"])
                 candidate_rows += len(episode["alternatives"])
                 if len(episode["alternatives"]) == 1:
                     diagnostics["singleton_groups"] += 1
@@ -131,7 +137,7 @@ def write_dataset(episodes: Iterable[DecisionEpisode], output: Path, policy: dic
                             diagnostics[f"zero_{event}_groups"] += 1
                         elif positives > 1:
                             diagnostics[f"multiple_{event}_groups"] += 1
-                split_group = episode["supervision"].get("respondent_id", episode["group_id"]) if episode["source"] == "swissmetro" else episode["group_id"]
+                split_group = episode["supervision"].get("respondent_id", episode["group_id"]) if episode["source"] in ("swissmetro", "sushi3_2016") else episode["group_id"]
                 official = episode["provenance"].get("official_split")
                 split = assign_split(episode["source"], str(split_group), policy, official)
                 handles[split].write(json.dumps(episode, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False) + "\n")
