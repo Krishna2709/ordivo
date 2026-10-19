@@ -21,9 +21,23 @@ The supervised reference remains alias-plus-EOS completion CE through
 Direct NLL/Brier is a separate controlled experiment. Temperature calibration
 fits only a fourth, disjoint calibration partition for an explicitly named
 event; SFT/early-stop validation and final test cannot enter the fitting function.
-Accepted event names are `conditional_booking_choice` (only among exposed,
-eligible, exactly-one-booking groups) and `stated_choice`. Graded relevance is
-not treated as a choice event.
+The fitting API reads all four frozen split files, checks hashes and group
+disjointness against the manifest, verifies the selected calibration group IDs,
+and records their digest. Applying the temperature requires the same event,
+candidate-population protocol, and manifest hash. Accepted events are
+`conditional_booking_choice` (only among exposed, eligible, exactly-one-booking
+groups) and `stated_choice`. Graded relevance is not a choice event.
+
+The source-only `train_v2_supervised.py` defines a bounded shared-adapter pilot:
+equal-domain round-robin sampling, one complete query per update, categorical
+NLL for stated/conditional booking choices and normalized-gain listwise loss
+for observed/graded relevance. Zero-gain groups are counted as excluded from
+loss; they are not converted into a false preference target. It uses train and
+validation only, caps optimizer steps and runtime, selects on macro-domain
+validation loss, saves the best adapter, and checks reload. The sample config
+is not an execution authorization. Real source acquisition, rights and baseline
+evidence must be reviewed before starting this pilot; two domains would still
+be preliminary research.
 
 ## Remote evidence gates
 
@@ -40,7 +54,7 @@ Required command, after the source commit is copied to the remote checkout:
 
 ```bash
 python -m pytest -q tests/test_option_policy.py tests/test_behavioral_rendering.py tests/test_calibration.py
-python scripts/check_v2_training_compatibility.py --output /workspace/receipts/v2-training-compatibility
+    python scripts/check_v2_training_compatibility.py --output /workspace/receipts/v2-training-compatibility
 ```
 
 The GPU receipt must show finite loss, nonzero finite LoRA gradients, exact

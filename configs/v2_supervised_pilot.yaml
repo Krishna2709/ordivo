@@ -1,0 +1,28 @@
+# Source template only. Root must substitute acquired, hashed grouped manifests.
+model_id: LiquidAI/d1-3B
+revision: 051bcc464b01b9f92942b364d9586b0ef5912432
+seed: 42
+max_steps: 40
+max_runtime_seconds: 1800
+validation_interval: 10
+max_length: 2048
+learning_rate: 0.0001
+wandb_project: liquid-mcdm-lab
+wandb_mode: offline
+lora:
+  r: 8
+  alpha: 16
+  dropout: 0.0
+  target_modules: [q_proj, k_proj, v_proj, out_proj, in_proj, w1, w2, w3]
+sources:
+  - name: expedia
+    directory: /workspace/data/expedia-frozen
+    feature_policy:
+      context_features: [srch_length_of_stay]
+      alternative_features: [price_usd, prop_review_score]
+      prediction_event: conditional_booking_choice
+  - name: esci
+    directory: /workspace/data/esci-frozen
+    feature_policy:
+      context_features: [query, locale]
+      alternative_features: [product_title, product_description, product_bullet_point, product_brand, product_color]
