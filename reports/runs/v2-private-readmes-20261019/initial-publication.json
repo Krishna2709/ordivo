@@ -1,0 +1,30 @@
+{
+  "artifacts": [
+    {
+      "bytes": 25920,
+      "forced_download_sha256": "30985d045750fa82410b7f17e698fa5fed5769d74f123225640917eba37a919b",
+      "private_after": true,
+      "private_before": true,
+      "readme_sha256": "30985d045750fa82410b7f17e698fa5fed5769d74f123225640917eba37a919b",
+      "repo": "blackOrder/Ordivo-v2-research",
+      "repo_commit": "dbdc03873a9a8b9876b1c0ba74d5340b202fbc16",
+      "repo_type": "model",
+      "source_commit": "c88c79ad10674fdbaf0446b2ac602ae6e3d9ef53",
+      "source_path": "hub/v2_research_model/README.md"
+    },
+    {
+      "bytes": 9441,
+      "forced_download_sha256": "dcfaffdddf790871e93a34365d4f97723cf82500a4531bd1c1d339461c7d7c5a",
+      "private_after": true,
+      "private_before": true,
+      "readme_sha256": "dcfaffdddf790871e93a34365d4f97723cf82500a4531bd1c1d339461c7d7c5a",
+      "repo": "blackOrder/Ordivo-v2-research-data",
+      "repo_commit": "cc69f3c0d44af262eeb4087f54c1d93bdbba0640",
+      "repo_type": "dataset",
+      "source_commit": "c88c79ad10674fdbaf0446b2ac602ae6e3d9ef53",
+      "source_path": "hub/v2_research_data/README.md"
+    }
+  ],
+  "public_release": false,
+  "schema_version": "ordivo-v2-private-readme-publication-v1"
+}

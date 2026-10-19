@@ -1,0 +1,15 @@
+{
+  "dataset_readme_sha256": "dcfaffdddf790871e93a34365d4f97723cf82500a4531bd1c1d339461c7d7c5a",
+  "dataset_repo_commit": "cc69f3c0d44af262eeb4087f54c1d93bdbba0640",
+  "dataset_repo_unchanged": "blackOrder/Ordivo-v2-research-data",
+  "model_readme_forced_readback_sha256": "e829941642607d5e3970359c303030086cd75dffa454e77743ac42b6aefce243",
+  "model_readme_sha256": "e829941642607d5e3970359c303030086cd75dffa454e77743ac42b6aefce243",
+  "model_readme_source_commit": "b5ae53698253c97ba7b85270d7176948dc7dc412",
+  "model_repo": "blackOrder/Ordivo-v2-research",
+  "model_repo_commit": "9f83bbdf1e7c646453e7ae736432ce07ca7a16f1",
+  "model_repo_private_after": true,
+  "model_repo_private_before": true,
+  "public_release": false,
+  "schema_version": "ordivo-v2-private-readme-supersession-v1",
+  "supersedes_publication_receipt_sha256": "9a46b496c66fead8ff4ad674d430d4fc57a3832c62f631222e56da9893a40ddc"
+}

@@ -136,6 +136,18 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   (SHA-256 `d977a0ba001fb98f7372420681945c933b546eb16bbec38d4acf50941ff1f86b`).
   Sanitized public summaries are in
   `reports/runs/v2-operations-closeout-20261019/`.
+- Final **private** Hub README publication was force-downloaded and SHA
+  reconciled. Model repository `blackOrder/Ordivo-v2-research` remains private
+  at commit `9f83bbdf1e7c646453e7ae736432ce07ca7a16f1`, README SHA-256
+  `e829941642607d5e3970359c303030086cd75dffa454e77743ac42b6aefce243`.
+  Dataset repository `blackOrder/Ordivo-v2-research-data` remains private at
+  commit `cc69f3c0d44af262eeb4087f54c1d93bdbba0640`, README SHA-256
+  `dcfaffdddf790871e93a34365d4f97723cf82500a4531bd1c1d339461c7d7c5a`.
+  The final [superseding publication receipt](../../reports/runs/v2-private-readmes-20261019/final-supersession.json)
+  SHA-256 is `4b777710bdb9ae4b11acb99dbb053b5f55e6eea64f9e880b396aa87939cddcac`;
+  the [initial private publication receipt](../../reports/runs/v2-private-readmes-20261019/initial-publication.json)
+  SHA-256 is `9a46b496c66fead8ff4ad674d430d4fc57a3832c62f631222e56da9893a40ddc`.
+  These are access-controlled research cards, not public v2 release artifacts.
 - V2 behavioral data reviewer-fix tests at `2f417cbe28e77e7303d3c7fbfdf3d3d80bcf720f`
   passed 19/0 on the remote pod. Release-report source tests at `178d1fd4`
   passed 7/0. These are component tests, not real-data performance evidence.
