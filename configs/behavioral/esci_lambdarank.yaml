@@ -1,5 +1,6 @@
 experiment_id: ordivo-v2-esci-lexical-ranker-v1
 source: amazon_esci
+candidate_pool_scope: source_task1_reduced_candidate_list
 seed: 42
 target_policy:
   policy_id: esci-task1-official-gain-v1

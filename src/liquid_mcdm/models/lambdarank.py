@@ -58,6 +58,9 @@ def fit_ranker(train: list[Mapping], validation: list[Mapping], config: Mapping,
         raise FileExistsError(output)
     policy = config["target_policy"]
     policy_id = policy["policy_id"]
+    if (policy_id == EXPEDIA_POLICY and
+            config["feature_policy"].get("prediction_event") != "combined_click_booking_relevance"):
+        raise ValueError("Expedia 0/1/5 LambdaRank requires combined_click_booking_relevance")
     if any(e["supervision"]["policy_id"] != policy_id for e in train + validation):
         raise ValueError("target policy mismatch")
     feature_state = FeatureState(config["feature_policy"]).fit(train)

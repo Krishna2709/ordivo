@@ -10,7 +10,8 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import subprocess
+import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -45,13 +46,22 @@ def _aggregate(report: dict) -> dict:
 
 
 def _revision() -> str:
-    result = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True,
-                            cwd=Path(__file__).resolve().parents[1], check=True)
-    return result.stdout.strip()
+    revision = os.environ.get("ORDIVO_SOURCE_COMMIT", "")
+    if not re.fullmatch(r"[0-9a-f]{40}", revision):
+        raise ValueError("ORDIVO_SOURCE_COMMIT must be a controller-verified 40-hex archive commit")
+    return revision
+
+
+def validate_candidate_pool_scope(source: str, configured: str, declared: str) -> None:
+    expected = {"expedia_personalized_sort_2013": "source_exposed_candidates",
+                "amazon_esci": "source_task1_reduced_candidate_list"}.get(source)
+    if expected is None or configured != expected or declared != expected:
+        raise ValueError("candidate pool scope differs from source/config policy")
 
 
 def benchmark(config_path: Path, data_dir: Path, output_dir: Path) -> dict:
     runtime = require_remote_gpu()
+    code_revision = _revision()
     output_dir = output_dir.resolve()
     if output_dir != Path("/workspace") and Path("/workspace") not in output_dir.parents:
         raise ValueError("benchmark output must be under remote /workspace storage")
@@ -64,8 +74,8 @@ def benchmark(config_path: Path, data_dir: Path, output_dir: Path) -> dict:
     manifest = json.loads(manifest_path.read_text())
     if manifest.get("target_policy_id") != config["target_policy"]["policy_id"]:
         raise ValueError("manifest target policy differs from config")
-    if manifest.get("candidate_pool_scope") != "source_exposed_candidates":
-        raise ValueError("unsupported candidate pool scope")
+    validate_candidate_pool_scope(config["source"], config.get("candidate_pool_scope"),
+                                  manifest.get("candidate_pool_scope"))
     for split in ("train", "validation", "calibration", "test"):
         expected_hash = manifest.get("split_sha256", {}).get(split)
         if not expected_hash or _digest(data_dir / f"{split}.jsonl") != expected_hash:
@@ -113,7 +123,8 @@ def benchmark(config_path: Path, data_dir: Path, output_dir: Path) -> dict:
         _write_json(output_dir / f"{name}_scores.json", predictions)
         aggregate[name] = _aggregate(report)
     metadata = {"experiment_id": config["experiment_id"], "source": config["source"],
-                "code_revision": _revision(),
+                "code_revision": code_revision,
+                "code_revision_basis": "controller_verified_archive_env",
                 "runtime_provider": runtime["provider"], "config_sha256": _digest(config_path),
                 "manifest_sha256": _digest(manifest_path),
                 "source_sha256": manifest.get("source_sha256", {}),
