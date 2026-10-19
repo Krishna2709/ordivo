@@ -146,8 +146,13 @@ respectively. Both degraded relative to the start; R0 degrading less does not
 show a benefit. This is a selection diagnostic, with no continuation held-out
 score. The [sanitized receipt](../reports/runs/v2-continuation-20261019/summary.json)
 (SHA-256 `cc686cf66ee3d7daa777ecc8b3c1ccaedda5d546da96107ad1f18ea0bf055cc5`)
-records the exact source, config, schedule and reload evidence. Cloud/private
-artifact readback remains pending.
+records the exact source, config, schedule and reload evidence. Both
+[cloud runs](https://wandb.ai/black-order/liquid-mcdm-lab/runs/6ohymgld)
+(C1; R0 run `57fzcrlp`) finished with sanitized cloud-readback SHA-256
+`f9b02842db5e1d6d0747913a3f3e0a760cdcb95a147d17f45603f7b52c3d4580`.
+The private C1/R0 adapters passed forced SHA readback at Hub commit
+`4b43ec8767d2bb99ec835020c04d412c89cd26a4`, retention-manifest SHA-256
+`4c5dc14a52a25e74acfa9a013d4ecc3ba14dcd96d9c21c44f0b61c857bfb367d`.
 
 ## Known and anticipated failure modes
 
