@@ -1,0 +1,44 @@
+{
+  "candidate_pool_scope": "original_ten_item_questionnaire_sets",
+  "diagnostics": {},
+  "episode_count": 10000,
+  "episode_counts": {
+    "calibration": 586,
+    "test": 984,
+    "train": 7912,
+    "validation": 518
+  },
+  "judgment_policy": "complete_strict_order_of_exposed_ten",
+  "manifest_version": "ordivo-grouped-v1",
+  "missing_candidate_feature_counts": {},
+  "source": "sushi3_2016",
+  "source_profile": {
+    "candidate_rows": 100000,
+    "omitted_by_reason": {},
+    "omitted_groups_by_reason": {},
+    "raw_groups": 10000,
+    "raw_rows": 10000,
+    "retained_groups": 10000,
+    "retained_rows": 10000,
+    "selected_groups": 10000,
+    "selected_rows": 10000
+  },
+  "source_sha256": {
+    "items": "568d73580f82a9ffba7ee1a3750506a0517c9ce904eec41559fe4ab573911fde",
+    "order_a": "c56da325c0f58f9a38bafc650ed699b48dd2fb9f6ad64ba61ffc288d1ae4cc24",
+    "order_b": "a241c87331e4eabea5841aae0c8a982453cccd01b0a0f3b6a4e9cfabcdab563b",
+    "respondents": "592d345613b6fbc1d7d126775eb5fb5628619e855c292166250f09651716eca2"
+  },
+  "source_terms": "https://www.kamishima.net/sushi/ (research use; redistribution prohibited)",
+  "split_policy_id": "sushi3-2016-respondent-v1-calibration",
+  "split_sha256": {
+    "calibration": "8cab930759b366215690028febffcd6e2c2b2302a5d7cb0fd87773bc6206a1b1",
+    "test": "1539a41a78fcf195f1db395ce1d3deb733ae64acb2e0ed30fd02090e71bafbac",
+    "train": "9782220cb7dfad71e25050d5fca57fbcc05158d361955aa6eb1c2e722a458c8a",
+    "validation": "c16b07d1327de84813b16eb383a8d9df041b2ea7bc58464de8c2dd76bc9e3392"
+  },
+  "target_policy_id": "sushi3-2016-order-v1",
+  "task_counts": {
+    "explicit_ranking": 10000
+  }
+}

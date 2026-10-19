@@ -1,0 +1,22 @@
+{
+  "adapter_directory_sha256": "831fb319d8a2144ef26ed86a7c985ed3ca4b9662180ced32e28b6f4c469c612c",
+  "all_candidates_covered": true,
+  "base_id": "LiquidAI/d1-3B",
+  "base_revision": "051bcc464b01b9f92942b364d9586b0ef5912432",
+  "candidate_count": 3,
+  "finite_probabilities": true,
+  "hub_private": true,
+  "hub_repo": "blackOrder/Ordivo-v2-research",
+  "hub_revision": "bf1d425b4e6ffc392121d8fb0776e41b1af48c4a",
+  "illustrative_scores": {
+    "car": 0.0,
+    "swissmetro": 0.7549149990081787,
+    "train": 0.24508503079414368
+  },
+  "input_tokens": 345,
+  "probabilities_sum_to_one": true,
+  "result": "pass",
+  "source_archive_sha256": "778a3689f90c44afa572fc4ecd968a8853e53f5c5bb81e3356338485dd57c2a0",
+  "source_commit": "bd24814429211ad4dad4e9a58ba0137daa0bc76b",
+  "unavailable_car_probability_zero": true
+}
