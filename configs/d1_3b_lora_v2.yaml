@@ -33,7 +33,7 @@ output_dir: checkpoints/d1-mcdm-v2
 save_steps: 100
 save_total_limit: 2
 train_examples: 512
-eval_examples: 128
+eval_examples: 87
 comparison_examples: 16
 parity_examples: 8
 reload_examples: 16
