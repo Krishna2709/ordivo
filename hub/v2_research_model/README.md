@@ -48,6 +48,16 @@ is `cc686cf66ee3d7daa777ecc8b3c1ccaedda5d546da96107ad1f18ea0bf055cc5`
 at source `f69643794a932b14dac46b2e866667f5a7814bc4`; no continuation
 held-out result, cloud readback or private Hub retention is asserted here.
 
+A validation-only candidate-order probe of this frozen pilot found
+52/180 Swissmetro top-choice flips (28.89%) across 20 selected respondents,
+and 7/12 admitted ESCI flips (58.33%) from 20 selected queries; eight ESCI
+query groups overflowed in both orders. Mean probability L1 change was
+0.39663/0.31887. This is positional sensitivity, not an accuracy comparison;
+base d1 was not evaluated for this probe. Sanitized aggregate SHA-256:
+`1caff28407551758975ab5ebcf67abd3708f44fa8f2fa4a29ead7f04beeabad7`.
+Per-query retention and cloud readback remain pending; no public result should
+omit the 8/20 ESCI overflow denominator.
+
 ## Loading and scoring a label-free research request
 
 Use integrated project source `bd24814429211ad4dad4e9a58ba0137daa0bc76b` or a reviewed descendant with its dependency lock. The label-free `render_predictor_input` uses the same prompt/readout core as the executed pilot; the remote scoped 16-test and integrated 244-test suites passed at this source commit (archive SHA-256 `778a3689f90c44afa572fc4ecd968a8853e53f5c5bb81e3356338485dd57c2a0`). The private adapter files were force-downloaded and matched upload SHA-256 at Hub commit `bf1d425b4e6ffc392121d8fb0776e41b1af48c4a`; inspect its private artifact manifest when reproducing. The **illustrative** Swissmetro-style input below has no target, supervision, exposure, provenance, respondent, group or source identifier. Its numbers are examples, not a dataset row or expected model prediction. Apply the exact feature allowlist from the frozen pilot config to real authorized inputs.

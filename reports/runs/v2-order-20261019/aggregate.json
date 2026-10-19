@@ -1,0 +1,57 @@
+{
+  "by_source": {
+    "esci": {
+      "admitted_pairs": 12,
+      "excluded": {
+        "fewer_than_two_available": 0,
+        "overflow_both": 8,
+        "overflow_original": 0,
+        "overflow_permuted": 0
+      },
+      "failed_queries": 0,
+      "manifest_sha256": "9fd4065fc0db4586453a412123eb9ef393b1750cd8196bb11cad794d020f07cc",
+      "mean_l1_probability_change": 0.3188707303100576,
+      "schema_version": "ordivo-candidate-order-v1",
+      "selected_episodes": 20,
+      "selected_units": 20,
+      "selected_units_sha256": "85e4fb1b1759a23112657243c231dc313e93655c3070280ea77f33e942b9740c",
+      "source": "amazon_esci",
+      "top1_flip_rate": 0.5833333333333334
+    },
+    "swissmetro": {
+      "admitted_pairs": 180,
+      "excluded": {
+        "fewer_than_two_available": 0,
+        "overflow_both": 0,
+        "overflow_original": 0,
+        "overflow_permuted": 0
+      },
+      "failed_queries": 0,
+      "manifest_sha256": "dd3dc4b0713506f1664149993ca11022614a3ee850c335944ae37b5525af592a",
+      "mean_l1_probability_change": 0.3966283288473884,
+      "schema_version": "ordivo-candidate-order-v1",
+      "selected_episodes": 180,
+      "selected_units": 20,
+      "selected_units_sha256": "92252ab1fc60fa892e6af59b9da25198b21a9f83c857564e20eaa4d73a65d57e",
+      "source": "swissmetro",
+      "top1_flip_rate": 0.28888888888888886
+    }
+  },
+  "claim_scope": "validation_only_diagnostic_no_model_selection",
+  "config_sha256": "d485b950794772cf7aa61dd93e6903f5d051c41c331d9d6ffe01d42652caefb3",
+  "elapsed_seconds": 70.11119827535003,
+  "partition": "validation",
+  "pilot_best_step": 40,
+  "pilot_config_sha256": "c152e64d839082531d4ece9e66d330fa35ffddfbc442685742b9fd171de5462b",
+  "pilot_source_identity": {
+    "archive_sha256": "38454c8d667183d57c9c48ed0bcc3d3b32f214e2485c6bdb6bf99f6af0204faa",
+    "commit": "854de0877c8e7e380b7353a578e95ba9865d4e25"
+  },
+  "prompt_version": "behavioral-choice-v1",
+  "schema_version": "ordivo-candidate-order-run-v1",
+  "source_identity": {
+    "archive_sha256": "bafe4d600f7da2cc924c395e806b11e9a4dc0a8c76827e4aaf42a9f9d7772021",
+    "commit": "a19d32d275db0012cecb50aafff84f4a125fbf7a"
+  },
+  "status": "complete"
+}

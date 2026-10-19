@@ -101,6 +101,17 @@ artifact readback remains pending.
 
 The v1 synthetic pilot raised alias/order and calibration concerns; it provides no v2 evidence. For v2, inspect long or variable candidate sets, missing or incomparable units, repeated entities across splits, unavailable options, zero-positive and multi-positive groups, position bias in clicks, domain shift, language imbalance, near-ties, and conflicting/absent preferences. Record actual failures with sanitized examples only after remote evaluation. A lack of suitable evidence should yield `preferences_unknown` or explicit scenarios, not fabricated weights or a false `verified` label.
 
+A validation-only candidate-order diagnostic on the frozen pilot found
+52/180 Swissmetro top-choice flips (28.89%) across 20 selected respondents,
+with mean probability L1 change 0.39663. ESCI admitted 12/20 selected query
+groups after eight both-order prompt overflows; 7/12 admitted pairs flipped
+(58.33%), mean L1 change 0.31887. There were no evaluation failures after
+admission. This exposes positional sensitivity in the pilot; it does not
+measure accuracy loss or show that fine-tuning caused the effect, because base
+d1 was not evaluated in this diagnostic. The
++[sanitized receipt](../reports/runs/v2-order-20261019/aggregate.json) has
++SHA-256 `1caff28407551758975ab5ebcf67abd3708f44fa8f2fa4a29ead7f04beeabad7`.
+
 ## Reproduction and rights
 
 Public artifacts will include exact code/config/checksum references, a base-plus-adapter loading example, and commands for the permitted evaluation subset. Restricted source rows and individual predictions require source-specific authorization and remain out of the public package. The [v2 data card](V2_DATA_CARD_DRAFT.md) and per-source acquisition records govern source rights; an upstream dataset license cannot be assumed to grant rights to publish trained derivatives. The report may publish aggregate metrics only after rights and disclosure review.
