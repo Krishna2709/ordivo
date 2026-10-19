@@ -138,6 +138,10 @@ The declared probability floor ensures positive concentration and changes the
 raw option distribution; the exact expected-Brier expression and tests account
 for that transform. The finite-concentration stochastic Brier optimum need not
 equal the deterministic strictly proper Brier optimum.
-A future trainer must bind the event and candidate-population protocol to the
-verified episode and manifest, and bind the frozen reference report policy to
-an immutable adapter/source receipt; caller strings alone do not prove either.
+The proposed `scripts/train_v2_continuation.py` source binds the stated-choice
+event to verified Swissmetro episodes, all four source splits and the exact
+selected pilot cohorts. It binds the frozen reference report policy to the
+pilot receipt and adapter directory hash, then replays the same ordered
+Swissmetro and ESCI training examples for direct-Brier C1 and Dirichlet-report
+R0. Its source and tests require independent review before a GPU experiment;
+no R0 optimization or held-out result is claimed here.
