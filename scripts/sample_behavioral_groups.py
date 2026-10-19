@@ -19,6 +19,7 @@ SPLITS = ("train", "validation", "calibration", "test")
 POLICY = "sha256_smallest_source_split_episode_id_v1"
 SOURCE = "expedia_personalized_sort_2013"
 FROZEN_CAPS = {"train": 20000, "validation": 2000, "calibration": 2000, "test": 5000}
+FROZEN_PARENT_SHA256 = "3b14e3f30466a2da868ac636c8888bc42366f865737715a57a67f32866a02d92"
 
 
 def _sha256(path: Path) -> str:
@@ -31,6 +32,14 @@ def _sha256(path: Path) -> str:
 
 def _key(seed: int, source: str, split: str, episode_id: str) -> bytes:
     return hashlib.sha256(f"{seed}|{source}|{split}|{episode_id}".encode()).digest()
+
+
+def _require_parent_binding(config: dict, parent_bytes: bytes) -> str:
+    expected = config.get("expected_parent_manifest_sha256")
+    actual = hashlib.sha256(parent_bytes).hexdigest()
+    if expected != FROZEN_PARENT_SHA256 or actual != expected:
+        raise ValueError("full source manifest differs from predeclared audited parent hash")
+    return actual
 
 
 def _select_split(path: Path, *, source: str, split: str, seed: int, cap: int,
@@ -68,7 +77,8 @@ def _select_split(path: Path, *, source: str, split: str, seed: int, cap: int,
     selected_candidates = sum(len(json.loads(line)["alternatives"]) for _, _, line in selected)
     return selected, {"full_groups": count, "full_candidates": candidate_count,
                       "selected_groups": len(selected), "selected_candidates": selected_candidates,
-                      "excluded_groups": count - len(selected)}
+                      "excluded_groups": count - len(selected),
+                      "excluded_candidates": candidate_count - selected_candidates}
 
 
 def sample(config_path: Path, data_dir: Path, output: Path) -> dict:
@@ -90,6 +100,7 @@ def sample(config_path: Path, data_dir: Path, output: Path) -> dict:
         raise ValueError("invalid predeclared source, policy, seed or four-way caps")
     parent_path = data_dir / "manifest.json"
     parent_bytes = parent_path.read_bytes()
+    parent_sha256 = _require_parent_binding(config, parent_bytes)
     parent = json.loads(parent_bytes)
     if (parent.get("source") != SOURCE or
             parent.get("candidate_pool_scope") != "source_exposed_candidates" or
@@ -127,7 +138,7 @@ def sample(config_path: Path, data_dir: Path, output: Path) -> dict:
             separators=(",", ":")).encode()).hexdigest()
     sampling = {"policy": POLICY, "seed": config["seed"],
                 "config_sha256": hashlib.sha256(config_bytes).hexdigest(),
-                "parent_manifest_sha256": hashlib.sha256(parent_bytes).hexdigest(),
+                "parent_manifest_sha256": parent_sha256,
                 "parent_split_sha256": parent["split_sha256"],
                 "group_caps": caps, "by_split": counts,
                 "selected_episode_ids_sha256": selection_hashes,

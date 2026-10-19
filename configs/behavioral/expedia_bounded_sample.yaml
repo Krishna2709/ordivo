@@ -1,5 +1,6 @@
 # Predeclared exploratory complete-search sample from the built four-way source split.
 source: expedia_personalized_sort_2013
+expected_parent_manifest_sha256: 3b14e3f30466a2da868ac636c8888bc42366f865737715a57a67f32866a02d92
 seed: 42
 selection_policy: sha256_smallest_source_split_episode_id_v1
 group_caps:

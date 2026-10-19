@@ -5,7 +5,9 @@ import json
 
 import pytest
 
-from scripts.sample_behavioral_groups import SOURCE, _select_split
+from scripts.sample_behavioral_groups import (
+    FROZEN_PARENT_SHA256, SOURCE, _require_parent_binding, _select_split,
+)
 
 
 def episode(group, booked=False):
@@ -38,7 +40,7 @@ def test_sample_selection_ignores_source_order_and_outcomes(tmp_path):
     assert [item[1] for item in chosen_a] == [item[1] for item in chosen_b]
     assert counts_a == counts_b == {"full_groups": 4, "full_candidates": 8,
                                     "selected_groups": 2, "selected_candidates": 4,
-                                    "excluded_groups": 2}
+                                    "excluded_groups": 2, "excluded_candidates": 4}
     original_by_id = {row["episode_id"]: row for row in rows}
     assert all(json.loads(raw) == original_by_id[episode_id]
                for _, episode_id, raw in chosen_a)
@@ -66,3 +68,14 @@ def test_sample_rejects_duplicate_group_inside_split(tmp_path):
     digest = write_rows(path, [episode("q1"), episode("q1")])
     with pytest.raises(ValueError, match="duplicate group"):
         select(path, digest)
+
+
+def test_predeclared_parent_hash_rejects_internally_consistent_other_manifest():
+    config = {"expected_parent_manifest_sha256": FROZEN_PARENT_SHA256}
+    # This could describe a self-consistent replacement four-way source. The
+    # predeclared acquisition audit, not merely self-consistency, must bind it.
+    replacement = json.dumps({"episode_count": 4, "split_sha256": {"train": "a" * 64}}).encode()
+    with pytest.raises(ValueError, match="audited parent hash"):
+        _require_parent_binding(config, replacement)
+    with pytest.raises(ValueError, match="audited parent hash"):
+        _require_parent_binding({"expected_parent_manifest_sha256": "0" * 64}, replacement)
