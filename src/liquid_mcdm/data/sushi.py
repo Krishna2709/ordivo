@@ -13,6 +13,13 @@ SOURCE = "sushi3_2016"
 SERIES = (("a", 10), ("b", 100))
 ITEM_FIELDS = ("item_name", "style", "major_group", "minor_group", "oiliness",
                "eating_frequency", "normalized_price", "shop_availability")
+OFFICIAL_SHA256 = {
+    "order_a": "c56da325c0f58f9a38bafc650ed699b48dd2fb9f6ad64ba61ffc288d1ae4cc24",
+    "order_b": "a241c87331e4eabea5841aae0c8a982453cccd01b0a0f3b6a4e9cfabcdab563b",
+    "items": "568d73580f82a9ffba7ee1a3750506a0517c9ce904eec41559fe4ab573911fde",
+    "respondents": "592d345613b6fbc1d7d126775eb5fb5628619e855c292166250f09651716eca2",
+}
+OFFICIAL_RESPONDENTS = 5000
 
 
 def _tab_rows(path: Path, width: int) -> list[list[str]]:
@@ -41,7 +48,7 @@ def _order_rows(path: Path, universe: int) -> Iterator[list[str]]:
 
 
 def iter_episodes(order_a: Path, order_b: Path, items: Path, respondents: Path,
-                  policy: dict) -> Iterator[DecisionEpisode]:
+                  policy: dict, *, verify_official: bool = True) -> Iterator[DecisionEpisode]:
     """Keep each complete original ten-item set and align respondents by row."""
     order_a, order_b, items, respondents = map(Path, (order_a, order_b, items, respondents))
     item_rows = _tab_rows(items, 9)
@@ -59,6 +66,10 @@ def iter_episodes(order_a: Path, order_b: Path, items: Path, respondents: Path,
         raise ValueError("SUSHI respondent IDs must be unique and nonempty")
     source_hashes = {"order_a": file_sha256(order_a), "order_b": file_sha256(order_b),
                      "items": file_sha256(items), "respondents": file_sha256(respondents)}
+    if verify_official and source_hashes != OFFICIAL_SHA256:
+        raise ValueError("official SUSHI source hash mismatch")
+    if verify_official and len(respondent_rows) != OFFICIAL_RESPONDENTS:
+        raise ValueError("official SUSHI source must have 5,000 respondent rows")
     profile = policy["source_profile"] = {"raw_rows": 0, "selected_rows": 0,
                                           "omitted_by_reason": {}}
     orders = ( _order_rows(order_a, 10), _order_rows(order_b, 100) )
@@ -89,3 +100,5 @@ def iter_episodes(order_a: Path, order_b: Path, items: Path, respondents: Path,
     profile["raw_groups"] = profile["raw_rows"]
     profile["selected_groups"] = profile["selected_rows"]
     profile["omitted_groups_by_reason"] = {}
+    if verify_official and profile["raw_rows"] != 2 * OFFICIAL_RESPONDENTS:
+        raise ValueError("official SUSHI source must have 10,000 ranking episodes")
