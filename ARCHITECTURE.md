@@ -26,6 +26,13 @@ Metrics require complete valid probability distributions and missing predictions
 
 ## Extension points
 
+The planned v2 boundary is a shared context/candidate input with source-specific
+observed-choice, stated-choice, relevance, and explicit-ranking supervision.
+Adapters own field semantics and split units; evaluators own task-specific
+metrics. Shared-model experiments must test entire held-out domains.
+See [ADR 0007](docs/decisions/0007-v2-multidomain-decision-learning.md).
+This design is not yet implemented by the v1 modules above.
+
 Add a method by declaring its formula/domain/order/compromise contract and independent fixtures, then extend the generator/schema. Add behavioral datasets through a separate grouped loader; do not impersonate `synthetic_solver`. Add a model through the decision-input/probability boundary. Encoder set-ranking and full-ranking metrics are later distinct tasks, not implied by winner classification.
 
 The user requires remote resources only and selected Hugging Face Jobs after Colab allocation failures; see ADR0005. Pure functions remain reusable, but CLI/notebook entry points reject local workload execution. Source preparation stays local; generated datasets, caches, environments, runs and checkpoints stay remote. Colab is ephemeral: persistent artifacts and resumable checkpoints require an explicit remote destination.

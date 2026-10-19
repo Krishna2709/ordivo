@@ -17,6 +17,15 @@ Public release destinations:
 
 ## What is implemented
 
+**V2 research direction:** build a shared contextual decision model across
+travel choices, retail/search relevance, and transport preferences. Expedia is
+the first dataset, with ESCI, MSLR and Swissmetro in the planned benchmark suite.
+The [v1 audit](reports/V2_RESEARCH_AUDIT.md),
+[dataset register](docs/V2_DATASET_REGISTER.md), and
+[v2 implementation plan](docs/superpowers/plans/2026-10-18-ordivo-v2-baseline.md)
+define the next work. These are research plans; no real-data v2 model or
+benchmark results have been produced yet. The implemented items below are v1.
+
 - Pure NumPy teachers with explicit domains, normalization, tie groups and VIKOR compromise conditions.
 - Synthetic JSONL generator, disjoint scenario families, seed lineage, source/data hashes, full-precision labels, and revalidation.
 - Hand cases, independent cross-checks, invariance/degeneracy/rank-reversal tests.
