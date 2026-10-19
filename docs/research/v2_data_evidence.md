@@ -242,7 +242,14 @@ has SHA-256 `bd6a19be2715ee3c43b45607b4c0177bd318c124f4c17dab082a14d3f866b6fa`.
 It reconciles 10,000 raw/selected/retained ranking episodes and 100,000
 candidate rows, no omissions, across train/validation/calibration/test counts
 7,912/518/586/984. All four source hashes match the pinned author files;
-respondent-disjoint readback and scored evaluation are pending.
+a [full private-split readback](../../../ordivo-v2-operations/reports/runs/v2-swarm-20261019T030009Z/sushi-fourway-audit.json)
+(SHA-256 `cd3ac809857826751939ccb0929c90272ad4eea98d3381ac19e9d87d997d40e1`)
+found 5,000 unique respondents, one A and one B ranking each, and no
+respondent in more than one partition. Every episode has exactly ten distinct
+available original candidates; its alternative list is numeric-ID sorted and
+set-equal to the ranked targets. All four split byte hashes match the manifest.
+One target ranking happens to equal ID sort by coincidence; the adapter does
+not use target order to arrange alternatives. Scored evaluation remains pending.
 No raw/derived data may be redistributed, and derivative-weight rights remain
 unresolved, so SUSHI is excluded from neural training configuration.
 The [official MSLR page](https://www.microsoft.com/en-us/research/project/mslr/)
