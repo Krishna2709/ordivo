@@ -1,6 +1,6 @@
 # Ordivo v2 research adapter (private)
 
-**Status:** preliminary, access-controlled research. This repository is not a public v2 release or a claim of held-out neural quality. It is separate from the published Ordivo v1 synthetic adapter. The current bounded pilot trained one shared adapter on Swissmetro stated choice and Amazon ESCI graded relevance; it has no Expedia training, no three-domain generality result, and no completed public release dossier. The model repository is `blackOrder/Ordivo-v2-research` and should remain private.
+**Status:** preliminary, access-controlled pilot, **not a release candidate**. This repository is not a public v2 release or a claim of held-out neural improvement. It is separate from the published Ordivo v1 synthetic adapter. The current bounded pilot trained one shared adapter on Swissmetro stated choice and Amazon ESCI graded relevance; it has no Expedia training, no three-domain generality result, and no completed public release dossier. The model repository is `blackOrder/Ordivo-v2-research` and should remain private.
 
 ## Exact model and task boundary
 
@@ -12,7 +12,7 @@ For `stated_choice`, output is a conditional distribution over **the supplied av
 
 ## Research artifact ledger
 
-The remote pilot receipt records 40 optimizer steps, best step 40, 20 updates per source, a nonzero LoRA update, and zero observed reload-probe loss delta. Swissmetro selection-validation loss changed from 1.1358 to 0.8577; ESCI from 3.1603 to 2.6311 on the selected eligible groups. ESCI rendered 71 of 100 selected validation groups; 29 complete groups exceeded the 2,048-token cap and were excluded explicitly. These are training-selection diagnostics, **not held-out accuracy, ranking quality, calibration, or transfer evidence**. Neural held-out evaluation and paired uncertainty remain pending. The receipt SHA-256 is `5f58e02b3259601d9663892f50e32460a57be2d424724ec283d87ecb8678f7c1`.
+The remote pilot receipt records 40 optimizer steps, best step 40, 20 updates per source, a nonzero LoRA update, and zero observed reload-probe loss delta. Swissmetro selection-validation loss changed from 1.1358 to 0.8577; ESCI from 3.1603 to 2.6311 on the selected eligible groups. ESCI rendered 71 of 100 selected validation groups; 29 complete groups exceeded the 2,048-token cap and were excluded explicitly. These are training-selection diagnostics, **not held-out accuracy, ranking quality, calibration, or transfer evidence**. A bounded paired held-out probe has now measured mixed/negative results below; paired intervals and protected release evaluation remain pending. The receipt SHA-256 is `5f58e02b3259601d9663892f50e32460a57be2d424724ec283d87ecb8678f7c1`.
 
 | Expected private run-folder item | State / verification rule |
 |---|---|
@@ -20,9 +20,23 @@ The remote pilot receipt records 40 optimizer steps, best step 40, 20 updates pe
 | `supervised-pilot/20261019T030009Z/pilot-854de/pilot_receipt.json` | Private upload/readback passed; SHA-256 `5f58e02b3259601d9663892f50e32460a57be2d424724ec283d87ecb8678f7c1` |
 | `supervised-pilot/20261019T030009Z/pilot-854de/effective_config.yaml` and `environment.json` | Private upload/readback passed; exact hashes in manifest |
 | `supervised-pilot/20261019T030009Z/pilot-854de/artifact_manifest.json` | Private upload/readback passed; nine allowlisted files plus manifest; Hub commit `bf1d425b4e6ffc392121d8fb0776e41b1af48c4a` |
-| Held-out neural evaluation, calibration, cost, and rights decision | Pending; no value should be inferred from validation loss |
+| Bounded paired held-out neural probe | Measured below; adapted model did not improve accuracy or NDCG on admitted groups; not the protected release test |
+| Full evaluation, calibration, cost, and rights decision | Pending; no release decision follows from this pilot |
 
 The private dataset repository is `blackOrder/Ordivo-v2-research-data`. Its source manifests define four disjoint roles: train, model-selection validation, calibration, and final test. The pilot consumed Swissmetro manifest SHA-256 `dd3dc4b0713506f1664149993ca11022614a3ee850c335944ae37b5525af592a` and ESCI manifest SHA-256 `9fd4065fc0db4586453a412123eb9ef393b1750cd8196bb11cad794d020f07cc`. Keep exact executed hashes, even if a later metadata-only manifest revision preserves split bytes.
+
+## Bounded held-out probe: mixed and negative results
+
+An exploratory paired probe used the same selected held-out units for base d1 and the private adapted pilot. The [sanitized aggregate](../../reports/runs/v2-neural-heldout-20261019/aggregate.json) has SHA-256 `a735c1db8810f9d9955152bbe16651e690c921e7330596cedc117d2358a19c8a`, executed source `854de0877c8e7e380b7353a578e95ba9865d4e25`, evaluation config SHA-256 `524bfe7cde8135132417ed029a8fb2738bd5ffd068f9190d081c6246aaaadc06`, and the frozen source-manifest hashes above. A private [W&B run](https://wandb.ai/black-order/liquid-mcdm-lab/runs/3zdzt6ik) records sanitized aggregates; per-query files remain private.
+
+| Endpoint | Base d1 | Adapted pilot | Coverage |
+|---|---:|---:|---|
+| Swissmetro stated-choice accuracy@1 | 0.68 (306/450) | 0.66 (297/450) | 450/450 selected scenarios from 50 held-out respondents |
+| Swissmetro choice NLL ↓ | 0.805878 | 0.758958 | Same 450 scenarios |
+| Swissmetro choice Brier ↓ | 0.459254 | 0.462190 | Same 450 scenarios |
+| ESCI judged-pool NDCG@10 | 0.778290 | 0.752276 | 27/50 selected held-out query groups; 23 prompt overflows |
+
+The adapted model loses 2 percentage points of Swissmetro top-1 accuracy and 0.0260146 ESCI NDCG@10 on admitted groups. NLL improves while Brier worsens on Swissmetro. There are no paired intervals, calibration fit, multi-seed replications, or entire-held-out-domain transfer result. ESCI prompt overflow is a material coverage failure; do not interpret 27/50 admitted queries as full test coverage. This probe is not the protected final release test. Private retention includes `heldout-probe/20261019T030009Z/paired-854de/aggregate.json` and per-query files; no per-query record belongs in a public report.
 
 ## Loading and scoring a validated research episode
 

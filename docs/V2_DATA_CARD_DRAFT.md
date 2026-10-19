@@ -1,6 +1,6 @@
 # Ordivo v2 data card — draft, no completed corpus
 
-**Status:** Swissmetro and ESCI source-bound manifests and a preliminary two-domain training subset have remote receipts; Expedia official source is acquired but grouped ingestion is pending. There is no frozen **public-release** v2 training mixture. Counts and hashes below refer to specific executed builds; source rights, retention and model-release rights remain source-specific. The [private research-data README](../hub/v2_research_data/README.md) describes the intended controlled Hub layout. See the [dataset register](V2_DATASET_REGISTER.md) and [release criteria](V2_RELEASE_CRITERIA.md).
+**Status:** Swissmetro and ESCI source-bound manifests and a preliminary two-domain training subset have remote receipts; their processed four-way splits and notices are retained with SHA readback in private dataset repo `blackOrder/Ordivo-v2-research-data` at commit `92df99f88ab12dd9c016f62e08ea15206600e98c`. Expedia official source is acquired but grouped ingestion is pending. There is no frozen **public-release** v2 training mixture. Counts and hashes below refer to specific executed builds; source rights and model-release rights remain source-specific. The [private research-data README](../hub/v2_research_data/README.md) describes the controlled Hub layout. See the [dataset register](V2_DATASET_REGISTER.md) and [release criteria](V2_RELEASE_CRITERIA.md).
 
 ## Sources and what their labels mean
 
