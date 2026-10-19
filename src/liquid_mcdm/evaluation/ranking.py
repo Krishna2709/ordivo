@@ -24,6 +24,34 @@ def ndcg_at_k(order: list[str], gains: Mapping[str, float], k: int) -> float | N
                for rank, i in enumerate(order[:k])) / denominator
 
 
+def tie_expected_ndcg_at_k(scores: Mapping[str, float], gains: Mapping[str, float],
+                           k: int) -> tuple[float | None, bool]:
+    """Exact expected NDCG if each equal-score block is uniformly permuted.
+
+    The boolean says a permutation can change DCG@k; a tie anywhere in a query
+    does not imply metric sensitivity.
+    """
+    if set(scores) != set(gains):
+        raise ValueError("tie analysis requires the exact judged candidate pool")
+    ideal = sorted(gains.values(), reverse=True)[:k]
+    denominator = sum(g / log2(rank + 2) for rank, g in enumerate(ideal))
+    if denominator == 0:
+        return None, False
+    order = ranked_ids(scores)
+    expected_dcg, sensitive, start = 0.0, False, 0
+    while start < len(order):
+        end = start + 1
+        while end < len(order) and scores[order[end]] == scores[order[start]]:
+            end += 1
+        block_gains = [gains[i] for i in order[start:end]]
+        if end - start > 1 and len(set(block_gains)) > 1 and start < k:
+            sensitive = True
+        mean_gain = sum(block_gains) / len(block_gains)
+        expected_dcg += sum(mean_gain / log2(rank + 2) for rank in range(start, min(end, k)))
+        start = end
+    return expected_dcg / denominator, sensitive
+
+
 def _macro(rows: list[dict], field: str) -> dict:
     values = [row["metrics"].get(field) for row in rows]
     eligible = [value for value in values if value is not None]

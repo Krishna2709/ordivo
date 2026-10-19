@@ -5,6 +5,9 @@ protected release test. Swissmetro classical test metrics were already visible
 when this probe was specified. Freeze the committed
 `configs/v2_neural_heldout.yaml` and exact pilot config/receipt before running;
 do not change training, feature policies or selection after viewing results.
+That config is frozen for the Swissmetro+ESCI fallback pilot. The separate
+`configs/v2_neural_heldout_expedia_esci.yaml` applies only if an Expedia+ESCI
+pilot completes; the runner requires exact source-key agreement.
 
 The remote runner verifies the pilot's completed receipt, saved best adapter,
 base model revision, exact feature policy, four split hashes and group-disjoint
