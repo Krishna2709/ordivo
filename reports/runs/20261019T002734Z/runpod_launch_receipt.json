@@ -1,0 +1,90 @@
+{
+  "adapter_manifest_sha256": "57e02404df22e987d7eadbe2984a03ac5f5ace1f9117ad12708d0c1958025d56",
+  "adapter_remote_path": "/workspace/runs/20261019T002734Z/training/adapter",
+  "attempt_history": [
+    {
+      "error_type": "RuntimeError",
+      "run_id": "20261018T235414Z",
+      "source_sha256": "1e89a4091f140832e92b7e0b2f85d6a2f206c170be8975513d187f072483deab",
+      "terminal_status": "failed",
+      "training_started": false
+    },
+    {
+      "cpu_acceptance_passed": true,
+      "error_type": "RuntimeError",
+      "run_id": "20261019T000332Z",
+      "source_sha256": "3ff568bc90f43b7ee2bc9932c013add5e203282d071465c45b3021de4d472904",
+      "terminal_status": "failed",
+      "training_started": false
+    },
+    {
+      "reason": "superseded_by_direct_training_on_validated_environment",
+      "run_id": "20261019T001641Z",
+      "source_sha256": "40092c7b3c16996f100b56596be1de8aec9fe478e24d2859b354c10dba1e1c1d",
+      "terminal_status": "cancelled_before_training",
+      "training_started": false
+    },
+    {
+      "error_type": "ImportError",
+      "reason": "optional_torchao_version_rejected_by_peft",
+      "run_id": "20261019T002233Z",
+      "source_sha256": "3ff568bc90f43b7ee2bc9932c013add5e203282d071465c45b3021de4d472904",
+      "terminal_status": "failed",
+      "training_started": false
+    },
+    {
+      "error_type": "RuntimeError",
+      "reason": "trl_1_15_uses_fractional_warmup_steps",
+      "run_id": "20261019T002516Z",
+      "source_sha256": "3ff568bc90f43b7ee2bc9932c013add5e203282d071465c45b3021de4d472904",
+      "terminal_status": "failed",
+      "training_started": false
+    }
+  ],
+  "cost_per_hour": 0.59,
+  "created_utc": "2026-10-18T23:54:14.849875+00:00",
+  "elapsed_hours_at_completion": 0.6283366530555555,
+  "environment_adjustment": "torchao omitted; TRL 1.15 fractional warmup_steps",
+  "estimated_pod_cost_usd": 0.3707186253027777,
+  "max_runtime_seconds": 7200,
+  "name": "liquid-mcdm-d1-overfit-20261018t235414z",
+  "network_volume_id": "ngica7qkhd",
+  "network_volume_preserved": true,
+  "optimizer_steps": 25,
+  "overfit_outcome": {
+    "accuracy_delta": 0.390625,
+    "base_train_accuracy": 0.28125,
+    "base_train_winner_nll": 1.5735638035133348,
+    "claim_scope": "64-example training subset only; not generalization evidence",
+    "improved": true,
+    "post_train_accuracy": 0.671875,
+    "post_train_winner_nll": 0.9932992945590178,
+    "winner_nll_delta": -0.580264508954317
+  },
+  "pod_deleted_utc": "2026-10-19T00:31:58.317910+00:00",
+  "pod_id": "xe1u74gznvk3jj",
+  "reaper_deadline_seconds": 7200,
+  "reaper_pid": 29026,
+  "reload_argmax_agreement": 1.0,
+  "reload_max_probability_delta": 0.030595471060246848,
+  "remote_output": "/workspace/runs/20261019T002734Z/training",
+  "remote_pid": 4484,
+  "remote_source": "/workspace/source/20261019T000332Z/decision-engines",
+  "remote_started_utc": "2026-10-19T00:27:37.337764+00:00",
+  "run_id": "20261019T002734Z",
+  "source_sha256": "3ff568bc90f43b7ee2bc9932c013add5e203282d071465c45b3021de4d472904",
+  "status": "pod_deleted",
+  "training_completed": true,
+  "training_metrics": {
+    "epoch": 1.5625,
+    "total_flos": 1385371965956832.0,
+    "train_loss": 0.72067702293396,
+    "train_runtime": 40.6227,
+    "train_samples_per_second": 2.462,
+    "train_steps_per_second": 0.615
+  },
+  "training_script_sha256": "36d9a8a82227f88665b42a413814a8e5ddd9f90a766174f64cc92bc457c0f05a",
+  "validated_environment_run_id": "20261019T000332Z",
+  "wandb_synced": true,
+  "wandb_url": "https://wandb.ai/liquid-mcdm-lab/runs/56i7klyd"
+}

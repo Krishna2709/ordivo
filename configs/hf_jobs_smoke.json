@@ -1,0 +1,15 @@
+{
+  "name": "liquid-mcdm-acceptance",
+  "namespace": "blackOrder",
+  "flavor": "t4-small",
+  "timeout_seconds": 600,
+  "image": "ghcr.io/astral-sh/uv@sha256:9aa60c50016c0485636ab9a830246a6ef3399aa4a8bab3d17ef4a2358fba2ca7",
+  "image_tag_resolved": "python3.12-bookworm",
+  "image_platform": "linux/amd64",
+  "image_resolved_date": "2026-10-18",
+  "compute_usd_per_hour_reference": 0.40,
+  "model_weights": false,
+  "training": false,
+  "wandb_mode": "offline",
+  "secrets_in_job": []
+}

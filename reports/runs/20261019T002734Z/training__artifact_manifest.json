@@ -1,0 +1,45 @@
+{
+  "adapter_bytes": 115818206,
+  "files": [
+    {
+      "bytes": 5194,
+      "path": "adapter/README.md",
+      "sha256": "1844b8fcb0a25fc46b54ffbb99fe1b3a623580c76ada4c07f287360da1274993"
+    },
+    {
+      "bytes": 1182,
+      "path": "adapter/adapter_config.json",
+      "sha256": "e5b227c37bcd973e8796309f24a166905ae8b20d13e998f76b6d582cfbeaaf06"
+    },
+    {
+      "bytes": 97894520,
+      "path": "adapter/adapter_model.safetensors",
+      "sha256": "ae1ba85962d6f4c87f14b055c6290ef142a25d6794207b9d5ebcc45d8493b282"
+    },
+    {
+      "bytes": 5436,
+      "path": "adapter/chat_template.jinja",
+      "sha256": "86f4770449a4797c9b4212d110b0cc70fb993c1ce960095bcfb12eea22f61cca"
+    },
+    {
+      "bytes": 17905589,
+      "path": "adapter/tokenizer.json",
+      "sha256": "c4687c0046da6579aba6f9aa713e9bed61e5fd210b0e012028ae57751d028689"
+    },
+    {
+      "bytes": 508,
+      "path": "adapter/tokenizer_config.json",
+      "sha256": "95243b671215ec52551df257d55121de55f15eb8bc40eab459a91dc09f3a130d"
+    },
+    {
+      "bytes": 5777,
+      "path": "adapter/training_args.bin",
+      "sha256": "92cc5a27f0770e7c8d419d99598b04481f9f77181c870a2a80a03d25e2b306c9"
+    }
+  ],
+  "run_id": "20261019T002734Z",
+  "terminal_interpretation": "training_completed_adapter_saved_reload_argmax_exact_probability_variance",
+  "wandb_project": "liquid-mcdm-lab",
+  "wandb_run_id": "56i7klyd",
+  "wandb_synced": true
+}

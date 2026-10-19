@@ -1,0 +1,18 @@
+{
+  "backend": "tokenizers",
+  "bos_token": "<|startoftext|>",
+  "clean_up_tokenization_spaces": false,
+  "eos_token": "<|im_end|>",
+  "is_local": true,
+  "legacy": false,
+  "local_files_only": false,
+  "max_length": null,
+  "model_max_length": 1000000000000000019884624838656,
+  "pad_to_multiple_of": null,
+  "pad_token": "<|pad|>",
+  "pad_token_type_id": 0,
+  "padding_side": "left",
+  "processor_class": "Lfm2VlProcessor",
+  "tokenizer_class": "TokenizersBackend",
+  "use_default_system_prompt": false
+}

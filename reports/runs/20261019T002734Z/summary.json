@@ -1,0 +1,47 @@
+{
+  "adapter_remote_path": "/workspace/runs/20261019T002734Z/training/adapter",
+  "adapter_weights_sha256": "ae1ba85962d6f4c87f14b055c6290ef142a25d6794207b9d5ebcc45d8493b282",
+  "claim_scope": "bounded synthetic overfit diagnostic; no generalization claim",
+  "estimated_pod_cost_usd": 0.3707186253027777,
+  "gpu": "NVIDIA A40, 46068 MiB, 580.173.02",
+  "held_out_accuracy": {
+    "after": 0.5,
+    "before": 0.375,
+    "examples": 16
+  },
+  "model": "LiquidAI/d1-3B",
+  "network_volume_id": "ngica7qkhd",
+  "network_volume_preserved": true,
+  "optimizer_steps": 25,
+  "overfit_outcome": {
+    "accuracy_delta": 0.390625,
+    "base_train_accuracy": 0.28125,
+    "base_train_winner_nll": 1.5735638035133348,
+    "claim_scope": "64-example training subset only; not generalization evidence",
+    "improved": true,
+    "post_train_accuracy": 0.671875,
+    "post_train_winner_nll": 0.9932992945590178,
+    "winner_nll_delta": -0.580264508954317
+  },
+  "pod_deleted": true,
+  "provider": "runpod",
+  "reload": {
+    "argmax_agreement": 1.0,
+    "max_probability_delta": 0.030595471060246848,
+    "threshold": 0.0001
+  },
+  "revision": "051bcc464b01b9f92942b364d9586b0ef5912432",
+  "run_id": "20261019T002734Z",
+  "train_metrics": {
+    "epoch": 1.5625,
+    "total_flos": 1385371965956832.0,
+    "train_loss": 0.72067702293396,
+    "train_runtime": 40.6227,
+    "train_samples_per_second": 2.462,
+    "train_steps_per_second": 0.615
+  },
+  "training_completed": true,
+  "training_validation_failure": "RuntimeError",
+  "training_validation_status": "failed",
+  "wandb_url": "https://wandb.ai/liquid-mcdm-lab/runs/56i7klyd"
+}

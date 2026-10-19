@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "liquid-mcdm-lab"
+version = "0.1.0"
+description = "Reproducible exact MCDM teachers and decision-model research"
+requires-python = ">=3.11,<3.14"
+dependencies = ["numpy==2.2.6", "PyYAML==6.0.2"]
+
+[project.optional-dependencies]
+tracking = ["wandb==0.22.3"]
+dev = ["pip==25.2", "pytest==8.4.2", "pymcdm==1.3.1", "nbformat==5.10.4", "nbclient==0.10.2", "ipykernel==6.30.1", "ruff==0.14.1"]
+tokenizer = ["transformers==5.19.0"]
+
+[project.scripts]
+liquid-mcdm = "liquid_mcdm.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/liquid_mcdm"]

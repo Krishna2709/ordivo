@@ -1,0 +1,37 @@
+{
+  "count": 1000,
+  "family_assignments": {
+    "test": [
+      "anticorrelated",
+      "near_tie"
+    ],
+    "train": [
+      "iid_uniform",
+      "correlated_quality",
+      "lognormal_tradeoff"
+    ],
+    "val": [
+      "clustered"
+    ]
+  },
+  "generator": "synthetic-v1",
+  "label_provenance": "synthetic_solver",
+  "numpy_version": "2.2.6",
+  "schema_version": 1,
+  "seed": 42,
+  "split_policy": "disjoint_families_before_sampling_no_augmentation",
+  "splits": {
+    "test": {
+      "count": 100,
+      "sha256": "a5ffedc0829cfa3474f9b99fab9495bd08309ed841a94149e76253b1d5962f87"
+    },
+    "train": {
+      "count": 800,
+      "sha256": "86b067e3afe0df739e0708dab4fe3da6baef5c7523e459ad1fb5ded42ee85a29"
+    },
+    "val": {
+      "count": 100,
+      "sha256": "35840bd0701116af600157f005590b34a9c95c04c86ff90bb23997aa333991d2"
+    }
+  }
+}

@@ -1,0 +1,277 @@
+{
+  "retrieved_on": "2026-10-18",
+  "method": "Public HTTPS API metadata and small source files only; no remote code executed or weights downloaded.",
+  "models": {
+    "d1-3B": {
+      "repo_id": "LiquidAI/d1-3B",
+      "revision": "051bcc464b01b9f92942b364d9586b0ef5912432",
+      "files": {
+        "LICENSE": {
+          "url": "https://huggingface.co/LiquidAI/d1-3B/resolve/051bcc464b01b9f92942b364d9586b0ef5912432/LICENSE",
+          "sha256": "4d28ca14dedc0b3d0fcc2b3339f0e79931faa33874f3d24f522183a8fc70068c",
+          "local_path": "research/upstream/d1-3B/LICENSE",
+          "bytes": 10574
+        },
+        "README.md": {
+          "url": "https://huggingface.co/LiquidAI/d1-3B/resolve/051bcc464b01b9f92942b364d9586b0ef5912432/README.md",
+          "sha256": "175b0bd5f0b4272a67723e16d5e1994e7a8c2d162e7797c9f1c24c01fed83f1d",
+          "local_path": "research/upstream/d1-3B/README.md",
+          "bytes": 10448
+        },
+        "api.py": {
+          "url": "https://huggingface.co/LiquidAI/d1-3B/resolve/051bcc464b01b9f92942b364d9586b0ef5912432/api.py",
+          "sha256": "94e9f82eabfdf92c4abe1153e9a6dc4dd9821f9cc2fec3221e79e70723d8ada0",
+          "local_path": "research/upstream/d1-3B/api.py",
+          "bytes": 3478
+        },
+        "chat_template.jinja": {
+          "url": "https://huggingface.co/LiquidAI/d1-3B/resolve/051bcc464b01b9f92942b364d9586b0ef5912432/chat_template.jinja",
+          "sha256": "86f4770449a4797c9b4212d110b0cc70fb993c1ce960095bcfb12eea22f61cca",
+          "local_path": "research/upstream/d1-3B/chat_template.jinja",
+          "bytes": 5436
+        },
+        "config.json": {
+          "url": "https://huggingface.co/LiquidAI/d1-3B/resolve/051bcc464b01b9f92942b364d9586b0ef5912432/config.json",
+          "sha256": "0cbac0f580bd8036ef94ac83aa632a57a170e66d20f381ef47c3f6486c9a3e8c",
+          "local_path": "research/upstream/d1-3B/config.json",
+          "bytes": 2773
+        },
+        "hybrid.py": {
+          "url": "https://huggingface.co/LiquidAI/d1-3B/resolve/051bcc464b01b9f92942b364d9586b0ef5912432/hybrid.py",
+          "sha256": "ce579827b952a6978a3560f70e74be9e228f9029de46048996b0c5f58d7f1f39",
+          "local_path": "research/upstream/d1-3B/hybrid.py",
+          "bytes": 14416
+        },
+        "lfm2_vl.py": {
+          "url": "https://huggingface.co/LiquidAI/d1-3B/resolve/051bcc464b01b9f92942b364d9586b0ef5912432/lfm2_vl.py",
+          "sha256": "f9e8d3354572a169237865283594b0364209fdb858901121b9f99147328b5d95",
+          "local_path": "research/upstream/d1-3B/lfm2_vl.py",
+          "bytes": 5602
+        },
+        "modeling_d1.py": {
+          "url": "https://huggingface.co/LiquidAI/d1-3B/resolve/051bcc464b01b9f92942b364d9586b0ef5912432/modeling_d1.py",
+          "sha256": "7fc6a001f80fc2d146f2a51128478f3b3bd4f1423a3ac129bc10f3fd0caf1d98",
+          "local_path": "research/upstream/d1-3B/modeling_d1.py",
+          "bytes": 1335
+        },
+        "prompt.py": {
+          "url": "https://huggingface.co/LiquidAI/d1-3B/resolve/051bcc464b01b9f92942b364d9586b0ef5912432/prompt.py",
+          "sha256": "a20b5f52e41a6d29e694bb8c861a5a4803ce3eb69364edad79511ccf8edb5c31",
+          "local_path": "research/upstream/d1-3B/prompt.py",
+          "bytes": 12478
+        },
+        "runner.py": {
+          "url": "https://huggingface.co/LiquidAI/d1-3B/resolve/051bcc464b01b9f92942b364d9586b0ef5912432/runner.py",
+          "sha256": "24d3ae718e9f9717771c0df39c93d324d00aa27bf3e12bab085c0922096cb0dd",
+          "local_path": "research/upstream/d1-3B/runner.py",
+          "bytes": 11776
+        },
+        "tokenizer_config.json": {
+          "url": "https://huggingface.co/LiquidAI/d1-3B/resolve/051bcc464b01b9f92942b364d9586b0ef5912432/tokenizer_config.json",
+          "sha256": "ef6770d12dd9ac58d334e979bf160c5cdfd41f13d205fd5d5516857645feb0ea",
+          "local_path": "research/upstream/d1-3B/tokenizer_config.json",
+          "bytes": 507
+        }
+      },
+      "tokenizer_inspection": {
+        "url": "https://huggingface.co/LiquidAI/d1-3B/resolve/051bcc464b01b9f92942b364d9586b0ef5912432/tokenizer.json",
+        "sha256": "8096ecb9f54599d756c8de728a598a340bc1e43c0deb77ddd62456c38349fcee",
+        "bytes": 17905750,
+        "retained_full_file": false,
+        "vocabulary_examples": {
+          "A": 41,
+          "B": 42,
+          "C": 43,
+          "D": 44,
+          "Z": 66,
+          "00": 555,
+          "01": 4040,
+          "26": 1616,
+          "76": 9024,
+          "\u0120A": 334,
+          "\u0120B": 378,
+          "\u0120C": 340
+        },
+        "note": "Direct BPE vocabulary inspection; verify actual tokenization and completion boundaries with pinned tokenizer before GPU training. \u0120 denotes the tokenizer space marker."
+      }
+    },
+    "d1-omni-600M": {
+      "repo_id": "LiquidAI/d1-omni-600M",
+      "revision": "02b55d7076f15129e59ab3f94783f32c4b088674",
+      "files": {
+        "LICENSE": {
+          "url": "https://huggingface.co/LiquidAI/d1-omni-600M/resolve/02b55d7076f15129e59ab3f94783f32c4b088674/LICENSE",
+          "sha256": "9953509cbd8c1c6ce7b06ddf74fcc204a892692316201dd8f7400a84790d4120",
+          "local_path": "research/upstream/d1-omni-600M/LICENSE",
+          "bytes": 10572
+        },
+        "README.md": {
+          "url": "https://huggingface.co/LiquidAI/d1-omni-600M/resolve/02b55d7076f15129e59ab3f94783f32c4b088674/README.md",
+          "sha256": "6577bee7b8cb23b595a90e99aa82007f57214d447f0ebcdfb2e812a7123d57bf",
+          "local_path": "research/upstream/d1-omni-600M/README.md",
+          "bytes": 10384
+        },
+        "audio.py": {
+          "url": "https://huggingface.co/LiquidAI/d1-omni-600M/resolve/02b55d7076f15129e59ab3f94783f32c4b088674/audio.py",
+          "sha256": "c5ff09d52d6a079e79d0505c89dbd0582ba2bc9abf2b26595d8d5b1d0c347bdf",
+          "local_path": "research/upstream/d1-omni-600M/audio.py",
+          "bytes": 11829
+        },
+        "config.json": {
+          "url": "https://huggingface.co/LiquidAI/d1-omni-600M/resolve/02b55d7076f15129e59ab3f94783f32c4b088674/config.json",
+          "sha256": "dfccae241822f81752426629c88c8b8d7efdd03dd19418b6645c604fad43d619",
+          "local_path": "research/upstream/d1-omni-600M/config.json",
+          "bytes": 1993
+        },
+        "encoder.py": {
+          "url": "https://huggingface.co/LiquidAI/d1-omni-600M/resolve/02b55d7076f15129e59ab3f94783f32c4b088674/encoder.py",
+          "sha256": "5f2e20319ee42a7367febf06c7653d7b3f9b28ef99a64cb9ec7739563dcfcffe",
+          "local_path": "research/upstream/d1-omni-600M/encoder.py",
+          "bytes": 7732
+        },
+        "modeling_d1.py": {
+          "url": "https://huggingface.co/LiquidAI/d1-omni-600M/resolve/02b55d7076f15129e59ab3f94783f32c4b088674/modeling_d1.py",
+          "sha256": "2b71a5c909ec5d3aa6307378a41a0fd24af1e17d5c1c1f8d510582147051a686",
+          "local_path": "research/upstream/d1-omni-600M/modeling_d1.py",
+          "bytes": 8655
+        },
+        "prompt.py": {
+          "url": "https://huggingface.co/LiquidAI/d1-omni-600M/resolve/02b55d7076f15129e59ab3f94783f32c4b088674/prompt.py",
+          "sha256": "a6b29a55ec8345f1fc1fdbfcc4b64d80d473dc4316f095a62c51cb6cce1194cf",
+          "local_path": "research/upstream/d1-omni-600M/prompt.py",
+          "bytes": 6309
+        },
+        "tokenizer_config.json": {
+          "url": "https://huggingface.co/LiquidAI/d1-omni-600M/resolve/02b55d7076f15129e59ab3f94783f32c4b088674/tokenizer_config.json",
+          "sha256": "03efc74b752b899b6292ff7e607738be59e6f206fec9aca32bbc05e9184090fc",
+          "local_path": "research/upstream/d1-omni-600M/tokenizer_config.json",
+          "bytes": 259
+        },
+        "vision.py": {
+          "url": "https://huggingface.co/LiquidAI/d1-omni-600M/resolve/02b55d7076f15129e59ab3f94783f32c4b088674/vision.py",
+          "sha256": "43ad71029f82e20fd26b97574627773d47639d7a3742c8b04fe5bf55f41c4c28",
+          "local_path": "research/upstream/d1-omni-600M/vision.py",
+          "bytes": 5233
+        }
+      }
+    },
+    "LFM2.5-Encoder-350M": {
+      "repo_id": "LiquidAI/LFM2.5-Encoder-350M",
+      "revision": "b886781f7c6f10ca9b7096e21b83e30a073c2f39",
+      "files": {
+        "LICENSE": {
+          "url": "https://huggingface.co/LiquidAI/LFM2.5-Encoder-350M/resolve/b886781f7c6f10ca9b7096e21b83e30a073c2f39/LICENSE",
+          "sha256": "4d28ca14dedc0b3d0fcc2b3339f0e79931faa33874f3d24f522183a8fc70068c",
+          "local_path": "research/upstream/LFM2.5-Encoder-350M/LICENSE",
+          "bytes": 10574
+        },
+        "README.md": {
+          "url": "https://huggingface.co/LiquidAI/LFM2.5-Encoder-350M/resolve/b886781f7c6f10ca9b7096e21b83e30a073c2f39/README.md",
+          "sha256": "1e8659cbe458ef9250ad6b0e4f3792ae78d02ed69df2b92c60fee1dc77fab846",
+          "local_path": "research/upstream/LFM2.5-Encoder-350M/README.md",
+          "bytes": 13750
+        },
+        "config.json": {
+          "url": "https://huggingface.co/LiquidAI/LFM2.5-Encoder-350M/resolve/b886781f7c6f10ca9b7096e21b83e30a073c2f39/config.json",
+          "sha256": "559f88ddcebfb0a7b46ba99a074b17f3a951f278b3010a0f22fdf5d9cc358d11",
+          "local_path": "research/upstream/LFM2.5-Encoder-350M/config.json",
+          "bytes": 1503
+        },
+        "modeling_lfm2_bidirectional.py": {
+          "url": "https://huggingface.co/LiquidAI/LFM2.5-Encoder-350M/resolve/b886781f7c6f10ca9b7096e21b83e30a073c2f39/modeling_lfm2_bidirectional.py",
+          "sha256": "f171f518be2a07da48b17fdea5655cad0a2452ab548e90e8ae903143686647e2",
+          "local_path": "research/upstream/LFM2.5-Encoder-350M/modeling_lfm2_bidirectional.py",
+          "bytes": 7093
+        },
+        "special_tokens_map.json": {
+          "url": "https://huggingface.co/LiquidAI/LFM2.5-Encoder-350M/resolve/b886781f7c6f10ca9b7096e21b83e30a073c2f39/special_tokens_map.json",
+          "sha256": "03de0f13c1ba6ffdc6051cded0d0276f9eedb712ee0f5d4b16a102ea280dab5b",
+          "local_path": "research/upstream/LFM2.5-Encoder-350M/special_tokens_map.json",
+          "bytes": 120
+        },
+        "tokenizer_config.json": {
+          "url": "https://huggingface.co/LiquidAI/LFM2.5-Encoder-350M/resolve/b886781f7c6f10ca9b7096e21b83e30a073c2f39/tokenizer_config.json",
+          "sha256": "016985c5cbbde5da8a08e904472e8b280bcf5cb84c43c6af0721ca0c21adf121",
+          "local_path": "research/upstream/LFM2.5-Encoder-350M/tokenizer_config.json",
+          "bytes": 91978
+        }
+      }
+    }
+  },
+  "cookbook": {
+    "commit": "744c5b628a27adb4f219ff4a1d11e3d70259b369",
+    "files": {
+      "finetuning/notebooks/sft_for_decision_models_with_trl.ipynb": {
+        "url": "https://raw.githubusercontent.com/Liquid4All/cookbook/744c5b628a27adb4f219ff4a1d11e3d70259b369/finetuning/notebooks/sft_for_decision_models_with_trl.ipynb",
+        "sha256": "2d9f7827305de560fc4a47f0b87e1ae95df8c743aefff14bb851d35813d63985",
+        "local_path": "research/upstream/cookbook/finetuning/notebooks/sft_for_decision_models_with_trl.ipynb",
+        "bytes": 65389
+      },
+      "finetuning/notebooks/sft_for_decision_models_with_unsloth.ipynb": {
+        "url": "https://raw.githubusercontent.com/Liquid4All/cookbook/744c5b628a27adb4f219ff4a1d11e3d70259b369/finetuning/notebooks/sft_for_decision_models_with_unsloth.ipynb",
+        "sha256": "2a2faaea449a33585e28bcccecba5de9727ace3c5cbbeca9726833818aacc6b9",
+        "local_path": "research/upstream/cookbook/finetuning/notebooks/sft_for_decision_models_with_unsloth.ipynb",
+        "bytes": 69852
+      },
+      "LICENSE": {
+        "url": "https://raw.githubusercontent.com/Liquid4All/cookbook/744c5b628a27adb4f219ff4a1d11e3d70259b369/LICENSE",
+        "error": "HTTP Error 404: Not Found"
+      }
+    },
+    "license_status": "No root license file found in pinned public API directory listing; repository notebook snapshots retained for local research provenance, no blanket license assumption."
+  },
+  "packages": {
+    "transformers": {
+      "version": "5.19.0",
+      "url": "https://pypi.org/pypi/transformers/5.19.0/json",
+      "requires_python": ">=3.10.0",
+      "base_requirements": [
+        "huggingface-hub<3.0,>=1.31.0",
+        "numpy>=1.17",
+        "packaging>=20.0",
+        "pyyaml>=5.1",
+        "regex>=2025.10.22",
+        "tokenizers<0.24.0,>=0.23.1",
+        "typer",
+        "safetensors>=0.8.0",
+        "tqdm>=4.60"
+      ]
+    },
+    "trl": {
+      "version": "1.15.0",
+      "url": "https://pypi.org/pypi/trl/1.15.0/json",
+      "requires_python": ">=3.11",
+      "base_requirements": [
+        "accelerate>=1.4.0",
+        "datasets>=4.7.0",
+        "jinja2",
+        "packaging>20.0",
+        "transformers>=4.56.2"
+      ]
+    },
+    "peft": {
+      "version": "0.21.2",
+      "url": "https://pypi.org/pypi/peft/0.21.2/json",
+      "requires_python": ">=3.10.0",
+      "base_requirements": [
+        "numpy>=1.17",
+        "packaging>=20.0",
+        "psutil",
+        "pyyaml",
+        "torch>=1.13.0",
+        "transformers",
+        "tqdm",
+        "accelerate>=0.21.0",
+        "safetensors",
+        "huggingface_hub>=0.25.0"
+      ]
+    }
+  },
+  "validation": {
+    "model_weights_downloaded": false,
+    "remote_code_executed": false,
+    "training_executed": false,
+    "package_metadata_checked": true,
+    "gpu_compatibility_tested": false
+  }
+}

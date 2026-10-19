@@ -1,0 +1,19 @@
+{
+  "python": "3.12.11",
+  "platform": "macOS-26.1-arm64-arm-64bit",
+  "packages": {
+    "numpy": "2.2.6",
+    "torch": null,
+    "torchvision": null,
+    "transformers": "5.19.0",
+    "trl": null,
+    "peft": null,
+    "datasets": null,
+    "accelerate": null,
+    "torchao": null,
+    "wandb": "0.22.3"
+  },
+  "gpu": null,
+  "training_validated": false,
+  "note": "Hardware/package inventory only; no model forward or backward executed."
+}

@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Evidence report for the first LiquidAI d1-3B MCDM LoRA experiment.">
+  <title>Liquid MCDM Lab — Experiment 01</title>
+  <style>
+    :root {
+      --ink: #14263d;
+      --muted: #5f7182;
+      --paper: #f7f4ec;
+      --sheet: #fffdf7;
+      --line: #cbd3d3;
+      --blue: #176b87;
+      --blue-dark: #0e4b66;
+      --cyan: #58b4b8;
+      --amber: #e7a52e;
+      --red: #be4b3e;
+      --green: #2f7d62;
+      --purple: #72578f;
+      --shadow: 0 18px 50px rgba(20, 38, 61, .09);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(20,38,61,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20,38,61,.035) 1px, transparent 1px),
+        var(--paper);
+      background-size: 32px 32px;
+      font-family: Avenir, "Avenir Next", "Segoe UI", sans-serif;
+      line-height: 1.58;
+    }
+
+    a { color: var(--blue-dark); text-underline-offset: 3px; }
+    a:hover { color: var(--red); }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    :focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
+
+    .shell { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid rgba(20,38,61,.16);
+      background: rgba(247,244,236,.93);
+      backdrop-filter: blur(14px);
+    }
+    .topbar .shell {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 60px;
+      gap: 24px;
+    }
+    .mark { font-family: Georgia, serif; font-weight: 700; letter-spacing: -.02em; }
+    nav { display: flex; gap: 19px; overflow-x: auto; font-size: .85rem; white-space: nowrap; }
+    nav a { color: var(--muted); text-decoration: none; }
+
+    header { padding: 88px 0 64px; }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(270px, .55fr);
+      gap: 56px;
+      align-items: end;
+    }
+    .run-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--sheet);
+      color: var(--muted);
+      font-size: .83rem;
+    }
+    .run-label::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--amber); }
+    h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; }
+    h1 {
+      max-width: 850px;
+      margin: 24px 0 20px;
+      font-size: clamp(3.6rem, 8.2vw, 7.9rem);
+      line-height: .88;
+      letter-spacing: -.065em;
+      font-weight: 500;
+    }
+    .dek { max-width: 750px; margin: 0; color: var(--muted); font-size: clamp(1.06rem, 1.9vw, 1.35rem); }
+    .verdict {
+      border-top: 5px solid var(--amber);
+      background: var(--ink);
+      color: white;
+      padding: 26px;
+      box-shadow: var(--shadow);
+    }
+    .verdict strong { display: block; font: 600 1.7rem/1.05 Georgia, serif; margin-bottom: 12px; }
+    .verdict p { margin: 0; color: #d9e2e7; font-size: .94rem; }
+
+    main { padding-bottom: 80px; }
+    section { scroll-margin-top: 82px; margin: 0 0 86px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 40px;
+      border-top: 2px solid var(--ink);
+      padding-top: 19px;
+      margin-bottom: 34px;
+    }
+    .section-head h2 { margin: 0; font-size: clamp(2rem, 4vw, 3.8rem); line-height: 1; letter-spacing: -.04em; }
+    .section-head p { max-width: 690px; margin: 0; color: var(--muted); font-size: 1.05rem; }
+
+    .ledger {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border: 1px solid var(--line);
+      background: var(--sheet);
+      box-shadow: var(--shadow);
+    }
+    .metric { min-height: 156px; padding: 23px; border-right: 1px solid var(--line); }
+    .metric:last-child { border-right: 0; }
+    .metric span { display: block; color: var(--muted); font-size: .82rem; }
+    .metric strong { display: block; margin: 10px 0 5px; font: 500 clamp(2rem, 4vw, 3.25rem)/1 Georgia, serif; letter-spacing: -.04em; }
+    .metric em { color: var(--green); font-style: normal; font-size: .83rem; }
+
+    .flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; }
+    .flow-step { position: relative; min-height: 180px; padding: 24px 22px; color: white; background: var(--ink); border-right: 1px solid #496073; }
+    .flow-step:nth-child(2) { background: #1b3953; }
+    .flow-step:nth-child(3) { background: #155b72; }
+    .flow-step:nth-child(4) { background: #167586; }
+    .flow-step:nth-child(5) { background: #2c8080; }
+    .flow-step b { display: block; margin-bottom: 10px; font: 600 1.1rem Georgia, serif; }
+    .flow-step p { margin: 0; color: #d9e7ea; font-size: .87rem; }
+    .flow-step::after { content: ""; position: absolute; right: -8px; top: 34px; z-index: 2; width: 15px; height: 15px; background: inherit; transform: rotate(45deg); }
+    .flow-step:last-child::after { display: none; }
+
+    .dataset-layout { display: grid; grid-template-columns: .88fr 1.12fr; gap: 28px; }
+    .split-stack { display: flex; height: 76px; overflow: hidden; border-radius: 12px; color: white; font-weight: 700; }
+    .split-stack div { display: grid; place-items: center; min-width: 58px; }
+    .split-stack .train { flex: 8; background: var(--blue-dark); }
+    .split-stack .val { flex: 1; background: var(--amber); color: var(--ink); }
+    .split-stack .test { flex: 1; background: var(--red); }
+    .panel { padding: 26px; background: var(--sheet); border: 1px solid var(--line); }
+    .panel h3 { margin: 0 0 10px; font-size: 1.45rem; }
+    .panel p { color: var(--muted); }
+    .panel p:last-child { margin-bottom: 0; }
+    .family-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .family { padding: 16px; background: #eef1ee; border-left: 4px solid var(--cyan); }
+    .family small { display: block; color: var(--muted); }
+
+    .methods { background: var(--ink); color: white; box-shadow: var(--shadow); }
+    .method-tabs { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid #496073; }
+    .method-tabs button {
+      padding: 17px;
+      border: 0;
+      border-right: 1px solid #496073;
+      color: #c7d3dc;
+      background: transparent;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 700;
+    }
+    .method-tabs button[aria-selected="true"] { background: var(--amber); color: var(--ink); }
+    .method-body { display: grid; grid-template-columns: .75fr 1.25fr; gap: 40px; min-height: 260px; padding: 34px; }
+    .method-body h3 { margin: 0 0 10px; font-size: 2.1rem; }
+    .method-body p { color: #d7e1e7; }
+    .formula {
+      display: grid;
+      place-items: center;
+      min-height: 170px;
+      padding: 24px;
+      border: 1px solid #547085;
+      background: #102236;
+      font: 1.08rem/1.65 Georgia, serif;
+      text-align: center;
+    }
+    .method-note { color: #fed17c !important; }
+
+    table { width: 100%; border-collapse: collapse; font-size: .94rem; }
+    th, td { padding: 13px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-size: .78rem; font-weight: 700; }
+    tbody tr:last-child td { border-bottom: 0; }
+    .number { font-variant-numeric: tabular-nums; text-align: right; }
+    .winner { color: var(--green); font-weight: 700; }
+    .fineprint { margin: 15px 0 0; color: var(--muted); font-size: .84rem; }
+
+    .setup-grid { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line); background: var(--sheet); }
+    .setup-grid article { padding: 24px; border-right: 1px solid var(--line); }
+    .setup-grid article:last-child { border-right: 0; }
+    .setup-grid h3 { font-size: 1.3rem; }
+    .tag { display: inline-block; margin: 3px 3px 3px 0; padding: 4px 8px; background: #e7ecea; border-radius: 4px; font-size: .78rem; }
+
+    .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+    .chart { background: var(--sheet); border: 1px solid var(--line); padding: 25px; }
+    .chart h3 { margin: 0 0 6px; font-size: 1.45rem; }
+    .chart > p { margin-top: 0; color: var(--muted); font-size: .88rem; }
+    .bar-row { display: grid; grid-template-columns: 88px 1fr 55px; align-items: center; gap: 11px; margin: 13px 0; font-size: .86rem; }
+    .track { position: relative; height: 16px; background: #e2e7e5; overflow: hidden; }
+    .bar { height: 100%; transform-origin: left; animation: grow .7s ease-out both; }
+    .bar.before { background: #92a6b2; }
+    .bar.after { background: var(--blue); }
+    .delta-up { color: var(--green); font-weight: 700; }
+    .delta-down { color: var(--red); font-weight: 700; }
+    @keyframes grow { from { transform: scaleX(0); } }
+
+    .prediction-table td:nth-child(n+2), .prediction-table th:nth-child(n+2) { text-align: right; }
+    .sample-size { color: var(--muted); font-size: .78rem; }
+    .callout { margin-top: 20px; padding: 18px 20px; border-left: 5px solid var(--amber); background: #fff4d9; }
+
+    .failure-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+    .failure-card { padding: 26px; border: 1px solid var(--line); background: var(--sheet); }
+    .failure-card strong { display: block; margin-bottom: 9px; font: 600 1.35rem Georgia, serif; }
+    .status { display: inline-block; margin-bottom: 15px; padding: 4px 8px; border-radius: 4px; font-size: .75rem; font-weight: 800; }
+    .status.fixed { background: #d7eee4; color: #15573e; }
+    .status.open { background: #f8dfd8; color: #7d251b; }
+    .code { padding: 14px; overflow-wrap: anywhere; color: #d7e1e7; background: var(--ink); font: .8rem/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; }
+
+    .wandb-band { display: grid; grid-template-columns: .7fr 1.3fr; background: #ffd15c; border: 2px solid var(--ink); }
+    .wandb-band > div { padding: 28px; }
+    .wandb-band h3 { margin: 0 0 9px; font-size: 2rem; }
+    .coverage { background: var(--sheet); border-left: 2px solid var(--ink); }
+    .coverage ul { columns: 2; margin: 0; padding-left: 20px; }
+    .coverage li { margin-bottom: 8px; }
+
+    .next-run { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; counter-reset: phase; }
+    .next-run article { counter-increment: phase; padding: 24px; background: var(--sheet); border-top: 5px solid var(--blue); box-shadow: var(--shadow); }
+    .next-run article::before { content: counter(phase); display: block; color: var(--blue); font: 500 2.4rem Georgia, serif; }
+    .next-run h3 { margin: 6px 0 9px; }
+
+    .evidence { background: var(--ink); color: white; padding: 35px; }
+    .evidence h2 { margin-top: 0; }
+    .evidence a { color: #91d9df; }
+    .evidence-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 28px; }
+    .evidence-grid div { padding: 10px 0; border-bottom: 1px solid #40566a; }
+    footer { padding: 30px 0 60px; color: var(--muted); font-size: .84rem; }
+
+    @media (max-width: 900px) {
+      .hero, .section-head, .dataset-layout, .method-body, .chart-grid, .failure-grid, .wandb-band { grid-template-columns: 1fr; }
+      .ledger { grid-template-columns: 1fr 1fr; }
+      .metric:nth-child(2) { border-right: 0; }
+      .metric:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .flow { grid-template-columns: 1fr; }
+      .flow-step { min-height: auto; border-right: 0; border-bottom: 1px solid #496073; }
+      .flow-step::after { display: none; }
+      .setup-grid, .next-run { grid-template-columns: 1fr; }
+      .setup-grid article { border-right: 0; border-bottom: 1px solid var(--line); }
+      .coverage { border-left: 0; border-top: 2px solid var(--ink); }
+    }
+    @media (max-width: 600px) {
+      .shell { width: min(100% - 24px, 1180px); }
+      header { padding-top: 54px; }
+      h1 { font-size: 3.55rem; }
+      .topbar .mark { display: none; }
+      .topbar .shell { justify-content: flex-start; }
+      .ledger, .family-grid, .evidence-grid { grid-template-columns: 1fr; }
+      .metric { border-right: 0; border-bottom: 1px solid var(--line); }
+      .method-tabs { grid-template-columns: 1fr 1fr; }
+      .method-tabs button:nth-child(2) { border-right: 0; }
+      .bar-row { grid-template-columns: 68px 1fr 46px; }
+      th, td { padding: 10px 7px; }
+      .coverage ul { columns: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .bar { animation: none; }
+    }
+    @media print {
+      .topbar { display: none; }
+      body { background: white; }
+      section { break-inside: avoid; }
+      .bar { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="shell">
+      <div class="mark">Liquid MCDM Lab / Experiment 01</div>
+      <nav aria-label="Report sections">
+        <a href="#dataset">Dataset</a>
+        <a href="#methods">Methods</a>
+        <a href="#training">Training</a>
+        <a href="#results">Results</a>
+        <a href="#failures">Failures</a>
+        <a href="#next">Next run</a>
+      </nav>
+    </div>
+  </div>
+
+  <header>
+    <div class="shell hero">
+      <div>
+        <span class="run-label">Run 20261019T002734Z · bounded overfit diagnostic</span>
+        <h1>Can a decision model learn four exact decision rules?</h1>
+        <p class="dek">A 25-step LoRA experiment taught LiquidAI/d1-3B to imitate COPRAS, WASPAS, VIKOR and TOPSIS winners on synthetic multi-criteria choices. It produced a clear learning signal, a small held-out gain, and one unresolved reload failure.</p>
+      </div>
+      <aside class="verdict" aria-label="Experiment verdict">
+        <strong>Learning signal confirmed.</strong>
+        <p>Training accuracy rose 39.1 percentage points. This is an overfit check on 64 examples, not evidence of broad generalization or human preference modeling. Release readiness is blocked by probability reload drift.</p>
+      </aside>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section aria-label="Key results">
+      <div class="ledger">
+        <div class="metric"><span>Training accuracy</span><strong>67.2%</strong><em>from 28.1% · +39.1 pp</em></div>
+        <div class="metric"><span>Held-out accuracy</span><strong>50.0%</strong><em>from 37.5% · +12.5 pp</em></div>
+        <div class="metric"><span>Winner NLL</span><strong>0.993</strong><em>from 1.574 · −36.9%</em></div>
+        <div class="metric"><span>GPU training</span><strong>40.6s</strong><em>25 steps · A40 48 GB</em></div>
+      </div>
+    </section>
+
+    <section id="question">
+      <div class="section-head">
+        <h2>The experiment</h2>
+        <p>The task is single-choice winner prediction. An exact numerical solver creates a teacher label from an alternatives-by-criteria matrix, criterion weights and directions, and a named MCDM method. The model sees that decision state and must select the winning option alias.</p>
+      </div>
+      <div class="flow" aria-label="Experiment data flow">
+        <div class="flow-step"><b>Decision episode</b><p>3–8 alternatives, 2–6 criteria, min/max directions and weights.</p></div>
+        <div class="flow-step"><b>Exact solver</b><p>Deterministic float64 COPRAS, WASPAS, VIKOR or TOPSIS scores.</p></div>
+        <div class="flow-step"><b>d1 prompt</b><p>Method, parameters, full-precision values and candidate aliases A–Z.</p></div>
+        <div class="flow-step"><b>LoRA update</b><p>Completion-only loss on the correct answer alias plus EOS.</p></div>
+        <div class="flow-step"><b>Choice readout</b><p>Restricted option probabilities; argmax compared with the exact teacher.</p></div>
+      </div>
+    </section>
+
+    <section id="dataset">
+      <div class="section-head">
+        <h2>Dataset</h2>
+        <p>Synthetic MCDM Episodes v1 contains 1,000 reproducible, non-personal examples. It tests mathematical imitation under controlled scenario shifts. It contains no hotel bookings, procurement records or human preference labels.</p>
+      </div>
+      <div class="dataset-layout">
+        <div class="panel">
+          <h3>Split before augmentation</h3>
+          <div class="split-stack" role="img" aria-label="800 training, 100 validation and 100 test episodes">
+            <div class="train">800 train</div><div class="val">100</div><div class="test">100</div>
+          </div>
+          <p>Seed 42 · float64 source values · 3–8 alternatives · 2–6 criteria · method, family and weighting factors crossed rather than coupled.</p>
+          <p><strong>Reproduction:</strong> two remote 1,000-episode generations were byte-identical. The manifest binds generator and solver hashes, counts, seed lineage and each JSONL SHA-256.</p>
+        </div>
+        <div class="panel">
+          <h3>Scenario families by split</h3>
+          <div class="family-grid">
+            <div class="family"><strong>IID uniform</strong><small>train · broad independent values</small></div>
+            <div class="family"><strong>Correlated quality</strong><small>train · attributes move together</small></div>
+            <div class="family"><strong>Lognormal tradeoff</strong><small>train · skewed competing attributes</small></div>
+            <div class="family"><strong>Clustered</strong><small>validation · locally similar candidates</small></div>
+            <div class="family"><strong>Anticorrelated</strong><small>test · sharper tradeoffs</small></div>
+            <div class="family"><strong>Near-equal</strong><small>test · deliberately close choices</small></div>
+          </div>
+        </div>
+      </div>
+      <p class="fineprint">Every episode stores the method, parameters, weights, directions, matrix, ordered tie groups, raw solver scores and a nullable winner. Nonunique outcomes remain available for analysis but are excluded from single-choice training. Positive-valued inputs are required for COPRAS and WASPAS.</p>
+    </section>
+
+    <section id="methods">
+      <div class="section-head">
+        <h2>Four teachers</h2>
+        <p>Each method answers a different mathematical question. Their scores cannot be compared across methods, and adding an alternative can change normalizers, ideals and rankings. Use the tabs to inspect each solver contract.</p>
+      </div>
+      <div class="methods">
+        <div class="method-tabs" role="tablist" aria-label="MCDM methods">
+          <button role="tab" aria-selected="true" aria-controls="method-copy" data-method="COPRAS">COPRAS</button>
+          <button role="tab" aria-selected="false" aria-controls="method-copy" data-method="WASPAS">WASPAS</button>
+          <button role="tab" aria-selected="false" aria-controls="method-copy" data-method="VIKOR">VIKOR</button>
+          <button role="tab" aria-selected="false" aria-controls="method-copy" data-method="TOPSIS">TOPSIS</button>
+        </div>
+        <div class="method-body" id="method-copy" role="tabpanel">
+          <div>
+            <h3 id="method-title">COPRAS</h3>
+            <p id="method-summary">Balances the sum of weighted benefit criteria with an inverse proportional cost term.</p>
+            <p class="method-note" id="method-direction">Higher Q is better.</p>
+          </div>
+          <div class="formula" id="method-formula">Normalize each column by its sum → weight → split benefit P and cost C<br>Qᵢ = Pᵢ + ΣC / (Cᵢ · Σ(1/C))</div>
+        </div>
+      </div>
+      <div class="panel" style="margin-top: 24px; overflow-x: auto;">
+        <h3>A hand-calculated dominance fixture</h3>
+        <p>Alternative A has twice the benefit and half the cost of B; both criteria have weight 0.5. All four exact solvers select A under their documented conventions.</p>
+        <table>
+          <thead><tr><th>Method</th><th class="number">A score</th><th class="number">B score</th><th>Direction</th><th>Winner</th></tr></thead>
+          <tbody>
+            <tr><td>COPRAS</td><td class="number">0.6667</td><td class="number">0.3333</td><td>higher</td><td class="winner">A</td></tr>
+            <tr><td>WASPAS</td><td class="number">1.0000</td><td class="number">0.5000</td><td>higher</td><td class="winner">A</td></tr>
+            <tr><td>VIKOR</td><td class="number">0.0000</td><td class="number">1.0000</td><td>lower</td><td class="winner">A</td></tr>
+            <tr><td>TOPSIS</td><td class="number">1.0000</td><td class="number">0.0000</td><td>higher</td><td class="winner">A</td></tr>
+          </tbody>
+        </table>
+        <p class="fineprint">The 124-test remote suite also checked independent library parity, ties, degeneracies, positive rescaling, direction reversal, method disagreement, weight sensitivity and documented rank reversal. Exact-teacher self-consistency was 100% on 85 eligible test episodes; 15 nonunique episodes were excluded.</p>
+      </div>
+    </section>
+
+    <section id="training">
+      <div class="section-head">
+        <h2>Model & training</h2>
+        <p>The run follows Liquid's official TRL/PEFT approach and preserves d1-3B's decision prompt and restricted answer-token readout. It adapts the text path with LoRA and leaves the vision tower frozen.</p>
+      </div>
+      <div class="setup-grid">
+        <article>
+          <h3>Base model</h3>
+          <p><strong>LiquidAI/d1-3B</strong><br>revision <code>051bcc…2432</code></p>
+          <span class="tag">BF16</span><span class="tag">no quantization</span><span class="tag">max length 2048</span>
+          <p class="fineprint">LFM Open License v1.0 applies. Redistribution conditions require review before publication.</p>
+        </article>
+        <article>
+          <h3>LoRA recipe</h3>
+          <p>Rank 16 · alpha 32 · dropout 0.05 · bias none</p>
+          <span class="tag">q/k/v</span><span class="tag">in/out projection</span><span class="tag">w1/w2/w3</span>
+          <p class="fineprint">332 trainable tensors; 166 received nonzero finite gradients in the compatibility batch. Vision trainable tensors: 0.</p>
+        </article>
+        <article>
+          <h3>Optimization</h3>
+          <p>64 examples · 25 steps · batch 1 × accumulation 4 · cosine schedule · LR 2×10⁻⁴</p>
+          <span class="tag">SFTTrainer</span><span class="tag">checkpointing</span><span class="tag">seed 42</span>
+          <p class="fineprint">The real collator supervised exactly two tokens per example: answer alias and EOS.</p>
+        </article>
+      </div>
+      <div class="panel" style="margin-top: 22px;">
+        <h3>Measured runtime</h3>
+        <table>
+          <tbody>
+            <tr><th>Compute</th><td>Secure-cloud NVIDIA A40, 46,068 MiB reported</td><th>Environment</th><td>Python 3.12.3 · Torch 2.9.1+cu128 · CUDA 12.8</td></tr>
+            <tr><th>Throughput</th><td>0.615 steps/s · 2.462 samples/s</td><th>Training loss</th><td>0.72068</td></tr>
+            <tr><th>Compatibility memory</th><td>6.63 GB allocated · 14.24 GB reserved</td><th>Estimated pod cost</th><td>$0.37 over about 0.628 pod-hours</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="results">
+      <div class="section-head">
+        <h2>What changed</h2>
+        <p>The adapter substantially fit the 64 training examples and improved the tiny 16-example held-out diagnostic. Because the held-out denominator is small and drawn from only two scenario families, method-level movements are descriptive rather than stable estimates.</p>
+      </div>
+      <div class="chart-grid">
+        <div class="chart">
+          <h3>Accuracy before and after</h3>
+          <p>Percentage of unique-winner episodes matching the exact teacher.</p>
+          <div class="bar-row"><span>Train before</span><div class="track"><div class="bar before" style="width:28.125%"></div></div><strong>28.1%</strong></div>
+          <div class="bar-row"><span>Train after</span><div class="track"><div class="bar after" style="width:67.1875%"></div></div><strong>67.2%</strong></div>
+          <div class="bar-row"><span>Test before</span><div class="track"><div class="bar before" style="width:37.5%"></div></div><strong>37.5%</strong></div>
+          <div class="bar-row"><span>Test after</span><div class="track"><div class="bar after" style="width:50%"></div></div><strong>50.0%</strong></div>
+        </div>
+        <div class="chart">
+          <h3>Loss and probability quality</h3>
+          <p>Lower is better. NLL is available for train; multiclass Brier for both splits.</p>
+          <div class="bar-row"><span>Train NLL</span><div class="track"><div class="bar before" style="width:78.68%"></div></div><strong>1.574</strong></div>
+          <div class="bar-row"><span>After</span><div class="track"><div class="bar after" style="width:49.66%"></div></div><strong>0.993</strong></div>
+          <div class="bar-row"><span>Test Brier</span><div class="track"><div class="bar before" style="width:75.04%"></div></div><strong>0.750</strong></div>
+          <div class="bar-row"><span>After</span><div class="track"><div class="bar after" style="width:71.09%"></div></div><strong>0.711</strong></div>
+          <p class="fineprint">Held-out ECE moved from 0.031 to 0.312. With only 16 examples, this warns that confidence changed faster than validated correctness; it is not a dependable calibration estimate.</p>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top: 28px; overflow-x: auto;">
+        <h3>Held-out model predictions by method</h3>
+        <table class="prediction-table">
+          <thead><tr><th>Teacher method</th><th>Episodes</th><th>Before</th><th>After</th><th>Change</th></tr></thead>
+          <tbody>
+            <tr><td>COPRAS</td><td>5</td><td>60%</td><td>40%</td><td class="delta-down">−20 pp</td></tr>
+            <tr><td>TOPSIS</td><td>4</td><td>25%</td><td>25%</td><td>0 pp</td></tr>
+            <tr><td>VIKOR</td><td>2</td><td>50%</td><td>100%</td><td class="delta-up">+50 pp</td></tr>
+            <tr><td>WASPAS</td><td>5</td><td>20%</td><td>60%</td><td class="delta-up">+40 pp</td></tr>
+          </tbody>
+        </table>
+        <div class="callout"><strong>What the run did not record:</strong> the preserved evidence has aggregate accuracies, probabilities-derived metrics and slice counts, but no per-episode model prediction table. Individual prompt, exact winner, predicted winner and option probabilities therefore cannot be shown honestly for this run. The next run must persist those rows and log them as a W&amp;B Table.</div>
+      </div>
+
+      <div class="panel" style="margin-top: 28px; overflow-x: auto;">
+        <h3>Held-out slices</h3>
+        <table class="prediction-table">
+          <thead><tr><th>Slice</th><th>Episodes</th><th>Before</th><th>After</th><th>Reading</th></tr></thead>
+          <tbody>
+            <tr><td>Anticorrelated family</td><td>9</td><td>22.2%</td><td>33.3%</td><td class="delta-up">+11.1 pp</td></tr>
+            <tr><td>Near-tie family</td><td>7</td><td>57.1%</td><td>71.4%</td><td class="delta-up">+14.3 pp</td></tr>
+            <tr><td>3 alternatives</td><td>4</td><td>50.0%</td><td>75.0%</td><td class="delta-up">+25 pp</td></tr>
+            <tr><td>4 alternatives</td><td>7</td><td>57.1%</td><td>42.9%</td><td class="delta-down">−14.3 pp</td></tr>
+            <tr><td>5 alternatives</td><td>3</td><td>0.0%</td><td>66.7%</td><td class="delta-up">+66.7 pp</td></tr>
+            <tr><td>6 alternatives</td><td>2</td><td>0.0%</td><td>0.0%</td><td>unchanged</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="failures">
+      <div class="section-head">
+        <h2>Failures are evidence</h2>
+        <p>The final run completed training and saved the adapter, then correctly failed its strict validation. Earlier setup failures also narrowed the supported environment. None should be hidden behind the improved headline metric.</p>
+      </div>
+      <div class="failure-grid">
+        <article class="failure-card">
+          <span class="status fixed">Resolved for this run</span>
+          <strong>Optional torchao broke the measured stack</strong>
+          <p>The notebook's open-ended <code>torchao&gt;0.16</code> selected 0.18.0, which failed with Torch 2.9.1. Version 0.15 imported, but PEFT 0.21.2 required 0.16 or newer during LoRA injection.</p>
+          <p><b>Resolution:</b> omit optional torchao and use the successful non-quantized BF16 path. TRL 1.15's warmup API was also mapped from the configured 0.05 fraction.</p>
+        </article>
+        <article class="failure-card">
+          <span class="status open">Open blocker</span>
+          <strong>Reloaded probabilities drifted</strong>
+          <p>All 4 reloaded predictions kept the same argmax, yet the maximum absolute probability delta was 0.03060 and the mean was 0.00842. Both exceeded the strict 0.0001 threshold.</p>
+          <div class="code">RuntimeError: Saved adapter reload parity failed<br>argmax agreement = 1.0<br>max |Δ probability| = 0.030595</div>
+        </article>
+        <article class="failure-card">
+          <span class="status open">Needs isolation</span>
+          <strong>Two loader paths were not identical</strong>
+          <p>The custom d1 wrapper and the standard image-text loader agreed on 7 of 8 base argmax decisions. Their maximum probability delta was 0.01562.</p>
+          <p><b>Implication:</b> the evaluation path itself can move a borderline decision. Use one pinned path for comparisons and diagnose dtype, cache, tokenizer and construction differences.</p>
+        </article>
+        <article class="failure-card">
+          <span class="status open">Statistical limitation</span>
+          <strong>The test set is too small for tuning decisions</strong>
+          <p>Only 16 held-out examples were evaluated: two VIKOR examples, four TOPSIS examples, and five each for COPRAS and WASPAS. A single prediction can move a method metric by 20–50 percentage points.</p>
+          <p><b>Implication:</b> do not tune hyperparameters against these four method percentages. Expand a frozen validation set first.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="wandb">
+      <div class="section-head">
+        <h2>W&amp;B coverage</h2>
+        <p>Weights &amp; Biases was used, but “everything” would overstate the evidence. The run logged offline on the pod and was then explicitly synced to the cloud.</p>
+      </div>
+      <div class="wandb-band">
+        <div>
+          <h3>Run 56i7klyd</h3>
+          <p><strong>Project:</strong> liquid-mcdm-lab<br><strong>SDK:</strong> 0.22.3<br><strong>Status:</strong> synced</p>
+          <p><a href="https://wandb.ai/liquid-mcdm-lab/runs/56i7klyd">Open the W&amp;B run</a></p>
+        </div>
+        <div class="coverage">
+          <strong>Recorded and preserved</strong>
+          <ul>
+            <li>step loss, gradient norm and learning rate</li>
+            <li>entropy and mean token accuracy</li>
+            <li>runtime, throughput and final train loss</li>
+            <li>run configuration and adapter manifest</li>
+            <li>aggregate pre/post evaluation JSON</li>
+            <li>adapter checksum and remote path</li>
+          </ul>
+          <p><strong>Missing for full auditability:</strong> per-episode prediction rows, W&amp;B Table of errors, the full synthetic dataset as a versioned artifact, and proof that every model file was uploaded to W&amp;B. These belong in the next run and release workflow.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="next">
+      <div class="section-head">
+        <h2>Next experiment</h2>
+        <p>Fix measurement reliability before spending on a larger sweep. Then move from the 64-example diagnostic to a validation-driven 1,000-example run with predictions preserved at episode level.</p>
+      </div>
+      <div class="next-run">
+        <article>
+          <h3>Close the parity gap</h3>
+          <p>Reproduce save/reload from the same local model snapshot, evaluation mode, dtype, device map and tokenizer. Compare logits before softmax and adapter state hashes. Treat cache settings separately; the recorded <code>use_cache=false</code> check did not remove the drift.</p>
+        </article>
+        <article>
+          <h3>Improve the evidence</h3>
+          <p>Freeze a larger validation split balanced by method, size and family. Persist one row per episode: source hash, teacher scores, exact winner, prompt hash, option probabilities, prediction, correctness and latency. Log the rows as a W&amp;B Table.</p>
+        </article>
+        <article>
+          <h3>Run a bounded comparison</h3>
+          <p>Train on the 800-example split and select on the 100-example validation split. Compare learning rates 1×10⁻⁴ and 2×10⁻⁴ with the same rank-16 LoRA, fixed batch semantics and at least three seeds. Touch the 100-example test split only after selection.</p>
+        </article>
+      </div>
+      <div class="callout"><strong>Release criterion:</strong> deterministic adapter reload within a justified tolerance, complete per-episode evaluation artifacts, performance reported with denominators and uncertainty, and a model card that preserves the LFM Open License conditions. Exact solvers remain the correct tool for computing the formulas; the learned model is an imitation experiment.</div>
+    </section>
+
+    <section class="evidence" id="evidence">
+      <h2>Evidence map</h2>
+      <p>This page is a readable layer over repository evidence. The numbers above come from these files; no secrets, tokens or private data are embedded.</p>
+      <div class="evidence-grid">
+        <div><a href="../dist/runpod/results-20261019T002734Z/summary.json">Run summary</a> — headline outcome, runtime, cost and reload result</div>
+        <div><a href="../dist/runpod/results-20261019T002734Z/training__run.json">Training record</a> — full config and compatibility evidence</div>
+        <div><a href="../dist/runpod/results-20261019T002734Z/training__base_metrics.json">Base test metrics</a> — pre-training method and slice results</div>
+        <div><a href="../dist/runpod/results-20261019T002734Z/training__post_metrics.json">Post test metrics</a> — post-training method and slice results</div>
+        <div><a href="../dist/runpod/results-20261019T002734Z/training__base_train_metrics.json">Base train metrics</a> — 64-example starting point</div>
+        <div><a href="../dist/runpod/results-20261019T002734Z/training__post_train_metrics.json">Post train metrics</a> — 64-example overfit outcome</div>
+        <div><a href="../docs/mathematics.md">Mathematical policy</a> — formulas, ties and VIKOR compromise rules</div>
+        <div><a href="../docs/dataset_card.md">Dataset card</a> — provenance, split policy and limitations</div>
+        <div><a href="../docs/model_card_draft.md">Model card draft</a> — intended use and release limitations</div>
+        <div><a href="../dist/runpod/results-20261019T002734Z/training__artifact_manifest.json">Artifact manifest</a> — adapter files, sizes and SHA-256 values</div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="shell">
+    <p>Prepared from recorded repository evidence on 2026-10-18 (America/Chicago). Run timestamps are UTC. Scope: synthetic exact-solver imitation, single-choice winner prediction.</p>
+  </footer>
+
+  <script>
+    const methods = {
+      COPRAS: {
+        summary: 'Balances the sum of weighted benefit criteria with an inverse proportional cost term.',
+        direction: 'Higher Q is better.',
+        formula: 'Normalize each column by its sum → weight → split benefit P and cost C<br>Qᵢ = Pᵢ + ΣC / (Cᵢ · Σ(1/C))'
+      },
+      WASPAS: {
+        summary: 'Blends a weighted sum and weighted product after direction-aware ratio normalization.',
+        direction: 'Higher Q is better. λ defaults to 0.5.',
+        formula: 'Benefit rᵢⱼ = xᵢⱼ / max(xⱼ); cost rᵢⱼ = min(xⱼ) / xᵢⱼ<br>Qᵢ = λ Σ(wⱼrᵢⱼ) + (1−λ) Π(rᵢⱼ<sup>wⱼ</sup>)'
+      },
+      VIKOR: {
+        summary: 'Minimizes group regret and maximum individual regret, then separately tests whether the leader is an admissible unique compromise.',
+        direction: 'Lower Q is better. Argmin alone is not enough.',
+        formula: 'Sᵢ = weighted total regret; Rᵢ = maximum weighted regret<br>Qᵢ = v·range(Sᵢ) + (1−v)·range(Rᵢ)<br>Unique winner also requires acceptable advantage and stability.'
+      },
+      TOPSIS: {
+        summary: 'Chooses the alternative closest to the direction-aware ideal and farthest from the anti-ideal.',
+        direction: 'Higher closeness is better.',
+        formula: 'Vector-normalize columns → weight → build ideal A⁺ and anti-ideal A⁻<br>Cᵢ = Dᵢ⁻ / (Dᵢ⁺ + Dᵢ⁻)'
+      }
+    };
+
+    const tabs = document.querySelectorAll('[data-method]');
+    const title = document.getElementById('method-title');
+    const summary = document.getElementById('method-summary');
+    const direction = document.getElementById('method-direction');
+    const formula = document.getElementById('method-formula');
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => selectMethod(tab));
+      tab.addEventListener('keydown', event => {
+        if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+        event.preventDefault();
+        const offset = event.key === 'ArrowRight' ? 1 : -1;
+        const next = tabs[(index + offset + tabs.length) % tabs.length];
+        next.focus();
+        selectMethod(next);
+      });
+    });
+    function selectMethod(tab) {
+      tabs.forEach(item => item.setAttribute('aria-selected', String(item === tab)));
+      const item = methods[tab.dataset.method];
+      title.textContent = tab.dataset.method;
+      summary.textContent = item.summary;
+      direction.textContent = item.direction;
+      formula.innerHTML = item.formula;
+    }
+  </script>
+</body>
+</html>

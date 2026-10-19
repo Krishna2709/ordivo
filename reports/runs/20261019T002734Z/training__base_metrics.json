@@ -1,0 +1,102 @@
+{
+  "accuracy": 0.375,
+  "brier_multiclass": 0.7503577817475491,
+  "by_method": {
+    "COPRAS": {
+      "accuracy": 0.6,
+      "eligible": 5
+    },
+    "TOPSIS": {
+      "accuracy": 0.25,
+      "eligible": 4
+    },
+    "VIKOR": {
+      "accuracy": 0.5,
+      "eligible": 2
+    },
+    "WASPAS": {
+      "accuracy": 0.2,
+      "eligible": 5
+    }
+  },
+  "ece_10_bins": 0.030663308073804442,
+  "eligible": 16,
+  "excluded_nonunique": 0,
+  "prediction_tie_break": "first_option",
+  "slices": {
+    "alternatives_count": {
+      "3": {
+        "accuracy": 0.5,
+        "eligible": 4
+      },
+      "4": {
+        "accuracy": 0.5714285714285714,
+        "eligible": 7
+      },
+      "5": {
+        "accuracy": 0.0,
+        "eligible": 3
+      },
+      "6": {
+        "accuracy": 0.0,
+        "eligible": 2
+      }
+    },
+    "criteria_count": {
+      "2": {
+        "accuracy": 0.0,
+        "eligible": 2
+      },
+      "3": {
+        "accuracy": 0.6666666666666666,
+        "eligible": 3
+      },
+      "4": {
+        "accuracy": 0.2,
+        "eligible": 5
+      },
+      "5": {
+        "accuracy": 0.0,
+        "eligible": 2
+      },
+      "6": {
+        "accuracy": 0.75,
+        "eligible": 4
+      }
+    },
+    "near_tie": {
+      "False": {
+        "accuracy": 0.3333333333333333,
+        "eligible": 12
+      },
+      "True": {
+        "accuracy": 0.5,
+        "eligible": 4
+      }
+    },
+    "scenario_family": {
+      "anticorrelated": {
+        "accuracy": 0.2222222222222222,
+        "eligible": 9
+      },
+      "near_tie": {
+        "accuracy": 0.5714285714285714,
+        "eligible": 7
+      }
+    },
+    "weighting_scheme": {
+      "dirichlet": {
+        "accuracy": 0.42857142857142855,
+        "eligible": 7
+      },
+      "equal": {
+        "accuracy": 0.2857142857142857,
+        "eligible": 7
+      },
+      "sparse": {
+        "accuracy": 0.5,
+        "eligible": 2
+      }
+    }
+  }
+}

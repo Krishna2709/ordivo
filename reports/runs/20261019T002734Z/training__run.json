@@ -1,0 +1,101 @@
+{
+  "compatibility": {
+    "finite_loss": 0.9137192964553833,
+    "gpu_memory_allocated_bytes": 6630437376,
+    "gpu_memory_reserved_bytes": 14237564928,
+    "supervised_token_ids": [
+      44,
+      124900
+    ],
+    "supervised_tokens_per_example": 2,
+    "trainable_tensors": 332,
+    "trainable_tensors_with_nonzero_gradient": 166
+  },
+  "config": {
+    "completion_only_loss": true,
+    "gradient_accumulation_steps": 4,
+    "gradient_checkpointing": true,
+    "inference_loader": "AutoModel",
+    "learning_rate": 0.0002,
+    "lora": {
+      "bias": "none",
+      "exclude_modules": ".*vision_tower.*",
+      "lora_alpha": 32,
+      "lora_dropout": 0.05,
+      "r": 16,
+      "target_modules": [
+        "q_proj",
+        "k_proj",
+        "v_proj",
+        "out_proj",
+        "in_proj",
+        "w1",
+        "w2",
+        "w3"
+      ],
+      "task_type": "CAUSAL_LM"
+    },
+    "lr_scheduler_type": "cosine",
+    "max_length": 2048,
+    "max_steps": 25,
+    "model_id": "LiquidAI/d1-3B",
+    "output_dir": "checkpoints/d1-overfit",
+    "overfit_examples": 64,
+    "packing": false,
+    "per_device_train_batch_size": 1,
+    "prompt_version": "mcdm-choice-v1-full-precision",
+    "quantization": "none",
+    "report_to": "wandb",
+    "revision": "051bcc464b01b9f92942b364d9586b0ef5912432",
+    "save_steps": 10,
+    "save_total_limit": 2,
+    "seed": 42,
+    "status": "candidate_not_gpu_validated",
+    "trainer": "trl.SFTTrainer",
+    "training_loader": "AutoModelForImageTextToText",
+    "wandb_mode": "offline",
+    "wandb_project": "liquid-mcdm-lab",
+    "warmup_ratio": 0.05
+  },
+  "cuda": "12.8",
+  "dataset_manifest_sha256": "1235dd1439935f217ab7fca62746fa7ddf28806ace867810b349abc147e4e1b2",
+  "dtype": "torch.bfloat16",
+  "error_type": "RuntimeError",
+  "finished_utc": "2026-10-19T00:29:23.484710+00:00",
+  "lora": {
+    "trainable_parameter_tensors": 332,
+    "vision_trainable_tensors": 0
+  },
+  "model_loaded": true,
+  "overfit_outcome": {
+    "accuracy_delta": 0.390625,
+    "base_train_accuracy": 0.28125,
+    "base_train_winner_nll": 1.5735638035133348,
+    "claim_scope": "64-example training subset only; not generalization evidence",
+    "improved": true,
+    "post_train_accuracy": 0.671875,
+    "post_train_winner_nll": 0.9932992945590178,
+    "winner_nll_delta": -0.580264508954317
+  },
+  "passed": false,
+  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.39",
+  "python": "3.12.3 (main, Nov  6 2025, 13:44:16) [GCC 13.3.0]",
+  "runtime": {
+    "gpu": "NVIDIA A40, 46068 MiB, 580.173.02",
+    "pod_id": "xe1u74gznvk3jj",
+    "provider": "runpod"
+  },
+  "started_utc": "2026-10-19T00:28:11.794085+00:00",
+  "status": "failed",
+  "torch": "2.9.1+cu128",
+  "train_metrics": {
+    "epoch": 1.5625,
+    "total_flos": 1385371965956832.0,
+    "train_loss": 0.72067702293396,
+    "train_runtime": 40.6227,
+    "train_samples_per_second": 2.462,
+    "train_steps_per_second": 0.615
+  },
+  "training_started": true,
+  "training_validated": true
+}

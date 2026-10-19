@@ -1,0 +1,11 @@
+# Official Liquid TRL recipe at cookbook 744c5b6; NOT a tested GPU lock.
+# Keep the runtime's matching torch/torchvision/CUDA stack; inspect with pip --dry-run first.
+transformers==5.19.0
+trl==1.15.0
+peft==0.21.2
+datasets>=4.7.0
+accelerate>=1.4.0
+# torchao is optional for this non-quantized LoRA path. Omit it: 0.15.0 is
+# rejected by PEFT 0.21.2, while newer releases are incompatible with the
+# verified Runpod image's torch 2.9.1 stack.
+wandb==0.22.3

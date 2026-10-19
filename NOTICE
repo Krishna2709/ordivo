@@ -1,0 +1,8 @@
+Liquid MCDM Lab
+Copyright 2026 Krishna Kankipati
+
+Original repository code is licensed under Apache License 2.0 unless a file
+states otherwise. The bundled Liquid prompt helper and any trained adapter are
+derivative of or depend on LiquidAI/d1-3B and remain subject to the LFM Open
+License v1.0. Synthetic dataset releases use CC BY 4.0. Third-party notices and
+source revisions are recorded under research/upstream and docs/research_findings.md.

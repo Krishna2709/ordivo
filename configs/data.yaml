@@ -1,0 +1,5 @@
+version: synthetic-v1
+count: 1000
+seed: 42
+output: outputs/smoke-v1
+# Families are fixed by generator version; editing split memberships requires a new version.

@@ -1,0 +1,26 @@
+{
+  "runtime": {
+    "provider": "runpod",
+    "pod_id": "xe1u74gznvk3jj",
+    "gpu": "NVIDIA A40, 46068 MiB, 580.173.02"
+  },
+  "passed": true,
+  "status": "passed",
+  "model_loaded": false,
+  "training_validated": false,
+  "completed_steps": [
+    "pip-check",
+    "freeze",
+    "environment",
+    "generate",
+    "repeat",
+    "tokenizer",
+    "pytest",
+    "baseline"
+  ],
+  "started_utc": "2026-10-19T00:08:47.933950+00:00",
+  "lock_sha256": "fc38c858fe0246ddb4d722868b25ee2aa57ccbddf81d98371e231696a0775f71",
+  "active_step": null,
+  "two_run_byte_identity": true,
+  "test_count": 124
+}

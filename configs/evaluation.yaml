@@ -1,0 +1,6 @@
+split: test
+single_choice_only: true
+exclude_nonunique: true
+probabilities: restricted_options_with_max_pooled_alias_forms
+ece_bins: 10
+full_ranking_metrics: false
