@@ -48,14 +48,19 @@ reduced pool were omitted; 1,118,011 candidate rows formed 48,300
 source-defined query groups. Four partitions contain 30,372 train, 1,688
 selection, 1,744 calibration, and 14,496 official-test groups. These are
 **candidate-pool** counts, not retrieval coverage across the product catalog.
-The acquisition/build exited 0 remotely; an explicit cross-partition overlap
-and official-test audit remained pending at that build. A separate classical
+The acquisition/build exited 0 remotely. A subsequent
+[source-bound audit](../reports/runs/v2-source-audit-20261019/audit.json)
+reconciled all four old/new ESCI split SHA-256 values exactly, found zero
+query-and-locale overlap across roles, and confirmed all 14,496 official-test
+groups remain in test. The same audit reconciled Swissmetro's four split hashes.
+A separate classical
 baseline scored all 14,496 source-defined test query groups under the frozen
 old manifest SHA-256
 `012fa5f58aaa6b75b0d73c1a9f84f811713e87c61df1dc5137867d34c2cba540`.
 Its [aggregate and readback](../reports/ordivo-v2-experiment.html) establish
-that run on that manifest only. A later source-bound manifest adds explicit
-group accounting; do not conflate the two without exact split-hash comparison.
+the run on that manifest. The new source-bound manifest adds explicit group
+accounting while retaining byte-identical split files; the audit does not
+constitute a new model evaluation or uncertainty estimate.
 
 ## Risks and limitations
 
