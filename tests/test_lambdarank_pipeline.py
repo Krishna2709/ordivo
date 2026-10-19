@@ -63,6 +63,15 @@ def test_saved_ranker_reload_and_metric_parity(tmp_path):
                for scores in reloaded.values())
 
 
+def test_training_groups_cannot_reenter_validation(tmp_path):
+    pytest.importorskip("lightgbm")
+    e = example(1)
+    config = {"feature_policy": POLICY,
+              "target_policy": {"policy_id": "expedia-click-booking-v1"}}
+    with pytest.raises(ValueError, match="overlap"):
+        fit_ranker([e], [e], config, tmp_path / "model")
+
+
 def test_lexical_baseline_keeps_source_judgments_out_of_projection():
     e = {"schema_version": "ordivo-behavioral-v1", "episode_id": "amazon_esci:q1",
          "source": "amazon_esci", "task_type": "graded_relevance", "group_id": "q1",
