@@ -27,7 +27,7 @@ The private dataset repository is `blackOrder/Ordivo-v2-research-data`. Its sour
 
 ## Bounded held-out probe: mixed and negative results
 
-An exploratory paired probe used the same selected held-out units for base d1 and the private adapted pilot. The [sanitized aggregate](../../reports/runs/v2-neural-heldout-20261019/aggregate.json) has SHA-256 `a735c1db8810f9d9955152bbe16651e690c921e7330596cedc117d2358a19c8a`, executed source `854de0877c8e7e380b7353a578e95ba9865d4e25`, evaluation config SHA-256 `524bfe7cde8135132417ed029a8fb2738bd5ffd068f9190d081c6246aaaadc06`, and the frozen source-manifest hashes above. A private [W&B run](https://wandb.ai/black-order/liquid-mcdm-lab/runs/3zdzt6ik) records sanitized aggregates; per-query files remain private.
+An exploratory paired probe used the same selected held-out units for base d1 and the private adapted pilot. The [sanitized aggregate](https://github.com/Krishna2709/ordivo/blob/1955a2ced9fa44cb71e5bee5e19f3002fe522f67/reports/runs/v2-neural-heldout-20261019/aggregate.json) has SHA-256 `a735c1db8810f9d9955152bbe16651e690c921e7330596cedc117d2358a19c8a`, executed source `854de0877c8e7e380b7353a578e95ba9865d4e25`, evaluation config SHA-256 `524bfe7cde8135132417ed029a8fb2738bd5ffd068f9190d081c6246aaaadc06`, and the frozen source-manifest hashes above. A private [W&B run](https://wandb.ai/black-order/liquid-mcdm-lab/runs/3zdzt6ik) records sanitized aggregates; per-query files remain private.
 
 | Endpoint | Base d1 | Adapted pilot | Coverage |
 |---|---:|---:|---|
