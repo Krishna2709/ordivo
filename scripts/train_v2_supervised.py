@@ -15,7 +15,7 @@ import time
 import yaml
 
 from liquid_mcdm.runtime import require_remote_gpu
-from liquid_mcdm.training.behavioral_rendering import render_behavioral
+from liquid_mcdm.training.behavioral_rendering import PROMPT_VERSION, render_behavioral
 from liquid_mcdm.training.option_policy import option_logits
 
 MODEL = 'LiquidAI/d1-3B'
@@ -262,6 +262,7 @@ def run(config_path, output):
     runtime = require_remote_gpu()
     config_bytes = Path(config_path).read_bytes()
     config = yaml.safe_load(config_bytes)
+    config_sha256 = hashlib.sha256(config_bytes).hexdigest()
     source_identity = _source_identity()
     if config.get('publish_model_artifacts', False):
         raise ValueError('model artifact publication requires separate rights and destination review')
@@ -331,7 +332,8 @@ def run(config_path, output):
                      mode=config.get('wandb_mode', 'offline'),
                      config={'model_id': MODEL, 'revision': REVISION,
                              'source_identity': source_identity,
-                             'config_sha256': hashlib.sha256(config_bytes).hexdigest(),
+                             'config_sha256': config_sha256,
+                             'prompt_version': PROMPT_VERSION,
                              'sources': provenance, 'seed': config['seed']})
     cursors = {source: 0 for source in training}
     for items in training.values():
@@ -349,6 +351,8 @@ def run(config_path, output):
     best_step = 0
     best_probe_loss = None
     best_by_source = None
+    realized_steps = 0
+    updates_by_source = {source: 0 for source in training}
     try:
         for step in range(1, config['max_steps'] + 1):
             if time.monotonic() - started > config['max_runtime_seconds']:
@@ -366,6 +370,8 @@ def run(config_path, output):
             loss.backward()
             before_update = probe_parameter.detach().clone()
             optimizer.step()
+            realized_steps = step
+            updates_by_source[source] += 1
             observed_update |= bool(torch.count_nonzero(probe_parameter.detach() - before_update).item())
             if step % config['validation_interval'] == 0 or step == config['max_steps']:
                 by_source, macro = _validate(model, tokenizer, validation, 'cuda',
@@ -401,10 +407,20 @@ def run(config_path, output):
         reload_delta = abs(best_probe_loss - after)
         if reload_delta > 0.02:
             raise RuntimeError(f'best adapter reload changed probe loss: {reload_delta}')
-        receipt = {'status': 'pilot_completed', 'claim_scope': 'preliminary bounded two-domain pilot',
+        receipt = {'status': 'pilot_completed',
+                   'claim_scope': f'preliminary bounded {len(specs)}-domain pilot',
                    'model_id': MODEL, 'revision': REVISION, 'runtime': runtime,
                    'source_identity': source_identity,
+                   'config_sha256': config_sha256,
+                   'prompt_version': PROMPT_VERSION,
+                   'effective_hyperparameters': {
+                       **{key: config[key] for key in ('max_steps', 'max_runtime_seconds',
+                           'validation_interval', 'max_length', 'learning_rate', 'seed', 'lora')},
+                       'max_train_groups': config.get('max_train_groups', 1000),
+                       'max_validation_groups': config.get('max_validation_groups', 100)},
                    'seed': config['seed'], 'best_step': best_step,
+                   'realized_optimizer_steps': realized_steps,
+                   'optimizer_updates_by_source': updates_by_source,
                    'nonzero_lora_update': observed_update,
                    'base_validation_macro_source_loss': base_macro,
                    'base_validation_by_source_loss': base_by_source,
