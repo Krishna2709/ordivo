@@ -19,7 +19,7 @@ CRITERIA = [{"name": "price_usd", "direction": "min", "weight": None},
 
 
 def _number(value: str | None) -> int | float | None:
-    if value in (None, ""):
+    if value is None or value == "" or value.strip().upper() == "NULL":
         return None
     number = float(value)
     if not (number == number and abs(number) != float("inf")):
@@ -40,6 +40,8 @@ def iter_episodes(path: Path, policy: dict) -> Iterator[DecisionEpisode]:
             for row in reader:
                 profile["raw_rows"] += 1
                 profile["selected_rows"] += 1
+                if any(row[name] is None or not row[name].strip() or row[name].strip().upper() == "NULL" for name in ("srch_id", "prop_id")):
+                    raise ValueError("Expedia search and property IDs cannot be missing")
                 # Keep only the approved dictionary/exposure/label columns in
                 # the disk spool; the competition CSV has many large excluded
                 # competitor/history fields.

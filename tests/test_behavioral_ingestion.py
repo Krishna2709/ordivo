@@ -72,6 +72,15 @@ def test_expedia_official_null_sentinel_is_missing_not_zero(tmp_path):
     assert episode["alternatives"][0]["features"]["prop_review_score"] is None
     assert episode["alternatives"][1]["features"]["prop_location_score2"] is None
     assert episode["alternatives"][1]["features"]["prop_review_score"] == 0
+    rows[0]["click_bool"] = "NULL"
+    write_csv(path, rows)
+    with pytest.raises(ValueError, match="binary"):
+        list(expedia.iter_episodes(path, {"temp_dir": tmp_path}))
+    rows[0]["click_bool"] = "0"
+    rows[0]["prop_id"] = "NULL"
+    write_csv(path, rows)
+    with pytest.raises(ValueError, match="IDs cannot be missing"):
+        list(expedia.iter_episodes(path, {"temp_dir": tmp_path}))
 
 
 def test_failed_materialization_leaves_no_dataset(tmp_path):
