@@ -1,0 +1,52 @@
+# Separate exploratory S0b proposal. Frozen validation token audit: ESCI
+# 92/100 <=4096; Expedia exactly-one booking 70/100, all 70 <=4096.
+# Longest ESCI 6118-token A40 backward used 38,118/46,068 MiB allocated;
+# arbitrary 8192-token training safety is unproven. Exclude full groups
+# exceeding 4096 tokens; never truncate candidates.
+# No matched claim versus S0 or conditional-booking comparison to Expedia
+# combined click/booking LambdaRank baseline.
+model_id: LiquidAI/d1-3B
+revision: 051bcc464b01b9f92942b364d9586b0ef5912432
+seed: 42
+max_steps: 90
+max_runtime_seconds: 900
+max_train_groups: 1000
+max_validation_groups: 100
+max_train_episodes: 10000
+max_validation_episodes: 1000
+validation_interval: 30
+max_length: 4096
+learning_rate: 0.00003
+train_candidate_permutation: true
+wandb_project: liquid-mcdm-lab
+wandb_mode: offline
+publish_model_artifacts: false
+lora:
+  r: 8
+  alpha: 16
+  dropout: 0.0
+  target_modules: [q_proj, k_proj, v_proj, out_proj, in_proj, w1, w2, w3]
+sources:
+  - name: swissmetro
+    expected_source: swissmetro
+    directory: /workspace/ordivo-v2-data/processed/swissmetro-source-bound-v2
+    expected_manifest_sha256: dd3dc4b0713506f1664149993ca11022614a3ee850c335944ae37b5525af592a
+    feature_policy:
+      context_features: [purpose, ga, who, luggage]
+      alternative_features: [travel_time_minutes, cost_chf, headway_minutes]
+  - name: esci
+    expected_source: amazon_esci
+    directory: /workspace/ordivo-v2-data/processed/esci-source-bound-v2
+    expected_manifest_sha256: 9fd4065fc0db4586453a412123eb9ef393b1750cd8196bb11cad794d020f07cc
+    feature_policy:
+      context_features: [query, locale]
+      alternative_features: [product_title, product_brand, product_color]
+  - name: expedia
+    expected_source: expedia_personalized_sort_2013
+    directory: /workspace/ordivo-v2-data/processed/expedia-bounded-79da
+    expected_manifest_sha256: c72552b8fe1acd0cab0480610dd65b5dd6aed575313047d2da2f2786953b4a2b
+    expected_parent_manifest_sha256: 3b14e3f30466a2da868ac636c8888bc42366f865737715a57a67f32866a02d92
+    feature_policy:
+      prediction_event: conditional_booking_choice
+      context_features: [srch_length_of_stay, srch_booking_window, srch_adults_count, srch_children_count, srch_room_count, srch_saturday_night_bool]
+      alternative_features: [price_usd, prop_starrating, prop_review_score, prop_location_score1, prop_location_score2]
