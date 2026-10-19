@@ -24,6 +24,16 @@ def swiss(respondent, row):
             "exposure": {}, "provenance": {}}
 
 
+def expedia(name, bookings):
+    return {"episode_id": f"expedia:{name}", "source": "expedia_personalized_sort_2013",
+            "group_id": name, "task_type": "observed_choice",
+            "alternatives": [{"id": "a", "available": True, "features": {}},
+                             {"id": "b", "available": True, "features": {}}],
+            "supervision": {"outcomes_by_id": {
+                "a": {"booking_bool": bookings[0]},
+                "b": {"booking_bool": bookings[1]}}}}
+
+
 def test_permutation_changes_only_candidate_order_and_ignores_labels():
     episode = swiss("r1", 1)
     episode["alternatives"].append({"id": "bike", "available": False, "features": {"time": 12}})
@@ -63,6 +73,25 @@ def test_overflow_has_explicit_denominator_and_no_partial_score():
     assert report["admitted_pairs"] == 1
     assert report["excluded"]["overflow_permuted"] == 1
     assert report["failed_queries"] == 0
+
+
+def test_conditional_booking_excludes_zero_and_multiple_before_pair_coverage():
+    rows = [expedia("zero", (False, False)), expedia("one", (True, False)),
+            expedia("multiple", (True, True))]
+    admitted = rows[1]["episode_id"]
+    prediction = {admitted: {"a": .7, "b": .3}}
+    policy = {"prediction_event": "conditional_booking_choice"}
+    report = order_stability_report(rows, prediction, prediction, set(), set(), policy)
+    assert report["selected_episodes"] == 3
+    assert report["admitted_pairs"] == 1
+    assert report["excluded"]["not_exactly_one_booking"] == 2
+    assert [row["status"] for row in report["per_query"]] == [
+        "not_exactly_one_booking", "scored", "not_exactly_one_booking"]
+    with pytest.raises(ValueError, match="incomplete paired"):
+        order_stability_report(rows, {}, prediction, set(), set(), policy)
+    with pytest.raises(ValueError, match="ineligible.*overflow"):
+        order_stability_report(rows, prediction, prediction,
+                               {rows[0]["episode_id"]}, set(), policy)
 
 
 def test_validation_source_selection_is_separate_from_test(tmp_path):

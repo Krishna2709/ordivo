@@ -11,7 +11,7 @@ from pathlib import Path
 
 import yaml
 
-from liquid_mcdm.evaluation.neural_heldout import _validate_probabilities
+from liquid_mcdm.evaluation.neural_heldout import _validate_probabilities, eligibility
 from liquid_mcdm.evaluation.ranking import ranked_ids
 from liquid_mcdm.runtime import require_remote_gpu
 from liquid_mcdm.training.behavioral_rendering import PROMPT_VERSION, render_behavioral
@@ -47,16 +47,19 @@ def permute_candidates(episode: dict, seed: int) -> dict:
 
 
 def order_stability_report(episodes: list[dict], original: dict, permuted: dict,
-                           original_overflow: set[str], permuted_overflow: set[str]) -> dict:
+                           original_overflow: set[str], permuted_overflow: set[str],
+                           feature_policy: dict | None = None) -> dict:
     """Compare probabilities by canonical candidate ID on the paired admitted cohort."""
     selected = {e["episode_id"]: e for e in episodes}
     if len(selected) != len(episodes):
         raise ValueError("duplicate selected episode")
     if not original_overflow <= set(selected) or not permuted_overflow <= set(selected):
         raise ValueError("overflow ID outside selected cohort")
-    fewer_than_two = {e["episode_id"] for e in episodes
-                      if sum(a.get("available", True) for a in e["alternatives"]) < 2}
-    admitted = set(selected) - fewer_than_two - original_overflow - permuted_overflow
+    exclusions = {e["episode_id"]: eligibility(e, feature_policy or {})[1] for e in episodes}
+    excluded = {episode_id for episode_id, reason in exclusions.items() if reason is not None}
+    if (original_overflow | permuted_overflow) & excluded:
+        raise ValueError("ineligible candidate-order query marked as prompt overflow")
+    admitted = set(selected) - excluded - original_overflow - permuted_overflow
     if set(original) != admitted or set(permuted) != admitted:
         raise ValueError("incomplete paired candidate-order prediction coverage")
     if not admitted:
@@ -64,7 +67,7 @@ def order_stability_report(episodes: list[dict], original: dict, permuted: dict,
     rows = []
     for episode in episodes:
         episode_id = episode["episode_id"]
-        status = ("fewer_than_two_available" if episode_id in fewer_than_two else
+        status = (exclusions[episode_id] if exclusions[episode_id] is not None else
                   "overflow_both" if episode_id in original_overflow and episode_id in permuted_overflow else
                   "overflow_original" if episode_id in original_overflow else
                   "overflow_permuted" if episode_id in permuted_overflow else "scored")
@@ -85,7 +88,8 @@ def order_stability_report(episodes: list[dict], original: dict, permuted: dict,
             "selected_episodes": len(episodes), "admitted_pairs": len(scored),
             "failed_queries": 0,
             "excluded": {reason: sum(r["status"] == reason for r in rows)
-                         for reason in ("fewer_than_two_available", "overflow_original",
+                         for reason in ("fewer_than_two_available", "not_exactly_one_booking",
+                                        "overflow_original",
                                         "overflow_permuted", "overflow_both")},
             "top1_flip_rate": sum(r["top1_flipped"] for r in scored) / len(scored),
             "mean_l1_probability_change": sum(r["l1_probability_change"] for r in scored) / len(scored),
@@ -152,7 +156,7 @@ def run(pilot_config_path: Path, pilot_output: Path, diagnostic_config_path: Pat
                 if time.monotonic() > deadline:
                     raise TimeoutError("validation diagnostic rendering time cap reached")
                 episode_id = episode["episode_id"]
-                if sum(a.get("available", True) for a in episode["alternatives"]) < 2:
+                if eligibility(episode, spec["feature_policy"])[1] is not None:
                     continue
                 changed = permute_candidates(episode, config["seed"])
                 pair = []
@@ -203,7 +207,9 @@ def run(pilot_config_path: Path, pilot_output: Path, diagnostic_config_path: Pat
             original = _score_model(model, tokenizer, original_rows, deadline, progress_original, name)
             permuted = _score_model(model, tokenizer, permuted_rows, deadline, progress_permuted, name)
             report = order_stability_report(rows, original, permuted,
-                                            original_overflow, permuted_overflow)
+                                            original_overflow, permuted_overflow,
+                                            next(spec["feature_policy"] for spec in specs
+                                                 if spec["name"] == name))
             _write(output / f"{name}_per_query.json", report.pop("per_query"))
             reports[name] = {**report, "source": source_meta[name]["source"],
                              "manifest_sha256": source_meta[name]["manifest_sha256"],

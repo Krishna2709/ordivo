@@ -47,10 +47,13 @@ Compare private per-query files by episode ID. Report Swissmetro on the same
 scored episodes** separately from S0b's complete newly admitted set; if any
 of the old 12 cease to be scored, disclose the shared-pair intersection and
 each new exclusion reason rather than silently dropping them. Also report
-S0b's selected 20 and all new overflow/failed counts. Expedia's 20 selected
-validation searches form a separate order-only diagnostic over exposed
-candidates; do not call that the exactly-one-booking choice population without
-an independent eligibility audit. Retain old and new private per-query files,
+S0b's selected 20 and all new overflow/failed counts. Expedia's 20 validation
+searches are selected without labels, then only exactly-one-booking groups
+are admitted under S0b's frozen `conditional_booking_choice` event. Zero- or
+multiple-booking searches are counted together as `not_exactly_one_booking`
+before rendering; report selected and admitted denominators separately. The
+diagnostic still measures order sensitivity, not booking accuracy. Retain old
+and new private per-query files,
 and publish only aggregate paired comparisons. Because S0b changes domain
 mixture, augmentation, learning rate, and likely prompt length together, any
 change in positional sensitivity cannot be attributed to one factor. No test
