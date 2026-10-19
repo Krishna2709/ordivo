@@ -39,7 +39,7 @@ that could have been retrieved or considered.
 
 | Source | Primary reference | Labels and fields | Terms evidence | Status |
 |---|---|---|---|---|
-| Expedia Personalized Sort | [official Kaggle data dictionary](https://www.kaggle.com/c/expedia-personalized-sort/data) | `srch_id` search, `prop_id` hotel, click and booking flags; position and `random_bool` are exposure | [competition rules](https://www.kaggle.com/c/expedia-personalized-sort/rules) require account review | Adapter and authenticated official-CLI acquisition implemented; no download receipt yet |
+| Expedia Personalized Sort | [official Kaggle data dictionary](https://www.kaggle.com/c/expedia-personalized-sort/data) | `srch_id` search, `prop_id` hotel, click and booking flags; position and `random_bool` are exposure | [competition rules](https://www.kaggle.com/c/expedia-personalized-sort/rules) require account review | Adapter implemented; official file listing succeeded but data.zip download returned HTTP 403, so no source acquired |
 | Amazon ESCI | [official Amazon Science repository](https://github.com/amazon-science/esci-data) | Task 1 uses `small_version=1`, E/S/C/I judgments, `split`, product join on `(product_locale, product_id)` | [Apache-2.0](https://github.com/amazon-science/esci-data/blob/main/LICENSE) and [NOTICE](https://github.com/amazon-science/esci-data/blob/main/NOTICE) | Remote acquisition and full ingestion pending |
 | Swissmetro | [official Biogeme source data](https://github.com/michelbierlaire/biogeme/blob/master/src/biogeme/data/data/swissmetro.dat) and [example loader](https://biogeme.epfl.ch/sphinx/_modules/biogeme/data/swissmetro.html) | Stated `CHOICE`, respondent `ID`, `TRAIN_AV`/`SM_AV`/`CAR_AV`, times/costs/headways; `CHOICE=0` excluded as in the example | [Biogeme data page](https://biogeme.epfl.ch/) makes data available for research and education; source-specific redistribution terms still require confirmation | Adapter implemented; remote acquisition and full ingestion pending |
 
@@ -124,7 +124,11 @@ The remote receipts must include the exact executed code commit, acquisition
 revision, file hashes/sizes, source terms, raw and retained rows/groups,
 duplicate/missingness/choice diagnostics, split counts and hashes, group
 integrity checks, and test results. The Swissmetro data-specific rights check
-and Expedia authenticated download result are open. The first release comparison needs
+is open. On the scoped official Kaggle CLI, `competitions files` listed
+`data.zip` (434,573,097 bytes), but `DownloadDataFile` returned HTTP 403
+Forbidden. No archive or training CSV was acquired, and automation accepted
+no new rules. The 403 does not identify the exact account-side cause; a user
+must review access in Kaggle if Expedia remains required. The first release comparison needs
 actual held-out scored groups; passing adapter tests alone is insufficient.
 
 For a third future real domain, the [SUSHI author page](https://www.kamishima.net/sushi/)
