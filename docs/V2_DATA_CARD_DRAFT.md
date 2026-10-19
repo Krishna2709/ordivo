@@ -1,6 +1,6 @@
 # Ordivo v2 data card — draft, no completed corpus
 
-**Status:** planned multi-source research collection; no frozen v2 training mixture or real-data manifest is certified by this card. It documents the intended evidence types and acquisition gates. Actual counts, hashes, licenses/terms, retention and model-release rights remain source-specific. See the [dataset register](V2_DATASET_REGISTER.md) and [release criteria](V2_RELEASE_CRITERIA.md).
+**Status:** Swissmetro and ESCI source-bound manifests and a preliminary two-domain training subset have remote receipts; Expedia official source is acquired but grouped ingestion is pending. There is no frozen **public-release** v2 training mixture. Counts and hashes below refer to specific executed builds; source rights, retention and model-release rights remain source-specific. The [private research-data README](../hub/v2_research_data/README.md) describes the intended controlled Hub layout. See the [dataset register](V2_DATASET_REGISTER.md) and [release criteria](V2_RELEASE_CRITERIA.md).
 
 ## Sources and what their labels mean
 
