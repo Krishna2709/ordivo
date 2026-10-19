@@ -122,6 +122,8 @@ def fit_temperature(option_scores: torch.Tensor, target: torch.Tensor, *,
         raise ValueError('fitting groups must belong to calibration split')
     if not set(group_ids) <= evidence.population_group_ids:
         raise ValueError('fitting groups violate candidate population protocol')
+    if set(group_ids) != evidence.population_group_ids:
+        raise ValueError('fit requires full eligible calibration population')
     if not isinstance(option_scores, torch.Tensor) or option_scores.ndim != 2:
         raise ValueError('option_scores must be [groups, options]')
     if not option_scores.is_floating_point():
