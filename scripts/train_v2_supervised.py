@@ -29,6 +29,7 @@ SOURCE_CONTRACTS = {
     'swissmetro': ('swissmetro-respondent-v2-calibration',
                    'three_survey_modes', 'swissmetro-choice-v1'),
 }
+BOUNDED_EXPEDIA_SPLIT = 'expedia-2013-split-v2-calibration:bounded-hash-v1'
 
 
 def _source_identity():
@@ -84,6 +85,37 @@ def _validate_source_specs(specs):
         raise ValueError('duplicate source manifest directory')
 
 
+def _validate_manifest_contract(spec, manifest, manifest_bytes, *, seed):
+    """Accept the full source or one explicitly frozen bounded Expedia sample."""
+    source = spec['expected_source']
+    expected = SOURCE_CONTRACTS.get(source)
+    if expected is None or json.loads(manifest_bytes) != manifest or (
+            manifest.get('source'), manifest.get('candidate_pool_scope'),
+            manifest.get('target_policy_id')) != (source, expected[1], expected[2]):
+        raise ValueError('manifest source contract differs from pilot spec')
+    digest = hashlib.sha256(manifest_bytes).hexdigest()
+    if spec.get('expected_manifest_sha256') is not None and digest != spec['expected_manifest_sha256']:
+        raise ValueError('manifest source contract differs from frozen digest')
+    if manifest.get('split_policy_id') == expected[0]:
+        if spec.get('expected_parent_manifest_sha256') is not None:
+            raise ValueError('manifest source contract has unexpected parent binding')
+        return
+    if source != 'expedia_personalized_sort_2013' or manifest.get('split_policy_id') != BOUNDED_EXPEDIA_SPLIT:
+        raise ValueError('manifest source contract differs from pilot spec')
+    parent = spec.get('expected_parent_manifest_sha256')
+    derived_digest = spec.get('expected_manifest_sha256')
+    sample = manifest.get('sampling')
+    if (not isinstance(derived_digest, str) or not re.fullmatch(r'[0-9a-f]{64}', derived_digest) or
+            not isinstance(parent, str) or not re.fullmatch(r'[0-9a-f]{64}', parent) or
+            not isinstance(sample, dict) or
+            sample.get('parent_manifest_sha256') != parent or
+            sample.get('policy') != 'sha256_smallest_source_split_episode_id_v1' or
+            sample.get('seed') != seed or
+            sample.get('label_independent_selection') is not True or
+            sample.get('complete_groups_preserved') is not True):
+        raise ValueError('bounded Expedia source contract requires exact parent and complete label-free sample')
+
+
 def _load_source(spec, *, seed, max_train_groups, max_validation_groups, deadline,
                  max_train_episodes=10000, max_validation_episodes=1000):
     if (not isinstance(max_train_groups, int) or not 1 <= max_train_groups <= 1000 or
@@ -96,11 +128,7 @@ def _load_source(spec, *, seed, max_train_groups, max_validation_groups, deadlin
     manifest_bytes = (directory / 'manifest.json').read_bytes()
     manifest = json.loads(manifest_bytes)
     expected_source = spec['expected_source']
-    expected = SOURCE_CONTRACTS.get(expected_source)
-    if expected is None or (manifest.get('source'), manifest.get('split_policy_id'),
-                            manifest.get('candidate_pool_scope'), manifest.get('target_policy_id')) != (
-                                expected_source, *expected):
-        raise ValueError('manifest source contract differs from pilot spec')
+    _validate_manifest_contract(spec, manifest, manifest_bytes, seed=seed)
     if set(manifest['split_sha256']) != {'train', 'validation', 'calibration', 'test'}:
         raise ValueError('four-way frozen split manifest required')
     counts = {}
@@ -171,6 +199,7 @@ def _load_source(spec, *, seed, max_train_groups, max_validation_groups, deadlin
                         if len(rows[split]) > budget:
                             raise ValueError('selected complete panels exceed absolute episode budget')
     info = {'manifest_sha256': hashlib.sha256(manifest_bytes).hexdigest(),
+            'parent_manifest_sha256': manifest.get('sampling', {}).get('parent_manifest_sha256'),
             'complete_episode_counts': counts,
             'complete_split_unit_counts': unit_counts,
             'selected_split_unit_counts': {key: len(value) for key, value in selected.items()},
