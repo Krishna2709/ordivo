@@ -1,0 +1,13 @@
+{
+  "cost_per_hour_usd": 0.59,
+  "created_utc": "2026-10-19T00:47:57.885798+00:00",
+  "estimated_pod_cost_usd": 0.3526951904166667,
+  "network_volume_absent_verified": true,
+  "network_volume_deleted_utc": "2026-10-19T01:23:57.195544+00:00",
+  "network_volume_id": "ngica7qkhd",
+  "pod_absent_verified": true,
+  "pod_deleted_utc": "2026-10-19T01:23:49.924248+00:00",
+  "pod_id": "9kn5qy9648dfnl",
+  "run_id": "20261019T005111Z",
+  "runtime_hours": 0.5977884583333334
+}

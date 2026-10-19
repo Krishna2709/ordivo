@@ -7,6 +7,12 @@ $0.59/hour. It reused network volume `ngica7qkhd` and the previously validated
 remote Python environments. No model, dataset generation, test suite, or
 training workload ran on the local machine.
 
+The pod ran for 0.5978 hours and cost an estimated $0.35. After GitHub,
+Hugging Face, and W&B read-back verification, both the pod and network volume
+were deleted and verified absent. Together with the approximately $0.37 first
+diagnostic pod, total GPU pod cost was approximately $0.72; no Runpod compute
+or storage resource remains.
+
 Remote CPU acceptance passed **130 tests in 31.45 seconds**. Two generated
 1,000-episode datasets were byte-identical. The release dataset contains 800
 training, 100 validation, and 100 test records; 87 test records have an

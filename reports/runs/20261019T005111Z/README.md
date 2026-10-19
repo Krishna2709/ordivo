@@ -15,8 +15,11 @@ from Runpod to Hugging Face and were never copied to the local machine.
 - W&B: https://wandb.ai/black-order/liquid-mcdm-lab/runs/4vblgw80
 - Dataset: https://huggingface.co/datasets/blackOrder/liquid-mcdm-synthetic
 - Model: https://huggingface.co/blackOrder/d1-3b-mcdm-lora
+- Cleanup: the pod cost an estimated $0.35 for 0.5978 hours; the pod and
+  network volume were deleted and verified absent.
 
 `hf_publish_receipt.json` records every published dataset and adapter payload
 hash plus the successful Hub read-back checks. `training/run.json` is the
 terminal run state; the remaining JSON files contain complete before/after,
 slice, prediction, and reload evidence.
+`runpod_cleanup_receipt.json` records the final provider-resource cleanup.
