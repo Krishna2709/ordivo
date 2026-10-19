@@ -277,6 +277,13 @@ def run(config_path, output):
         raise ValueError('pilot step/runtime limits exceeded')
     if not (1 <= config['validation_interval'] <= config['max_steps']):
         raise ValueError('invalid validation interval')
+    effective_hyperparameters = {
+        **{key: config[key] for key in ('max_steps', 'max_runtime_seconds',
+            'validation_interval', 'max_length', 'learning_rate', 'seed', 'lora')},
+        'max_train_groups': config.get('max_train_groups', 1000),
+        'max_validation_groups': config.get('max_validation_groups', 100),
+        'max_train_episodes': config.get('max_train_episodes', 10000),
+        'max_validation_episodes': config.get('max_validation_episodes', 1000)}
     specs = config['sources']
     _validate_source_specs(specs)
     output = Path(output)
@@ -339,8 +346,10 @@ def run(config_path, output):
                      mode=config.get('wandb_mode', 'offline'),
                      config={'model_id': MODEL, 'revision': REVISION,
                              'source_identity': source_identity,
+                             'source_archive_sha256': source_identity['archive_sha256'],
                              'config_sha256': config_sha256,
                              'prompt_version': PROMPT_VERSION,
+                             'effective_hyperparameters': effective_hyperparameters,
                              'sources': provenance, 'seed': config['seed']})
     cursors = {source: 0 for source in training}
     for items in training.values():
@@ -380,11 +389,13 @@ def run(config_path, output):
             realized_steps = step
             updates_by_source[source] += 1
             observed_update |= bool(torch.count_nonzero(probe_parameter.detach() - before_update).item())
+            run.log({'train/query_loss': float(loss.detach()),
+                     f'train/{source}_query_loss': float(loss.detach()),
+                     f'train/{source}_updates': updates_by_source[source]}, step=step)
             if step % config['validation_interval'] == 0 or step == config['max_steps']:
                 by_source, macro = _validate(model, tokenizer, validation, 'cuda',
                                              started + config['max_runtime_seconds'])
-                run.log({'train/query_loss': float(loss.detach()),
-                         'validation/macro_source_loss': macro,
+                run.log({'validation/macro_source_loss': macro,
                          **{f'validation/{key}_query_loss': value for key, value in by_source.items()}},
                         step=step)
                 if macro < best:
@@ -420,13 +431,7 @@ def run(config_path, output):
                    'source_identity': source_identity,
                    'config_sha256': config_sha256,
                    'prompt_version': PROMPT_VERSION,
-                   'effective_hyperparameters': {
-                       **{key: config[key] for key in ('max_steps', 'max_runtime_seconds',
-                           'validation_interval', 'max_length', 'learning_rate', 'seed', 'lora')},
-                       'max_train_groups': config.get('max_train_groups', 1000),
-                       'max_validation_groups': config.get('max_validation_groups', 100),
-                       'max_train_episodes': config.get('max_train_episodes', 10000),
-                       'max_validation_episodes': config.get('max_validation_episodes', 1000)},
+                   'effective_hyperparameters': effective_hyperparameters,
                    'seed': config['seed'], 'best_step': best_step,
                    'realized_optimizer_steps': realized_steps,
                    'optimizer_updates_by_source': updates_by_source,
