@@ -11,7 +11,7 @@ dependency versions, candidate coverage, test outcome, and remote artifact paths
 |---|---|---|
 | Expedia observed hotel searches | `expedia-click-booking-v1`: grades 0 neither, 1 clicked without booking, 2 booked; gains 0/1/5 | Entire eligible exposed hotel set per retained search. Click and booking endpoints retain independent binary gain and denominators. |
 | ESCI source judgments | `esci-task1-official-gain-v1`: E=1, C=0.1, S=0.01, I=0 | Judged candidates within each source query. Unjudged products remain counted but do not consume metric ranks. This is relevance, not a click or purchase event. |
-| Swissmetro stated mode choice | `swissmetro-choice-v1`: selected available mode | Available modes only; accuracy@1 and reciprocal selected rank. A conditional logit specialist is present for a future respondent-disjoint run. |
+| Swissmetro stated mode choice | `swissmetro-choice-v1`: selected available mode | Available modes only; accuracy@1 and reciprocal selected rank. The runner fits a respondent-disjoint conditional logit specialist. |
 
 Macro query NDCG@5 and @10 use `gain/log2(rank+1)` with rank starting at
 one. Ideal DCG zero yields no NDCG contribution, with an exclusion count per
@@ -51,7 +51,11 @@ until versions and wheels are verified by a remote acceptance run.
 The runner requires the operations controller's `ORDIVO_SOURCE_COMMIT` from a
 SHA-verified git archive; that receipt must be reconciled against controller
 provenance. Candidate-pool scope is checked per source: exposed hotels for
-Expedia and the official reduced Task 1 candidate list for ESCI.
+Expedia, the official reduced Task 1 candidate list for ESCI, and three survey
+modes for Swissmetro. The Swissmetro runner rejects respondent overlap across
+all four splits; its fixed-setting conditional logit fits only train data,
+saves its feature state, and checks validation score parity after JSON reload.
+Its time, cost and headway inputs are source fields, not invented weights.
 
 ## Evidence ledger
 
@@ -62,6 +66,6 @@ Expedia and the official reduced Task 1 candidate list for ESCI.
 | Remote LightGBM save/reload parity | Pending dependency verification. |
 | Real ESCI lexical and ranker results | Pending source acquisition, manifested dataset, remote run. |
 | Real Expedia baseline | Pending authenticated source access and terms record. |
-| Swissmetro stated-choice baseline | Pending source adapter and respondent-disjoint manifest. |
+| Swissmetro stated-choice baseline | Runner/config ready; respondent-disjoint real manifest, remote tests and result pending. |
 
 Do not turn a fixture pass or a completed test process into a real-data result.

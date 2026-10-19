@@ -35,12 +35,21 @@ def numerical_heuristic(episode: Mapping, feature_policy: Mapping,
                         weights: Mapping[str, float]) -> dict[str, float]:
     projected = inference_input(episode, feature_policy)
     result = {}
+    missing = []
     for alternative in projected["alternatives"]:
         if not alternative.get("available", True):
             continue
         values = alternative["features"]
-        result[alternative["id"]] = sum(float(coefficient) * float(values.get(field) or 0)
+        selected = [values.get(field) for field in weights]
+        if any(not isinstance(value, (int, float)) or not math.isfinite(float(value))
+               for value in selected):
+            missing.append(alternative["id"])
+            continue
+        result[alternative["id"]] = sum(float(coefficient) * float(values[field])
                                          for field, coefficient in weights.items())
+    # A missing price/time/rating cannot win by masquerading as a favorable zero.
+    floor = min(result.values(), default=0.0) - 1.0
+    result.update({candidate_id: floor for candidate_id in missing})
     return result
 
 
