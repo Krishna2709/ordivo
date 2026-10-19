@@ -4,6 +4,7 @@ seed: 42
 target_policy:
   policy_id: expedia-click-booking-v1
 feature_policy:
+  prediction_event: booking_bool
   context_features: [srch_length_of_stay, srch_booking_window, srch_adults_count, srch_children_count, srch_room_count]
   alternative_features: [price_usd, prop_starrating, prop_review_score, prop_location_score1, prop_location_score2]
   numeric_features:

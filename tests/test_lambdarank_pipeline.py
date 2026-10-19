@@ -8,7 +8,8 @@ from liquid_mcdm.models.lambdarank import fit_ranker, predict_ranker
 from liquid_mcdm.models.ranking_baselines import FeatureState, lexical_scores, random_scores
 
 
-POLICY = {"context_features": [], "alternative_features": ["price_usd", "hotel_class"],
+POLICY = {"prediction_event": "booking_bool", "context_features": [],
+          "alternative_features": ["price_usd", "hotel_class"],
           "numeric_features": ["alternative.price_usd"],
           "categorical_features": ["alternative.hotel_class"]}
 
