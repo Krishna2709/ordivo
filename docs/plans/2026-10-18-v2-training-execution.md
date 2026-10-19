@@ -59,12 +59,24 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   `0a40a57fde6e4b3d81a7f87becc53cbba54280d826228e7ec9308680fc920bab`.
   This supersedes the fresh-archive three-skip diagnostic as the current
   integrated source check; neither result measures model efficacy.
-- S0b three-source supervised follow-up is configured for 90 updates,
-  6,144-token complete-group cap, learning rate 3e-5, 900-second cap and
-  training-only candidate shuffle. It started remotely at 04:24:40 UTC on
-  19 October 2026 at integrated source `945fe6e`; W&B run `0sq2jfj9` was
-  online at launch. No final validation/test result or artifact-retention
-  receipt is yet available; no efficacy claim follows from launch.
+- S0b three-source supervised follow-up completed at exact integrated source
+  `945fe6e07df4916f202108d7a56a543041808315`, archive SHA-256
+  `d655f68a053264cf4c37665504ceecd25c097bc95813c0804342c9bf006e29c4`,
+  config SHA-256
+  `1ad185a26779248dc0b9bf1635eb4c2a6460304cd34479de77941b898ab6403c`.
+  It realized 90/90 nonzero optimizer steps, 30 per source, best selected-
+  validation step 90. Source-macro loss fell 2.6071312→2.2937011;
+  Swissmetro 1.1358083→0.8775658 (549/549 selected validation eligible),
+  ESCI 3.4676457→2.8772386 (100/100), Expedia conditional booking
+  3.2179395→3.1262991 (70/100; 30 lacking supervised event). ESCI
+  training overflow excluded 4/1,000 selected groups; Expedia training
+  target exclusions were 315/1,000. Expedia source was the declared
+  bounded 20k/2k/2k/5k complete-search sample. Receipt:
+  `reports/runs/v2-s0b-20261019/pilot-receipt.json`, SHA-256
+  `85426d547c1fbc88cc52cf9c4fc9c9bfac99fb3bfbd7b256b177c3f069e24565`.
+  This is selection-validation learning only; held-out quality, private
+  adapter retention, calibration and transfer remain pending.
+
 - V2 behavioral data reviewer-fix tests at `2f417cbe28e77e7303d3c7fbfdf3d3d80bcf720f`
   passed 19/0 on the remote pod. Release-report source tests at `178d1fd4`
   passed 7/0. These are component tests, not real-data performance evidence.

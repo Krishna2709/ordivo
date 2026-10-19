@@ -1,6 +1,6 @@
 # Ordivo v2 research adapter (private)
 
-**Status:** preliminary, access-controlled pilot, **not a release candidate**. This repository is not a public v2 release or a claim of held-out neural improvement. It is separate from the published Ordivo v1 synthetic adapter. The current bounded pilot trained one shared adapter on Swissmetro stated choice and Amazon ESCI graded relevance; it has no Expedia training, no three-domain generality result, and no completed public release dossier. The model repository is `blackOrder/Ordivo-v2-research` and should remain private.
+**Status:** preliminary, access-controlled pilot, **not a release candidate**. This repository is not a public v2 release or a claim of held-out neural improvement. It is separate from the published Ordivo v1 synthetic adapter. The retained bounded pilot trained one shared adapter on Swissmetro stated choice and Amazon ESCI graded relevance. A separate three-source S0b pilot has now completed training with sampled Expedia conditional-booking choice, but has no held-out result or verified private adapter retention yet. Neither establishes three-domain generality or a public release dossier. The model repository is `blackOrder/Ordivo-v2-research` and should remain private.
 
 ## Exact model and task boundary
 
@@ -48,12 +48,30 @@ is `cc686cf66ee3d7daa777ecc8b3c1ccaedda5d546da96107ad1f18ea0bf055cc5`
 at source `f69643794a932b14dac46b2e866667f5a7814bc4`; no continuation
 held-out result, cloud readback or private Hub retention is asserted here.
 
-A separate S0b three-source supervised follow-up started remotely at 04:24:40 UTC
-on 19 October 2026 from integrated source `945fe6e`; its
-[W&B run](https://wandb.ai/black-order/liquid-mcdm-lab/runs/0sq2jfj9) was online
-at launch. No final S0b validation, held-out, artifact-retention or efficacy
-result has been read back. Its setup does not change the frozen pilot results
-above.
+A separate S0b three-source supervised follow-up completed 90/90 nonzero
+optimizer steps at exact integrated source
+`945fe6e07df4916f202108d7a56a543041808315`, archive SHA-256
+`d655f68a053264cf4c37665504ceecd25c097bc95813c0804342c9bf006e29c4`,
+and config SHA-256
+`1ad185a26779248dc0b9bf1635eb4c2a6460304cd34479de77941b898ab6403c`.
+It used 30 updates per source, a 6,144-token complete-group cap, training-only
+candidate permutation and best selected-validation checkpoint step 90. The
+mean of source validation losses fell 2.6071312→2.2937011; Swissmetro
+1.1358083→0.8775658 (549/549 selected validation episodes eligible), ESCI
+3.4676457→2.8772386 (100/100), and Expedia conditional-booking choice
+3.2179395→3.1262991 (70/100 selected validation searches eligible; 30 had
+no exactly-one-booking supervised event). ESCI training excluded 4/1,000
+selected groups for prompt overflow; Expedia training excluded 315/1,000
+selected groups for the target event. The metadata-only pilot receipt SHA-256 is
+`85426d547c1fbc88cc52cf9c4fc9c9bfac99fb3bfbd7b256b177c3f069e24565`.
+The S0b Expedia source is the predeclared bounded 20k/2k/2k/5k grouped
+sample (manifest SHA-256
+`c72552b8fe1acd0cab0480610dd65b5dd6aed575313047d2da2f2786953b4a2b`),
+not the full 399,344-search source. A [W&B run](https://wandb.ai/black-order/liquid-mcdm-lab/runs/0sq2jfj9)
+was online at launch; final cloud readback, private adapter retention,
+held-out efficacy, calibration and cross-domain transfer remain pending. These
+are model-selection validation losses only; they do not overturn the earlier
+negative/mixed held-out probe of the frozen two-source pilot.
 
 A validation-only candidate-order probe of this frozen pilot found
 52/180 Swissmetro top-choice flips (28.89%) across 20 selected respondents,

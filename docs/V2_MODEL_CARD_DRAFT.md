@@ -1,6 +1,6 @@
 # Ordivo v2 model card — draft, unreleased
 
-**Research status:** a preliminary two-domain v2 adapter exists in a **private** research repository; one bounded held-out neural probe measured negative/mixed results, while no public release claim is established here. This is the intended public card template; replace remaining pending fields with immutable receipts before publication. [Release criteria](V2_RELEASE_CRITERIA.md) control promotion. `blackOrder/Ordivo-v1` and its [synthetic-only results](../reports/V2_RESEARCH_AUDIT.md) are a separate historical model.
+**Research status:** a preliminary two-domain v2 adapter exists in a **private** research repository; its bounded held-out neural probe measured negative/mixed results. A separate three-source S0b training run has completed with better selected-validation loss, but no S0b held-out or retained-adapter evidence yet. No public release claim is established here. This is the intended public card template; replace remaining pending fields with immutable receipts before publication. [Release criteria](V2_RELEASE_CRITERIA.md) control promotion. `blackOrder/Ordivo-v1` and its [synthetic-only results](../reports/V2_RESEARCH_AUDIT.md) are a separate historical model.
 
 A bounded remote compatibility check at integrated source commit
 `22707ed34fd125e96aade9123f9baaf34cd64a18` completed one A40 BF16
@@ -44,6 +44,20 @@ The preliminary adapter uses [LiquidAI/d1-3B](https://huggingface.co/LiquidAI/d1
 ## Intended uses and limits
 
 Research comparisons of candidate ordering, conditional choice, calibration and verifiable numerical decisions are in scope. Tasks must be declared: a click/booking event, a stated selected mode, a relevance grade, and an explicit preference ranking have different meanings. Human review and approved policy remain necessary for consequential procurement or healthcare decisions. The model is not an exact MCDM calculator, a causal estimate of preference from observational clicks, or an autonomous policy authority. It should not be used to infer hidden personal preferences, to treat relevance as purchasing probability, to recommend unavailable candidates, or to act on unknown constraints.
+
+The separate S0b pilot at `945fe6e07df4916f202108d7a56a543041808315`
+completed 90/90 optimizer updates (30 per source), best selected-validation
+step 90, with source-macro loss 2.6071312→2.2937011. Swissmetro loss fell
+1.1358083→0.8775658 on 549 eligible validation episodes; ESCI
+3.4676457→2.8772386 on 100 eligible groups; Expedia conditional-booking
+choice 3.2179395→3.1262991 on 70/100 selected groups (30 had no target
+supervised event). The receipt SHA-256 is
+`85426d547c1fbc88cc52cf9c4fc9c9bfac99fb3bfbd7b256b177c3f069e24565`.
+ESCI training overflow excluded 4/1,000 selected groups; Expedia target
+exclusions were 315/1,000 selected training groups. Expedia used only the
+predeclared 20k/2k/2k/5k complete-search sample, not the full source. This is
+selection-validation evidence, not held-out accuracy, booking probability,
+calibration or cross-domain generality. Private S0b adapter readback pending.
 
 ## Research inference interface
 

@@ -1,0 +1,233 @@
+{
+  "status": "pilot_completed",
+  "claim_scope": "preliminary bounded 3-domain pilot",
+  "model_id": "LiquidAI/d1-3B",
+  "revision": "051bcc464b01b9f92942b364d9586b0ef5912432",
+  "runtime": {
+    "provider": "runpod",
+    "pod_id": "v99st82vxwi6rl",
+    "gpu": "NVIDIA A40, 46068 MiB, 570.211.01"
+  },
+  "source_identity": {
+    "commit": "945fe6e07df4916f202108d7a56a543041808315",
+    "archive_sha256": "d655f68a053264cf4c37665504ceecd25c097bc95813c0804342c9bf006e29c4"
+  },
+  "config_sha256": "1ad185a26779248dc0b9bf1635eb4c2a6460304cd34479de77941b898ab6403c",
+  "prompt_version": "behavioral-choice-v1",
+  "effective_hyperparameters": {
+    "max_steps": 90,
+    "max_runtime_seconds": 900,
+    "validation_interval": 30,
+    "max_length": 6144,
+    "learning_rate": 3e-05,
+    "seed": 42,
+    "lora": {
+      "r": 8,
+      "alpha": 16,
+      "dropout": 0.0,
+      "target_modules": [
+        "q_proj",
+        "k_proj",
+        "v_proj",
+        "out_proj",
+        "in_proj",
+        "w1",
+        "w2",
+        "w3"
+      ]
+    },
+    "max_train_groups": 1000,
+    "max_validation_groups": 100,
+    "max_train_episodes": 10000,
+    "max_validation_episodes": 1000,
+    "train_candidate_permutation": true
+  },
+  "seed": 42,
+  "best_step": 90,
+  "realized_optimizer_steps": 90,
+  "optimizer_updates_by_source": {
+    "swissmetro": 30,
+    "esci": 30,
+    "expedia": 30
+  },
+  "nonzero_lora_update": true,
+  "base_validation_macro_source_loss": 2.6071312005101204,
+  "base_validation_by_source_loss": {
+    "swissmetro": 1.1358083336459701,
+    "esci": 3.4676457369327545,
+    "expedia": 3.2179395309516363
+  },
+  "best_validation_macro_source_loss": 2.2937011335229345,
+  "best_validation_by_source_loss": {
+    "swissmetro": 0.8775657543773425,
+    "esci": 2.877238556146622,
+    "expedia": 3.126299090044839
+  },
+  "source_provenance": {
+    "swissmetro": {
+      "manifest_sha256": "dd3dc4b0713506f1664149993ca11022614a3ee850c335944ae37b5525af592a",
+      "parent_manifest_sha256": null,
+      "complete_episode_counts": {
+        "train": 8532,
+        "validation": 549,
+        "calibration": 594,
+        "test": 1044
+      },
+      "complete_split_unit_counts": {
+        "train": 948,
+        "validation": 61,
+        "calibration": 66,
+        "test": 116
+      },
+      "selected_split_unit_counts": {
+        "train": 948,
+        "validation": 61
+      },
+      "selected_split_unit_sha256": {
+        "train": "816c770c16250029f20cfef849254f3c270fa6442430606016260eadb86b5ff9",
+        "validation": "2a122590d592580f116e414c83e6c52d487c60c3fcc66f3421d823a6bd285045"
+      },
+      "canonical_source": "swissmetro",
+      "feature_policy": {
+        "context_features": [
+          "purpose",
+          "ga",
+          "who",
+          "luggage"
+        ],
+        "alternative_features": [
+          "travel_time_minutes",
+          "cost_chf",
+          "headway_minutes"
+        ]
+      },
+      "train_candidate_permutation": true,
+      "selected_train_episodes": 8532,
+      "selected_validation_episodes": 549,
+      "eligible_train_groups": 8532,
+      "eligible_validation_groups": 549,
+      "train_loss_exclusions": {
+        "no_supervised_event_or_positive_gain": 0,
+        "fewer_than_two_eligible": 0,
+        "prompt_overflow": 0
+      },
+      "validation_loss_exclusions": {
+        "no_supervised_event_or_positive_gain": 0,
+        "fewer_than_two_eligible": 0,
+        "prompt_overflow": 0
+      }
+    },
+    "esci": {
+      "manifest_sha256": "9fd4065fc0db4586453a412123eb9ef393b1750cd8196bb11cad794d020f07cc",
+      "parent_manifest_sha256": null,
+      "complete_episode_counts": {
+        "train": 30372,
+        "validation": 1688,
+        "calibration": 1744,
+        "test": 14496
+      },
+      "complete_split_unit_counts": {
+        "train": 30372,
+        "validation": 1688,
+        "calibration": 1744,
+        "test": 14496
+      },
+      "selected_split_unit_counts": {
+        "train": 1000,
+        "validation": 100
+      },
+      "selected_split_unit_sha256": {
+        "train": "58e75505bb0eebd5cec1584b846487dd4be20e2b419728fab8184030b418400b",
+        "validation": "ec7e56f78e30dc00e9d3be07e4347e55cef72100eed4b8ec28198ed605b50bc1"
+      },
+      "canonical_source": "amazon_esci",
+      "feature_policy": {
+        "context_features": [
+          "query",
+          "locale"
+        ],
+        "alternative_features": [
+          "product_title",
+          "product_brand",
+          "product_color"
+        ]
+      },
+      "train_candidate_permutation": true,
+      "selected_train_episodes": 1000,
+      "selected_validation_episodes": 100,
+      "eligible_train_groups": 996,
+      "eligible_validation_groups": 100,
+      "train_loss_exclusions": {
+        "no_supervised_event_or_positive_gain": 0,
+        "fewer_than_two_eligible": 0,
+        "prompt_overflow": 4
+      },
+      "validation_loss_exclusions": {
+        "no_supervised_event_or_positive_gain": 0,
+        "fewer_than_two_eligible": 0,
+        "prompt_overflow": 0
+      }
+    },
+    "expedia": {
+      "manifest_sha256": "c72552b8fe1acd0cab0480610dd65b5dd6aed575313047d2da2f2786953b4a2b",
+      "parent_manifest_sha256": "3b14e3f30466a2da868ac636c8888bc42366f865737715a57a67f32866a02d92",
+      "complete_episode_counts": {
+        "train": 20000,
+        "validation": 2000,
+        "calibration": 2000,
+        "test": 5000
+      },
+      "complete_split_unit_counts": {
+        "train": 20000,
+        "validation": 2000,
+        "calibration": 2000,
+        "test": 5000
+      },
+      "selected_split_unit_counts": {
+        "train": 1000,
+        "validation": 100
+      },
+      "selected_split_unit_sha256": {
+        "train": "bcb946cd19c938920ec0cf6331b144a75c61f21e81b39786a8b82bca26cbe656",
+        "validation": "ceb69dcb99b39ecf748db480d8d59c81a4aa4f1d7812180137b7d7452ffd89f0"
+      },
+      "canonical_source": "expedia_personalized_sort_2013",
+      "feature_policy": {
+        "prediction_event": "conditional_booking_choice",
+        "context_features": [
+          "srch_length_of_stay",
+          "srch_booking_window",
+          "srch_adults_count",
+          "srch_children_count",
+          "srch_room_count",
+          "srch_saturday_night_bool"
+        ],
+        "alternative_features": [
+          "price_usd",
+          "prop_starrating",
+          "prop_review_score",
+          "prop_location_score1",
+          "prop_location_score2"
+        ]
+      },
+      "train_candidate_permutation": true,
+      "selected_train_episodes": 1000,
+      "selected_validation_episodes": 100,
+      "eligible_train_groups": 685,
+      "eligible_validation_groups": 70,
+      "train_loss_exclusions": {
+        "no_supervised_event_or_positive_gain": 315,
+        "fewer_than_two_eligible": 0,
+        "prompt_overflow": 0
+      },
+      "validation_loss_exclusions": {
+        "no_supervised_event_or_positive_gain": 30,
+        "fewer_than_two_eligible": 0,
+        "prompt_overflow": 0
+      }
+    }
+  },
+  "wall_seconds": 398.70349912531674,
+  "reload_probe_loss": 0.34224948287010193,
+  "best_checkpoint_reload_probe_loss_delta": 0.0
+}
