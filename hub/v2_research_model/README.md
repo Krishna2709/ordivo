@@ -43,7 +43,7 @@ completed 40 optimizer updates per arm from the same starting pilot adapter.
 Their best **post-update** checkpoints (step 10; step 0 excluded from that
 selection rule) both worsened selected-validation macro loss relative to the
 shared start: start 1.5817367, C1 1.6459532, R0 1.6163764. R0 degrading less
-than C1 is not evidence of improvement. The sanitized remote receipt SHA-256
+than C1 is not evidence of improvement. The [sanitized remote receipt](https://github.com/Krishna2709/ordivo/blob/b6a353549f478b806b50d979bbfc4a5d5d5907d3/reports/runs/v2-continuation-20261019/summary.json) SHA-256
 is `cc686cf66ee3d7daa777ecc8b3c1ccaedda5d546da96107ad1f18ea0bf055cc5`
 at source `f69643794a932b14dac46b2e866667f5a7814bc4`; no continuation
 held-out result, cloud readback or private Hub retention is asserted here.
@@ -59,7 +59,7 @@ query groups overflowed in both orders. Mean probability L1 change was
 0.39663/0.31887. This is positional sensitivity, not an accuracy comparison;
 base d1 was not evaluated for this probe. Sanitized aggregate SHA-256:
 `1caff28407551758975ab5ebcf67abd3708f44fa8f2fa4a29ead7f04beeabad7`.
-Per-query retention and cloud readback remain pending; no public result should
+The [sanitized order aggregate](https://github.com/Krishna2709/ordivo/blob/b6a353549f478b806b50d979bbfc4a5d5d5907d3/reports/runs/v2-order-20261019/aggregate.json) is metadata-only. Per-query retention and cloud readback remain pending; no public result should
 omit the 8/20 ESCI overflow denominator.
 
 ## Loading and scoring a label-free research request
@@ -146,7 +146,7 @@ scores_by_candidate_id = dict(zip(rendered["candidate_ids"], probabilities.cpu()
 The remote A40 playthrough produced `train: 0.24508503079414368`,
 `swissmetro: 0.7549149990081787`, and unavailable `car: 0.0` for this
 constructed request. It rendered all three candidates in 345 input tokens;
-all scores were finite and summed to one. The metadata-only receipt SHA-256 is
+all scores were finite and summed to one. The [metadata-only receipt](https://github.com/Krishna2709/ordivo/blob/b6a353549f478b806b50d979bbfc4a5d5d5907d3/reports/runs/v2-inference-20261019/summary.json) SHA-256 is
 `9f9832eddaf39df94079cd82a9458839ed4be28e13cde70727943e42c25c3137`
 at exact project source `bd24814429211ad4dad4e9a58ba0137daa0bc76b`,
 base revision above, private Hub adapter revision above, and adapter directory
