@@ -10,7 +10,7 @@ experiment does not mean a release criterion passed.
 |---|---|---|---|---|
 | V0 | Weight policy + numerical verifier | Hand fixtures, adversarial inputs, independent formula references | Mathematical invariants | Implemented; see remote validation report |
 | B0 | Exact MCDM | Synthetic and explicit-preference numeric specifications | Formula reference; not behavioral oracle | v1 available; new wrapper implemented |
-| B1 | LightGBM / choice baselines | Source-specific real groups | Domain-specific choice/ranking performance | Swissmetro 1,044-group and ESCI 14,496-group classical held-out runs measured; [aggregate receipts](../reports/ordivo-v2-experiment.html). Expedia grouped 399,344-search build complete; baseline pending. |
+| B1 | LightGBM / choice baselines | Source-specific real groups | Domain-specific choice/ranking performance | Swissmetro 1,044-group and ESCI 14,496-group classical held-out runs measured; [aggregate receipts](../reports/ordivo-v2-experiment.html). Expedia grouped 399,344-search build complete; bounded 5,000-search [classical aggregate](../reports/runs/v2-expedia-bounded-20261019/aggregate.json) measured on a declared hash sample, not the full source. |
 | S0 | d1 supervised choice/ranking | Shared mixed-domain model, task-typed labels | B1, v1 transfer, zero-shot backbone | Preliminary two-domain 40-step pilot and [bounded paired held-out probe](../reports/runs/v2-neural-heldout-20261019/aggregate.json) completed at `854de087`: adapted accuracy/NDCG below base on admitted groups; 23/50 selected ESCI groups overflowed. Full controls, seeds and transfer pending. |
 | C0 | S0 + held-out temperature fit | Event probabilities | S0 raw probability quality | Planned |
 | C1 | Direct NLL/Brier fine-tuning | Same S0 checkpoint and splits | C0 and matched-budget SFT | Bounded 40-step run completed at `f696437`; best post-update checkpoint step 10 had selection-validation macro loss 1.645953 versus shared starting 1.581737 (worse). [Receipt](../reports/runs/v2-continuation-20261019/summary.json); no held-out improvement claim. |
@@ -26,7 +26,7 @@ experiment does not mean a release criterion passed.
   presentation subset and position bias. Exactly-one-booking conditional choice
   is distinct from purchase probability. Official archive and `train.csv` were
   [acquired and hashed](../reports/runs/v2-expedia-20261019/acquisition.json)
-  after user-confirmed rules; [grouped source manifest](../reports/runs/v2-expedia-20261019/manifest.json) records all 399,344 searches in four roles. Any Expedia metric remains pending.
+  after user-confirmed rules; [grouped source manifest](../reports/runs/v2-expedia-20261019/manifest.json) records all 399,344 searches in four roles. A bounded 5,000-search classical ranking metric is reported above; full-source/neural Expedia metrics remain pending.
 - Swissmetro: stated mode choice, respondent-disjoint splits and availability.
 - Amazon ESCI: graded relevance; preserve official test and query/locale groups.
 - MSLR: fixed official fold and query groups; source agreement recorded.

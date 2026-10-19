@@ -1,0 +1,323 @@
+{
+  "candidate_pool_scope": "source_exposed_candidates",
+  "code_revision": "79da4ffa885888d141bc396a617c48c4c8fa0531",
+  "code_revision_basis": "controller_verified_archive_env",
+  "config_sha256": "d1b718f5649a8ac116346e94d7aabbf0cc0939b33707e7ca3ea4650cfda79700",
+  "elapsed_seconds": 69.6705626109615,
+  "experiment_id": "ordivo-v2-expedia-lambdarank-v1",
+  "manifest_sha256": "c72552b8fe1acd0cab0480610dd65b5dd6aed575313047d2da2f2786953b4a2b",
+  "metrics": {
+    "lambdarank": {
+      "by_source_task_policy": {
+        "expedia_personalized_sort_2013|observed_choice|expedia-click-booking-v1": {
+          "macro": {
+            "booking_hit@1": {
+              "eligible": 3389,
+              "excluded_zero_ideal_gain": 1611,
+              "value": 0.1870758335792269
+            },
+            "booking_mrr": {
+              "eligible": 3389,
+              "excluded_zero_ideal_gain": 1611,
+              "value": 0.3555920523630722
+            },
+            "booking_ndcg@10": {
+              "eligible": 3389,
+              "excluded_zero_ideal_gain": 1611,
+              "value": 0.4361560595003713
+            },
+            "booking_ndcg@5": {
+              "eligible": 3389,
+              "excluded_zero_ideal_gain": 1611,
+              "value": 0.37038988790187133
+            },
+            "click_ndcg@10": {
+              "eligible": 5000,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.41638813440208294
+            },
+            "click_ndcg@5": {
+              "eligible": 5000,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.3468644385533976
+            },
+            "ndcg@10": {
+              "eligible": 5000,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.4131101835860497
+            },
+            "ndcg@5": {
+              "eligible": 5000,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.3442453830510037
+            }
+          },
+          "query_count": 5000,
+          "tied_score_queries": 1715,
+          "unjudged_candidates": 0
+        }
+      },
+      "estimand": "ranking_within_exposed_hotel_search_candidates",
+      "expected_queries": 5000,
+      "failed_queries": 0,
+      "missing_predictions": [],
+      "prediction_tie_break": "canonical_candidate_id_ascending",
+      "schema_version": "ordivo-ranking-eval-v1",
+      "scored_queries": 5000
+    },
+    "price_ascending": {
+      "by_source_task_policy": {
+        "expedia_personalized_sort_2013|observed_choice|expedia-click-booking-v1": {
+          "macro": {
+            "booking_hit@1": {
+              "eligible": 3389,
+              "excluded_zero_ideal_gain": 1611,
+              "value": 0.07671879610504574
+            },
+            "booking_mrr": {
+              "eligible": 3389,
+              "excluded_zero_ideal_gain": 1611,
+              "value": 0.21283731241729878
+            },
+            "booking_ndcg@10": {
+              "eligible": 3389,
+              "excluded_zero_ideal_gain": 1611,
+              "value": 0.2666787898979347
+            },
+            "booking_ndcg@5": {
+              "eligible": 3389,
+              "excluded_zero_ideal_gain": 1611,
+              "value": 0.1976909085175699
+            },
+            "click_ndcg@10": {
+              "eligible": 5000,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.2704376001055065
+            },
+            "click_ndcg@5": {
+              "eligible": 5000,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.20248431642890544
+            },
+            "ndcg@10": {
+              "eligible": 5000,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.26841360936850855
+            },
+            "ndcg@5": {
+              "eligible": 5000,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.20113799599547474
+            }
+          },
+          "query_count": 5000,
+          "tied_score_queries": 4156,
+          "unjudged_candidates": 0
+        }
+      },
+      "estimand": "ranking_within_exposed_hotel_search_candidates",
+      "expected_queries": 5000,
+      "failed_queries": 0,
+      "missing_predictions": [],
+      "prediction_tie_break": "canonical_candidate_id_ascending",
+      "schema_version": "ordivo-ranking-eval-v1",
+      "scored_queries": 5000
+    },
+    "random_seed42": {
+      "by_source_task_policy": {
+        "expedia_personalized_sort_2013|observed_choice|expedia-click-booking-v1": {
+          "macro": {
+            "booking_hit@1": {
+              "eligible": 3389,
+              "excluded_zero_ideal_gain": 1611,
+              "value": 0.05458837415166716
+            },
+            "booking_mrr": {
+              "eligible": 3389,
+              "excluded_zero_ideal_gain": 1611,
+              "value": 0.1819284451025375
+            },
+            "booking_ndcg@10": {
+              "eligible": 3389,
+              "excluded_zero_ideal_gain": 1611,
+              "value": 0.22986107465601976
+            },
+            "booking_ndcg@5": {
+              "eligible": 3389,
+              "excluded_zero_ideal_gain": 1611,
+              "value": 0.16201185081985842
+            },
+            "click_ndcg@10": {
+              "eligible": 5000,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.23509569559129467
+            },
+            "click_ndcg@5": {
+              "eligible": 5000,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.16477907989055549
+            },
+            "ndcg@10": {
+              "eligible": 5000,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.23271100524074714
+            },
+            "ndcg@5": {
+              "eligible": 5000,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.16320322920535416
+            }
+          },
+          "query_count": 5000,
+          "tied_score_queries": 0,
+          "unjudged_candidates": 0
+        }
+      },
+      "estimand": "ranking_within_exposed_hotel_search_candidates",
+      "expected_queries": 5000,
+      "failed_queries": 0,
+      "missing_predictions": [],
+      "prediction_tie_break": "canonical_candidate_id_ascending",
+      "schema_version": "ordivo-ranking-eval-v1",
+      "scored_queries": 5000
+    },
+    "rating_descending": {
+      "by_source_task_policy": {
+        "expedia_personalized_sort_2013|observed_choice|expedia-click-booking-v1": {
+          "macro": {
+            "booking_hit@1": {
+              "eligible": 3389,
+              "excluded_zero_ideal_gain": 1611,
+              "value": 0.05576866332251402
+            },
+            "booking_mrr": {
+              "eligible": 3389,
+              "excluded_zero_ideal_gain": 1611,
+              "value": 0.18777990575614192
+            },
+            "booking_ndcg@10": {
+              "eligible": 3389,
+              "excluded_zero_ideal_gain": 1611,
+              "value": 0.24070228049253156
+            },
+            "booking_ndcg@5": {
+              "eligible": 3389,
+              "excluded_zero_ideal_gain": 1611,
+              "value": 0.1690627112579908
+            },
+            "click_ndcg@10": {
+              "eligible": 5000,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.2427190538596663
+            },
+            "click_ndcg@5": {
+              "eligible": 5000,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.1697433730217752
+            },
+            "ndcg@10": {
+              "eligible": 5000,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.24001934293102645
+            },
+            "ndcg@5": {
+              "eligible": 5000,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.167615852250975
+            }
+          },
+          "query_count": 5000,
+          "tied_score_queries": 4990,
+          "unjudged_candidates": 0
+        }
+      },
+      "estimand": "ranking_within_exposed_hotel_search_candidates",
+      "expected_queries": 5000,
+      "failed_queries": 0,
+      "missing_predictions": [],
+      "prediction_tie_break": "canonical_candidate_id_ascending",
+      "schema_version": "ordivo-ranking-eval-v1",
+      "scored_queries": 5000
+    }
+  },
+  "model": {
+    "lightgbm_version": "4.7.0",
+    "model_best_iteration": 105,
+    "model_kind": "lambdarank"
+  },
+  "prediction_event": "combined_click_booking_relevance",
+  "ranking_objective": "declared_click_booking_gain_0_1_5_lambdarank",
+  "runtime_provider": "runpod",
+  "sampling": {
+    "by_split": {
+      "calibration": {
+        "excluded_candidates": 448751,
+        "excluded_groups": 18040,
+        "full_candidates": 497968,
+        "full_groups": 20040,
+        "selected_candidates": 49217,
+        "selected_groups": 2000
+      },
+      "test": {
+        "excluded_candidates": 868472,
+        "excluded_groups": 34851,
+        "full_candidates": 991928,
+        "full_groups": 39851,
+        "selected_candidates": 123456,
+        "selected_groups": 5000
+      },
+      "train": {
+        "excluded_candidates": 7440471,
+        "excluded_groups": 299714,
+        "full_candidates": 7935793,
+        "full_groups": 319714,
+        "selected_candidates": 495322,
+        "selected_groups": 20000
+      },
+      "validation": {
+        "excluded_candidates": 441986,
+        "excluded_groups": 17739,
+        "full_candidates": 491841,
+        "full_groups": 19739,
+        "selected_candidates": 49855,
+        "selected_groups": 2000
+      }
+    },
+    "complete_groups_preserved": true,
+    "config_sha256": "d3a7b918a015c7e527b921dd7dd30767031f9b695db5c4b007738edb64d5f225",
+    "group_caps": {
+      "calibration": 2000,
+      "test": 5000,
+      "train": 20000,
+      "validation": 2000
+    },
+    "label_independent_selection": true,
+    "parent_manifest_sha256": "3b14e3f30466a2da868ac636c8888bc42366f865737715a57a67f32866a02d92",
+    "parent_split_sha256": {
+      "calibration": "f601b23c3b3356e93afc781db9c760b9cc549772ad3fe79279494530cab9f9cb",
+      "test": "0cb2bde7ee0c912bf5c70a937b287a38c121fc2e9639ecb95d4f00bf268595b8",
+      "train": "84034a305d0ff5a80226c55e7cd8e9764fc1497576695c1580d00922da994e10",
+      "validation": "60248e91709aa7c3615f654eeb6d8954b09d923e30423d9ab7cc00fa2b6d9877"
+    },
+    "policy": "sha256_smallest_source_split_episode_id_v1",
+    "seed": 42,
+    "selected_episode_ids_sha256": {
+      "calibration": "9d4d5009a349fe1b3dc3d668276367784d83c45a83e9caaadf768af4f4de1736",
+      "test": "28853a7c691da0350bcd0a21d888eab4e413d915b08a813a6c7657b9272a9405",
+      "train": "5e57e1eefc7f6a235b3a0f44821a57bb5c78b0ebef09b4f1d2282ce67ea707e7",
+      "validation": "ccecb2439df2b2fbc83e355b2bc811cefa08d6ec33d612ec195990804e475de5"
+    }
+  },
+  "source": "expedia_personalized_sort_2013",
+  "source_sha256": {
+    "training": "84a53139ea92df1e9400f84852facbd78f3136f366a08440f4ab4518e71a49a9"
+  },
+  "source_terms": "https://www.kaggle.com/c/expedia-personalized-sort/rules",
+  "split_counts": {
+    "calibration_unused": 2000,
+    "test": 5000,
+    "train": 20000,
+    "validation": 2000
+  },
+  "split_policy_id": "expedia-2013-split-v2-calibration:bounded-hash-v1"
+}

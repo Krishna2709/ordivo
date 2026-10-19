@@ -1,0 +1,88 @@
+{
+  "candidate_pool_scope": "source_exposed_candidates",
+  "episode_count": 29000,
+  "episode_counts": {
+    "calibration": 2000,
+    "test": 5000,
+    "train": 20000,
+    "validation": 2000
+  },
+  "judgment_policy": "complete_observed_click_booking_per_exposed_candidate",
+  "manifest_version": "ordivo-grouped-bounded-v1",
+  "sampling": {
+    "by_split": {
+      "calibration": {
+        "excluded_candidates": 448751,
+        "excluded_groups": 18040,
+        "full_candidates": 497968,
+        "full_groups": 20040,
+        "selected_candidates": 49217,
+        "selected_groups": 2000
+      },
+      "test": {
+        "excluded_candidates": 868472,
+        "excluded_groups": 34851,
+        "full_candidates": 991928,
+        "full_groups": 39851,
+        "selected_candidates": 123456,
+        "selected_groups": 5000
+      },
+      "train": {
+        "excluded_candidates": 7440471,
+        "excluded_groups": 299714,
+        "full_candidates": 7935793,
+        "full_groups": 319714,
+        "selected_candidates": 495322,
+        "selected_groups": 20000
+      },
+      "validation": {
+        "excluded_candidates": 441986,
+        "excluded_groups": 17739,
+        "full_candidates": 491841,
+        "full_groups": 19739,
+        "selected_candidates": 49855,
+        "selected_groups": 2000
+      }
+    },
+    "complete_groups_preserved": true,
+    "config_sha256": "d3a7b918a015c7e527b921dd7dd30767031f9b695db5c4b007738edb64d5f225",
+    "group_caps": {
+      "calibration": 2000,
+      "test": 5000,
+      "train": 20000,
+      "validation": 2000
+    },
+    "label_independent_selection": true,
+    "parent_manifest_sha256": "3b14e3f30466a2da868ac636c8888bc42366f865737715a57a67f32866a02d92",
+    "parent_split_sha256": {
+      "calibration": "f601b23c3b3356e93afc781db9c760b9cc549772ad3fe79279494530cab9f9cb",
+      "test": "0cb2bde7ee0c912bf5c70a937b287a38c121fc2e9639ecb95d4f00bf268595b8",
+      "train": "84034a305d0ff5a80226c55e7cd8e9764fc1497576695c1580d00922da994e10",
+      "validation": "60248e91709aa7c3615f654eeb6d8954b09d923e30423d9ab7cc00fa2b6d9877"
+    },
+    "policy": "sha256_smallest_source_split_episode_id_v1",
+    "seed": 42,
+    "selected_episode_ids_sha256": {
+      "calibration": "9d4d5009a349fe1b3dc3d668276367784d83c45a83e9caaadf768af4f4de1736",
+      "test": "28853a7c691da0350bcd0a21d888eab4e413d915b08a813a6c7657b9272a9405",
+      "train": "5e57e1eefc7f6a235b3a0f44821a57bb5c78b0ebef09b4f1d2282ce67ea707e7",
+      "validation": "ccecb2439df2b2fbc83e355b2bc811cefa08d6ec33d612ec195990804e475de5"
+    }
+  },
+  "source": "expedia_personalized_sort_2013",
+  "source_sha256": {
+    "training": "84a53139ea92df1e9400f84852facbd78f3136f366a08440f4ab4518e71a49a9"
+  },
+  "source_terms": "https://www.kaggle.com/c/expedia-personalized-sort/rules",
+  "split_policy_id": "expedia-2013-split-v2-calibration:bounded-hash-v1",
+  "split_sha256": {
+    "calibration": "a7965c41940433f5866ece8e13a9d34717ac02bcc4e565caa0ff7749ae90091c",
+    "test": "2f2e427221e364ccee71f2b7d9d24d040964a91b02ea1b02817b9812c9366286",
+    "train": "8e2942682f9d260b2cb92068239e57c310b1584d71f010f93f5f6bd0858bbfbb",
+    "validation": "8dcb7f66830a45094482eee3729498f6e430dfd450dcc30820360610b758a4ff"
+  },
+  "target_policy_id": "expedia-click-booking-v1",
+  "task_counts": {
+    "observed_choice": 29000
+  }
+}

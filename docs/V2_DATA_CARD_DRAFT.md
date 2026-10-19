@@ -1,13 +1,13 @@
 # Ordivo v2 data card — draft, private research corpora
 
-**Status:** Swissmetro and ESCI source-bound manifests and a preliminary two-domain training subset have remote receipts; their processed four-way splits and notices are retained with SHA readback in private dataset repo `blackOrder/Ordivo-v2-research-data` at commit `92df99f88ab12dd9c016f62e08ea15206600e98c`. Expedia official source has a complete grouped four-way build on the remote pod, but no Expedia baseline, neural training or private Hub retention receipt. There is no frozen **public-release** v2 training mixture. Counts and hashes below refer to specific executed builds; source rights and model-release rights remain source-specific. The [private research-data README](../hub/v2_research_data/README.md) describes the controlled Hub layout. See the [dataset register](V2_DATASET_REGISTER.md) and [release criteria](V2_RELEASE_CRITERIA.md).
+**Status:** Swissmetro and ESCI source-bound manifests and a preliminary two-domain training subset have remote receipts; their processed four-way splits and notices are retained with SHA readback in private dataset repo `blackOrder/Ordivo-v2-research-data` at commit `92df99f88ab12dd9c016f62e08ea15206600e98c`. Expedia official source has a complete grouped four-way build on the remote pod, but a bounded 5,000-search classical ranking baseline, but no Expedia neural training or private Hub retention receipt. There is no frozen **public-release** v2 training mixture. Counts and hashes below refer to specific executed builds; source rights and model-release rights remain source-specific. The [private research-data README](../hub/v2_research_data/README.md) describes the controlled Hub layout. See the [dataset register](V2_DATASET_REGISTER.md) and [release criteria](V2_RELEASE_CRITERIA.md).
 
 ## Sources and what their labels mean
 
 | Source | Supervision | Complete unit and split policy | Access/rights status |
 |---|---|---|---|
 | Ordivo synthetic MCDM | Exact formula rankings, ties and scores conditioned on supplied method/weights | Scenario family assigned before generation; retain all alternatives | Existing v1 control only; v2 corpus pending |
-| Expedia Personalized Sort | Observed clicks and bookings, separately | Search group; search-ID split; inspect entity/time overlap | Earlier official requests returned HTTP 403. After user-confirmed rules, official archive/CSV and grouped four-way build were acquired/hashed; no benchmark or training. Public trained-derivative rights remain unresolved |
+| Expedia Personalized Sort | Observed clicks and bookings, separately | Search group; search-ID split; inspect entity/time overlap | Earlier official requests returned HTTP 403. After user-confirmed rules, official archive/CSV and grouped four-way build were acquired/hashed; a bounded sampled classical benchmark but no neural training. Public trained-derivative rights remain unresolved |
 | Amazon ESCI | Human graded product relevance in a source-sampled judged candidate pool | Query and locale; preserve official test | Official source/build verified at revision and hashes below; repository declares Apache-2.0, retain notices and verify actual artifact rights |
 | MSLR-WEB10K | Graded web relevance in a source-sampled judged candidate pool | Official fold and query groups | Agreement acceptance and file records pending |
 | Swissmetro | Stated travel-mode choice and availability | Respondent-disjoint panel split | Official source/build verified; source SHA-256 and four-way group counts recorded below. Dataset-specific raw redistribution terms remain unresolved |
@@ -74,14 +74,30 @@ records split SHA-256 hashes and policy
 click/booking judgment policy. There are 122,751 groups with no booking and
 25,969 groups with multiple clicks; neither should be silently converted into
 a single-booking choice label. Missing `prop_location_score2` and
-`prop_review_score` counts are 2,178,380 and 14,630 candidate rows. No Expedia
-benchmark, trained adapter, or public row redistribution follows from this build.
+`prop_review_score` counts are 2,178,380 and 14,630 candidate rows. The source build itself contains no Expedia ranking result, trained adapter, or public row redistribution right; the bounded ranking run below is separate.
 An independent [four-way streaming audit](../reports/runs/v2-expedia-20261019/fourway-audit.json)
 (SHA-256 `d48db0af0be72b48c7244ca41e78dda5789c496bf6a29fc7a8bcb5211558c387`)
 re-read all split hashes and accounted for 399,344 unique search groups and
 9,917,530 candidates, with zero duplicate groups/candidate IDs, source
 mismatches or wrong-hash partitions. This is integrity evidence, not
 prediction quality.
+
+A later Expedia classical benchmark used a label-independent SHA-256 sample
+of **complete** source search groups, capped at 20,000 train, 2,000 selection,
+2,000 unused calibration and 5,000 test. Its
+[bounded manifest](../reports/runs/v2-expedia-bounded-20261019/manifest.json)
+SHA-256 is `c72552b8fe1acd0cab0480610dd65b5dd6aed575313047d2da2f2786953b4a2b`;
+the sampled test contains 123,456 candidates and excludes 34,851 of the
+original source test searches (868,472 candidates). All 5,000 selected test
+searches were scored with zero failures. The
+[sanitized aggregate](../reports/runs/v2-expedia-bounded-20261019/aggregate.json)
+SHA-256 `95d9251e7efa1d9b6ab745f25cd8649fb9bbf5d532bdcaa76dab6d39db1182b0`
+reports declared click/booking 0/1/5-gain NDCG@10: LambdaRank 0.413110,
+price 0.268414, rating 0.240019, seeded random 0.232711 on 5,000 exposed
+candidate groups. Booking-only NDCG@10 0.436156 is defined on 3,389 groups
+with positive booking gain; 1,611 zero-booking groups are excluded from that
+endpoint. This is a bounded ranking benchmark, not full-source performance,
+booking probability or an Expedia-trained neural result.
 
 ## Risks and limitations
 
