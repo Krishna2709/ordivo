@@ -64,10 +64,13 @@ do not guarantee finite-sample calibration or calibration under domain shift.
 For Expedia, distinguish conditional choice among exactly-one-booking groups
 from unconditional purchase probability. For relevance grades, use a separately
 defined categorical/ordinal event model; do not treat ranking scores as choice
-probabilities. Fit temperature/calibration transformations on validation only.
+probabilities. Select models and hyperparameters on model-selection validation;
+fit temperature/calibration transformations only on a separate reserved
+calibration partition. Assess both on untouched final-test groups.
 
-First compare supervised NLL, supervised Brier where appropriate, and validation
-temperature scaling against the same uncalibrated model. Direct differentiable
+First compare supervised NLL, supervised Brier where appropriate, and
+calibration-partition temperature scaling against the same model selected on
+validation. Direct differentiable
 losses are necessary controls when a full probability vector and labels are
 available. Do not call ordinary backpropagation through Brier loss RL.
 

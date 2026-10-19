@@ -250,17 +250,21 @@ documented availability check before inclusion. No inferred budget, city-center
 distance, business-trip indicator, or preference weights. Price units remain
 source-described until the country/site convention is established.
 
-For Expedia, deterministic initial split: SHA-256 of
+For Expedia, deterministic four-role split under policy
+`expedia-2013-split-v2-calibration`: SHA-256 of
 `expedia-2013|split-v1|42|<srch_id>`; interpret the
-first 8 bytes as an unsigned big-endian integer modulo 100. Buckets 0–79 train,
-80–89 validation, 90–99 test. Persist assignments; expect approximate ratios,
+first 8 bytes as an unsigned big-endian integer modulo 100. The hash salt remains
+`split-v1` so existing group buckets are stable; the policy ID versions the new
+bucket interpretation. Buckets 0–79 train, 80–84 model-selection validation,
+85–89 calibration, 90–99 final test. Persist assignments; expect approximate ratios,
 not exact group counts. Split before augmentation or label-dependent filtering.
 Derived rows inherit the parent split. This prevents query overlap, not user
 or hotel overlap. Record hotel overlap; add temporal and hotel-disjoint stress
 tests later, with separately versioned manifests. This is not a universal split
-policy: preserve ESCI's official query train/test partition and derive validation
-only from its train queries; freeze a single published MSLR fold; group Swissmetro
-and SUSHI by respondent. Namespaced manifests record split-policy ID, grouping
+policy: preserve ESCI's official query train/test partition and derive disjoint
+model-selection and calibration groups only from its train queries; freeze a
+single published MSLR fold and derive both roles from its training fold; group
+Swissmetro and SUSHI by respondent across four roles. Namespaced manifests record split-policy ID, grouping
 entity, raw checksums and overlap diagnostics. Cross-domain duplicate examples
 or related source versions must be identified before constructing transfer folds.
 
@@ -312,7 +316,8 @@ drop individual candidates or force unavailable numerical values to positive.
 
 Ranking scores are not probabilities. Calibration metrics are optional and
 require a defined event: for example conditional choice among exactly-one-booking
-groups, with temperature fitted only on validation. Report that selected
+groups, with temperature fitted only on the disjoint calibration partition after
+model and hyperparameters have been selected on validation. Report that selected
 population explicitly. Unconditional booking probability requires a separate
 event/no-purchase model. Randomized impressions are a bias-analysis slice,
 not proof of unbiased utility or known examination propensities.
