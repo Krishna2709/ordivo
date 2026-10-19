@@ -1,0 +1,222 @@
+{
+  "candidate_pool_scope": "three_survey_modes",
+  "code_revision": "9c532d98050e40ab3c9056e0bec1eeace123ccef",
+  "code_revision_basis": "controller_verified_archive_env",
+  "config_sha256": "d0bc2b82fca7862f71c9bfa29535c1be296451cdf05007085826159473968d8a",
+  "elapsed_seconds": 45.92131533008069,
+  "experiment_id": "ordivo-v2-swissmetro-conditional-logit-v1",
+  "manifest_sha256": "028e5f2fc87cda849ca72213d8ba846fb00ac0784b7595e942f0644c1167b53a",
+  "metrics": {
+    "conditional_logit": {
+      "by_source_task_policy": {
+        "swissmetro|stated_choice|swissmetro-choice-v1": {
+          "macro": {
+            "choice_accuracy@1": {
+              "eligible": 1044,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.6245210727969349
+            },
+            "choice_mrr": {
+              "eligible": 1044,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.8004469987228607
+            },
+            "ndcg@10": {
+              "eligible": 1044,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.8521414383483942
+            },
+            "ndcg@5": {
+              "eligible": 1044,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.8521414383483942
+            }
+          },
+          "query_count": 1044,
+          "tied_score_queries": 0,
+          "unjudged_candidates": 0
+        }
+      },
+      "estimand": "choice_among_available_survey_modes",
+      "expected_queries": 1044,
+      "failed_queries": 0,
+      "missing_predictions": [],
+      "prediction_tie_break": "canonical_candidate_id_ascending",
+      "schema_version": "ordivo-ranking-eval-v1",
+      "scored_queries": 1044
+    },
+    "cost_ascending": {
+      "by_source_task_policy": {
+        "swissmetro|stated_choice|swissmetro-choice-v1": {
+          "macro": {
+            "choice_accuracy@1": {
+              "eligible": 1044,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.28160919540229884
+            },
+            "choice_mrr": {
+              "eligible": 1044,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.5799808429118773
+            },
+            "ndcg@10": {
+              "eligible": 1044,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.6870814933600267
+            },
+            "ndcg@5": {
+              "eligible": 1044,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.6870814933600267
+            }
+          },
+          "query_count": 1044,
+          "tied_score_queries": 49,
+          "unjudged_candidates": 0
+        }
+      },
+      "estimand": "choice_among_available_survey_modes",
+      "expected_queries": 1044,
+      "failed_queries": 0,
+      "missing_predictions": [],
+      "prediction_tie_break": "canonical_candidate_id_ascending",
+      "schema_version": "ordivo-ranking-eval-v1",
+      "scored_queries": 1044
+    },
+    "random_seed42": {
+      "by_source_task_policy": {
+        "swissmetro|stated_choice|swissmetro-choice-v1": {
+          "macro": {
+            "choice_accuracy@1": {
+              "eligible": 1044,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.35919540229885055
+            },
+            "choice_mrr": {
+              "eligible": 1044,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.6312260536398467
+            },
+            "ndcg@10": {
+              "eligible": 1044,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.7254983618842467
+            },
+            "ndcg@5": {
+              "eligible": 1044,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.7254983618842467
+            }
+          },
+          "query_count": 1044,
+          "tied_score_queries": 0,
+          "unjudged_candidates": 0
+        }
+      },
+      "estimand": "choice_among_available_survey_modes",
+      "expected_queries": 1044,
+      "failed_queries": 0,
+      "missing_predictions": [],
+      "prediction_tie_break": "canonical_candidate_id_ascending",
+      "schema_version": "ordivo-ranking-eval-v1",
+      "scored_queries": 1044
+    },
+    "travel_time_ascending": {
+      "by_source_task_policy": {
+        "swissmetro|stated_choice|swissmetro-choice-v1": {
+          "macro": {
+            "choice_accuracy@1": {
+              "eligible": 1044,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.6369731800766284
+            },
+            "choice_mrr": {
+              "eligible": 1044,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.803639846743295
+            },
+            "ndcg@10": {
+              "eligible": 1044,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.8543543194649779
+            },
+            "ndcg@5": {
+              "eligible": 1044,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.8543543194649779
+            }
+          },
+          "query_count": 1044,
+          "tied_score_queries": 16,
+          "unjudged_candidates": 0
+        }
+      },
+      "estimand": "choice_among_available_survey_modes",
+      "expected_queries": 1044,
+      "failed_queries": 0,
+      "missing_predictions": [],
+      "prediction_tie_break": "canonical_candidate_id_ascending",
+      "schema_version": "ordivo-ranking-eval-v1",
+      "scored_queries": 1044
+    }
+  },
+  "model": {
+    "model_kind": "conditional_logit",
+    "reload_score_parity": true,
+    "train_queries": 8532,
+    "validation_metrics": {
+      "by_source_task_policy": {
+        "swissmetro|stated_choice|swissmetro-choice-v1": {
+          "macro": {
+            "choice_accuracy@1": {
+              "eligible": 549,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.5591985428051002
+            },
+            "choice_mrr": {
+              "eligible": 549,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.7656344869459624
+            },
+            "ndcg@10": {
+              "eligible": 549,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.8263428628415405
+            },
+            "ndcg@5": {
+              "eligible": 549,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.8263428628415405
+            }
+          },
+          "query_count": 549,
+          "tied_score_queries": 0,
+          "unjudged_candidates": 0
+        }
+      },
+      "estimand": "choice_among_available_survey_modes",
+      "expected_queries": 549,
+      "failed_queries": 0,
+      "missing_predictions": [],
+      "prediction_tie_break": "canonical_candidate_id_ascending",
+      "schema_version": "ordivo-ranking-eval-v1",
+      "scored_queries": 549
+    },
+    "validation_queries": 549
+  },
+  "prediction_event": null,
+  "ranking_objective": "stated_choice_conditional_logit_nll",
+  "runtime_provider": "runpod",
+  "source": "swissmetro",
+  "source_sha256": {
+    "survey": "27432693cf052985d79a950b4b888be3efca798fc89b0d3ffefe40608ede00f2"
+  },
+  "source_terms": "https://biogeme.epfl.ch/",
+  "split_counts": {
+    "calibration_unused": 594,
+    "test": 1044,
+    "train": 8532,
+    "validation": 549
+  },
+  "split_policy_id": "swissmetro-respondent-v2-calibration"
+}

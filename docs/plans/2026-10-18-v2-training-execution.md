@@ -38,11 +38,28 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   raw 10,728 survey rows yielded 10,719 retained choice groups after nine
   no-choice exclusions. Four partitions contain 8,532 train, 549 selection,
   594 calibration, and 1,044 final-test groups. Source-specific redistribution
-  rights and any held-out model result remain unresolved. Receipt:
+  rights and any neural held-out model result remain unresolved. Receipt:
   `v2-swarm-20261019T030009Z/swiss_source`.
+- First Swissmetro classical held-out benchmark at exact evaluator commit
+  `9c532d98050e40ab3c9056e0bec1eeace123ccef` scored all 1,044 expected
+  stated-choice groups, zero failures/exclusions. Conditional logit had 652/1,044
+  top-1 agreement; travel-time heuristic 665/1,044, cost heuristic 294/1,044,
+  seeded random 375/1,044. This is a single-source, single-run baseline, not a
+  neural v2 or transfer result. No paired interval or billed cost is recorded.
+  Sanitized [aggregate](../../reports/runs/v2-swissmetro-20261019/aggregate.json)
+  and [remote/local readback](../../reports/runs/v2-swissmetro-20261019/readback.json)
+  preserve the result. Source file SHA, split-manifest SHA and denominators were
+  checked against the persisted remote task receipt.
 - Official Expedia `DownloadDataFile` returned HTTP 403 after file-list access;
   no training rows were acquired and the cause is not established. Receipt:
   `v2-swarm-20261019T030009Z/expedia_diagnostic`.
+- Official Amazon ESCI Task 1 acquisition/build at `b352c14` exited 0: 2,621,288
+  example rows, 1,503,277 outside the reduced ranking pool omitted,
+  1,118,011 candidate rows across 48,300 groups. Four partitions contain
+  30,372 train, 1,688 selection, 1,744 calibration, and 14,496 official-test
+  groups. This is a source-defined judged candidate pool, not retrieval recall.
+  Explicit split-overlap/official-test audit and held-out baseline are pending.
+  Receipt: `v2-swarm-20261019T030009Z/esci_source`.
 
 No local workload was executed. The v2 worker branches have not yet passed a
 single integrated remote suite. Initial GitHub CPU runs were superseded by the

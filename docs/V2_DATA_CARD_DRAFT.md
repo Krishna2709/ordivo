@@ -8,9 +8,9 @@
 |---|---|---|---|
 | Ordivo synthetic MCDM | Exact formula rankings, ties and scores conditioned on supplied method/weights | Scenario family assigned before generation; retain all alternatives | Existing v1 control only; v2 corpus pending |
 | Expedia Personalized Sort | Observed clicks and bookings, separately | Search group; search-ID split; inspect entity/time overlap | Official file listing succeeded; official data download returned HTTP 403 on 2026-10-19. No source rows acquired; applicable training/derivative rights unresolved |
-| Amazon ESCI | Human graded product relevance in a source-sampled judged candidate pool | Query and locale; preserve official test | Official source declares Apache-2.0; pin files/notices and inspect terms at ingestion |
+| Amazon ESCI | Human graded product relevance in a source-sampled judged candidate pool | Query and locale; preserve official test | Official source/build verified at revision and hashes below; repository declares Apache-2.0, retain notices and verify actual artifact rights |
 | MSLR-WEB10K | Graded web relevance in a source-sampled judged candidate pool | Official fold and query groups | Agreement acceptance and file records pending |
-| Swissmetro | Stated travel-mode choice and availability | Respondent-disjoint panel split | Dataset terms and acquired file record pending |
+| Swissmetro | Stated travel-mode choice and availability | Respondent-disjoint panel split | Official source/build verified; source SHA-256 and four-way group counts recorded below. Dataset-specific raw redistribution terms remain unresolved |
 | SUSHI (optional) | Elicited rankings | Respondent-disjoint; retain shown alternatives/partial order | Archive/version and terms pending |
 
 Click and booking are noisy behavioral outcomes affected by exposure. Stated choice, relevance and explicit ranking do not measure the same latent quantity. Synthetic solver labels measure a formula, not human utility. No common utility scale or pooled accuracy is implied. Some sources have no authoritative criterion directions or weights; those fields stay absent or `null` until supplied by a declared policy.
@@ -25,13 +25,39 @@ For each acquired source, publish a metadata manifest containing URL/revision, r
 
 Preserve official test sets where provided. Freeze four disjoint roles: training, model-selection validation, calibration, and final test. Derive the middle two from source training data without touching official tests. Expedia splits whole searches; Swissmetro and SUSHI split respondents; ESCI splits queries including locale; MSLR keeps one published fold. Cross-source duplication and repeated entities require separate diagnostics. Every expected group and candidate in the source-defined set must be accounted for, including singleton, zero-positive, multi-positive, unjudged, unsupported, overflow and failed groups. An unjudged item is not a grade-zero negative. NDCG evaluates ordering within the judged candidate pool; it cannot establish retrieval recall over the full catalog or web. Do not filter individual rows to make a model fit context length. A small fixture validates code paths only; it is not a measured dataset distribution.
 
+The verified first Swissmetro build used official Biogeme source revision
+`8d1063b5c371f09f5dd44f430b3be66455f2b785`, source file SHA-256
+`27432693cf052985d79a950b4b888be3efca798fc89b0d3ffefe40608ede00f2`.
+Of 10,728 raw survey rows, nine had no stated choice and 10,719 complete
+three-mode episodes were retained. Respondent-grouped partitions contain 8,532
+train, 549 model-selection validation, 594 calibration, and 1,044 final-test
+episodes under policy `swissmetro-respondent-v2-calibration`. These counts and
+source hash come from the remote source/build receipt; the first classical
+held-out results and their separate aggregate/readback are in the
+[experiment report](../reports/ordivo-v2-experiment.html). The source describes
+the dataset for research and education; raw-data redistribution remains a
+separate rights question.
+
+The first official Amazon ESCI Task 1 reduced-ranking build used source
+revision `7916cdf6ab75a462e77f20ab40428a10923998d5` and example/product
+file SHA-256 values
+`4a735b693b4a424a6fc67f5be6e4c811495c488bbf66d02a602d308b2744263a` /
+`25124442d064d64b26f74082d6fa09438d679efc0c183cf28d19064a2b65a265`.
+Of 2,621,288 source example rows, 1,503,277 outside the declared Task 1
+reduced pool were omitted; 1,118,011 candidate rows formed 48,300
+source-defined query groups. Four partitions contain 30,372 train, 1,688
+selection, 1,744 calibration, and 14,496 official-test groups. These are
+**candidate-pool** counts, not retrieval coverage across the product catalog.
+The acquisition/build exited 0 remotely; an explicit cross-partition overlap
+and official-test audit and any held-out baseline result remain pending.
+
 ## Risks and limitations
 
 Observed choices are exposed and position-biased, and Expedia's randomized-presentation flag alone does not provide known examination propensities. Hotel price semantics depend on site/country conventions. ESCI/MSLR relevance is assessor judgment, not purchase behavior. Swissmetro responses are stated rather than revealed preferences. Synthetic numbers inherit generator assumptions and may not represent real tradeoffs. Text coverage differs across locales and candidate set lengths. Incomplete source access or restrictive terms may limit any public adapter even if a private research benchmark can be run.
 
 ## Reproduction and distribution
 
-The public release should provide manifests, code/config revisions, split-assignment policy, source links and eligible aggregate statistics. Reproducing restricted source experiments may require the reader's own authorized access and agreement acceptance. The v1 synthetic dataset/card is historical and its published Hub licensing does not license the entire v2 mixture. No source rows, fitted encodings based on restricted IDs, individual prediction tables, or trained derivatives are redistributed until their permissions are documented. The intended model and its limits are described in the [draft model card](V2_MODEL_CARD_DRAFT.md).
+The public release should provide manifests, code/config revisions, split-assignment policy, source links and eligible aggregate statistics. Reproducing restricted source experiments may require the reader's own authorized access and agreement acceptance. The v1 synthetic dataset/card is historical and its published Hub licensing does not license the entire v2 mixture. No source rows, fitted encodings based on restricted IDs, individual prediction tables, or trained derivatives are redistributed until their permissions are documented. Reporting reviewed aggregate scientific measurements is a separate question from redistributing source rows or trained weights. The intended model and its limits are described in the [draft model card](V2_MODEL_CARD_DRAFT.md).
 
 ## Expedia rights reading for this draft
 
