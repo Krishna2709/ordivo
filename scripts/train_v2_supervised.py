@@ -302,11 +302,15 @@ def run(config_path, output):
     cursors = {source: 0 for source in training}
     for items in training.values():
         random.shuffle(items)
-    base_by_source, base_macro = _validate(
-        model, tokenizer, validation, 'cuda', started + config['max_runtime_seconds'])
-    run.log({'validation/base_macro_source_loss': base_macro,
-             **{f'validation/base_{key}_query_loss': value
-                for key, value in base_by_source.items()}}, step=0)
+    try:
+        base_by_source, base_macro = _validate(
+            model, tokenizer, validation, 'cuda', started + config['max_runtime_seconds'])
+        run.log({'validation/base_macro_source_loss': base_macro,
+                 **{f'validation/base_{key}_query_loss': value
+                    for key, value in base_by_source.items()}}, step=0)
+    except BaseException:
+        run.finish()
+        raise
     best = float('inf')
     best_step = 0
     best_probe_loss = None
