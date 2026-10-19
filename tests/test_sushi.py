@@ -2,6 +2,8 @@
 
 import json
 
+import pytest
+
 from liquid_mcdm.data.grouped import write_dataset
 from liquid_mcdm.data import sushi
 
@@ -61,3 +63,12 @@ def test_sushi_rejects_malformed_original_candidate_set(tmp_path):
         assert "candidate set" in str(exc)
     else:
         raise AssertionError("duplicate ranked item was accepted")
+
+
+def test_sushi_rejects_equal_truncation_of_all_respondent_sources(tmp_path):
+    paths = _fixture(tmp_path)
+    policy = _policy(paths)
+    # A/B orders and respondents are equally shortened and still align by row.
+    # A successful join alone cannot certify the official 5,000-person corpus.
+    with pytest.raises(ValueError, match="official SUSHI source"):
+        list(sushi.iter_episodes(*paths, policy))
