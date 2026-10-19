@@ -63,6 +63,14 @@ The Swissmetro adapter preserves all three modes and availability masks.
 must report their number. A selected unavailable mode is an error. The
 respondent ID is retained only in supervision for respondent-disjoint splitting.
 These are stated survey choices, not observed transport purchases.
+The `cost_chf` feature preserves the source `TRAIN_CO`, `SM_CO` or `CAR_CO`
+value. It is **raw survey cost**, not the traveler-effective amount for a GA
+travel-card holder. Biogeme's [official preparation](https://biogeme.epfl.ch/sphinx/_modules/biogeme/data/swissmetro.html)
+defines `TRAIN_COST = TRAIN_CO * (GA == 0)` and
+`SM_COST = SM_CO * (GA == 0)` for its model, while car cost is unadjusted.
+The `ga` context field is preserved so a specialist baseline can apply that
+documented transformation using the same split; do not label raw rail cost as
+actual paid fare. Car headway is null because that mode has no headway field.
 
 ## Immutable splits and remote materialization
 
