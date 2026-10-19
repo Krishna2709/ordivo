@@ -1,4 +1,6 @@
 import importlib
+import hashlib
+import json
 import sys
 import time
 import types
@@ -156,3 +158,38 @@ def test_archive_identity_required_without_git_checkout(monkeypatch):
         _source_identity()
     monkeypatch.setenv('ORDIVO_SOURCE_SHA256', 'b' * 64)
     assert _source_identity() == {'commit': 'a' * 40, 'archive_sha256': 'b' * 64}
+
+
+def test_sql_pilot_selection_is_order_invariant_and_panel_atomic(tmp_path):
+    from scripts.train_v2_supervised import _load_source
+
+    train = [
+        {'episode_id': 's:a1', 'source': 's', 'group_id': 'a1',
+         'supervision': {'respondent_id': 'panel-a'}},
+        {'episode_id': 's:a2', 'source': 's', 'group_id': 'a2',
+         'supervision': {'respondent_id': 'panel-a'}},
+        {'episode_id': 's:b1', 'source': 's', 'group_id': 'b1',
+         'supervision': {'respondent_id': 'panel-b'}},
+    ]
+    other = {split: [{'episode_id': f's:{split}', 'source': 's',
+                      'group_id': split, 'supervision': {'respondent_id': split}}]
+             for split in ('validation', 'calibration', 'test')}
+
+    def materialize(order):
+        hashes = {}
+        for split, rows in {'train': order, **other}.items():
+            content = ''.join(json.dumps(row) + '\n' for row in rows).encode()
+            (tmp_path / f'{split}.jsonl').write_bytes(content)
+            hashes[split] = hashlib.sha256(content).hexdigest()
+        (tmp_path / 'manifest.json').write_text(json.dumps({'split_sha256': hashes}))
+        return _load_source({'directory': str(tmp_path), 'name': 's'}, seed=42,
+                            max_train_groups=1, max_validation_groups=1,
+                            deadline=time.monotonic() + 10)
+
+    left_rows, left_info = materialize(train)
+    right_rows, right_info = materialize(list(reversed(train)))
+    assert left_info['selected_unit_ids'] == right_info['selected_unit_ids']
+    assert left_info['selected_split_unit_sha256'] == right_info['selected_split_unit_sha256']
+    assert {row['episode_id'] for row in left_rows['train']} == {
+        row['episode_id'] for row in right_rows['train']}
+    assert len(left_rows['train']) in (1, 2)  # whole respondent panel selected
