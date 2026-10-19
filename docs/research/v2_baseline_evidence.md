@@ -67,7 +67,7 @@ Its time, cost and headway inputs are source fields, not invented weights.
 | Integrated remote suite | 214 tests, exit 0, no skips at integrated commit `9c532d98050e40ab3c9056e0bec1eeace123ccef`; controller archive SHA `4dd4793819f8d4507312894dbdbac9e510fc67d01afc6da7a6c292276f491838`. This includes evaluator fixtures and LightGBM save/reload parity fixture. |
 | Remote LightGBM save/reload parity | Fixture check included in the 214-test suite; real ESCI bundle persisted and scored. |
 | Real ESCI lexical and ranker results | Complete for frozen old manifest at commit `22707ed34fd125e96aade9123f9baaf34cd64a18`; source-bound rebuild has byte-identical train/validation/calibration/test split files. |
-| Real Expedia baseline | Official data acquired after terms acceptance and four-way source build completed; predeclared bounded complete-group benchmark remains pending. |
+| Real Expedia baseline | Predeclared bounded complete-search benchmark ran on 5,000 sampled test searches; figures and limits below. |
 | Swissmetro stated-choice baseline | Real 1,044-episode test run complete with full score coverage and model reload parity; figures and limits below. |
 
 Do not turn a fixture pass or a completed test process into a real-data result.
@@ -156,4 +156,42 @@ raw training CSV SHA-256 is
 `84a53139ea92df1e9400f84852facbd78f3136f366a08440f4ab4518e71a49a9`.
 The cgroup memory limit is 49,999,998,976 bytes; eager full-corpus baseline
 fitting is not a credible bounded run. The frozen complete-group sample protocol
-is in `v2_expedia_bounded_protocol.md`; no Expedia baseline metric exists yet.
+is in `v2_expedia_bounded_protocol.md`.
+
+The guarded sampler at integrated commit
+`79da4ffa885888d141bc396a617c48c4c8fa0531` verified the exact audited
+parent manifest SHA-256
+`3b14e3f30466a2da868ac636c8888bc42366f865737715a57a67f32866a02d92`
+and every full split's byte hash and group/candidate count. Fixed seed 42 and
+source/split/episode-ID SHA order selected complete groups 20,000/2,000/2,000/5,000
+for train/validation/calibration/test. The derived manifest SHA-256 is
+`c72552b8fe1acd0cab0480610dd65b5dd6aed575313047d2da2f2786953b4a2b`.
+The sampled test pool has 123,456 exposed candidates across 5,000 searches;
+34,851 full-test searches and 868,472 candidates were excluded by the
+predeclared sample. The source test split itself was not reassigned or changed.
+
+The same integrated code fit LightGBM 4.7.0 LambdaRank with validation-only
+selection (best iteration 105) and read back a sanitized baseline aggregate
+identical locally/remotely at SHA-256
+`95d9251e7efa1d9b6ab745f25cd8649fb9bbf5d532bdcaa76dab6d39db1182b0`.
+All 5,000 selected test searches and their candidates were scored by every
+control and model, with zero failed queries or unjudged candidates. Private
+model and per-query files are under
+`/workspace/ordivo-v2-data/baselines/expedia-bounded-79da/`.
+
+| Baseline | Combined 0/1/5 NDCG@10 | Eligible selected searches |
+|---|---:|---:|
+| LambdaRank | 0.413110 | 5,000 |
+| Price ascending | 0.268414 | 5,000 |
+| Rating descending | 0.240019 | 5,000 |
+| Seeded random | 0.232711 | 5,000 |
+
+For the **same LambdaRank scores**, click NDCG@10 is 0.416388 on all 5,000
+selected searches; booking NDCG@10 is 0.436156 on 3,389 searches with an
+observed booking, with 1,611 zero-ideal-booking exclusions. These separate
+endpoint denominators must not be pooled. The 0/1/5 objective is a declared
+research relevance policy for observed clicks and bookings, not a
+conditional-booking probability or human utility weight. These figures are
+exploratory on a bounded source-exposed candidate sample; they do not estimate
+performance over all 39,851 original test searches, and no uncertainty interval
+or independent protected release test has been computed.
