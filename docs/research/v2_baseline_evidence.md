@@ -63,10 +63,10 @@ Its time, cost and headway inputs are source fields, not invented weights.
 
 | Gate | Status |
 |---|---|
-| Source code and hand-authored tests | Included in the remote integrated suite below; newer neural-probe fixtures remain pending. |
+| Source code and hand-authored tests | Included in the remote integrated suite below; later neural/ranking fixtures passed remotely at `854de08` (12) and `73d9085` (15). Candidate-order diagnostic fixtures remain pending. |
 | Integrated remote suite | 214 tests, exit 0, no skips at integrated commit `9c532d98050e40ab3c9056e0bec1eeace123ccef`; controller archive SHA `4dd4793819f8d4507312894dbdbac9e510fc67d01afc6da7a6c292276f491838`. This includes evaluator fixtures and LightGBM save/reload parity fixture. |
 | Remote LightGBM save/reload parity | Fixture check included in the 214-test suite; real ESCI bundle persisted and scored. |
-| Real ESCI lexical and ranker results | Complete for frozen old manifest at commit `22707ed34fd125e96aade9123f9baaf34cd64a18`; new manifest equivalence pending. |
+| Real ESCI lexical and ranker results | Complete for frozen old manifest at commit `22707ed34fd125e96aade9123f9baaf34cd64a18`; source-bound rebuild has byte-identical train/validation/calibration/test split files. |
 | Real Expedia baseline | Pending authenticated source access and terms record. |
 | Swissmetro stated-choice baseline | Real 1,044-episode test run complete with full score coverage and model reload parity; figures and limits below. |
 
@@ -122,9 +122,24 @@ The fitted LightGBM 4.7.0 bundle selected iteration 138 on validation.
 | Seeded random score | 0.533827 | 14,496 |
 
 The ranker had at least one tied score in 14,495 test queries, and the lexical
-control in all 14,496. That count alone does not tell us whether ties affect
-NDCG@10; exact tie sensitivity remains unmeasured. This result is valid for
-the frozen old manifest. A subsequent data-code fix added source-bound
-manifest fields and group accounting; matched neural comparisons require
-equality of all four split-file SHA-256 values after rebuilding, or a fresh
-baseline run on changed split bytes. Per-query files remain in remote storage.
+control in all 14,496. A later exact analysis at integrated commit
+`f69643794a932b14dac46b2e866667f5a7814bc4` compared the canonical-ID
+tie break to the mathematical expectation under uniform permutations within
+equal-score blocks. The analyzer consumed the original baseline aggregate and
+three score files; their byte hashes matched Operations' private retention
+manifest. Its sanitized aggregate matched local/remote SHA-256
+`ea9145726743573c091e38c9af21d1ccd9cd8fb7881c0fd6836e28b2e0ee538e`.
+
+| Baseline | Canonical NDCG@10 | Uniform-tie expected NDCG@10 | Queries whose tie permutations can affect NDCG@10 |
+|---|---:|---:|---:|
+| LambdaRank | 0.659554 | 0.656403 | 13,360 / 14,496 |
+| Lexical overlap | 0.649744 | 0.646555 | 13,730 / 14,496 |
+| Seeded random | 0.533827 | 0.533827 | 0 / 14,496 |
+
+The expectation is an analytic tie-handling sensitivity calculation on fixed
+scores, not an alternate trained model or uncertainty interval. The baseline
+run remains attributed to the old frozen manifest. The source-bound rebuild
+manifest SHA-256 is `9fd4065fc0db4586453a412123eb9ef393b1750cd8196bb11cad794d020f07cc`;
+an independent remote audit confirmed all four split-file byte hashes match
+the old manifest, so the evaluated groups are unchanged. Per-query files
+remain in private remote storage.
