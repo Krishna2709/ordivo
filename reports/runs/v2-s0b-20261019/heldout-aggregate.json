@@ -1,0 +1,125 @@
+{
+  "base_model": "LiquidAI/d1-3B",
+  "by_source": {
+    "esci": {
+      "admitted_queries": 50,
+      "excluded": {
+        "fewer_than_two_available": 0,
+        "not_exactly_one_booking": 0,
+        "prompt_overflow": 0
+      },
+      "failed_queries": 0,
+      "manifest_sha256": "9fd4065fc0db4586453a412123eb9ef393b1750cd8196bb11cad794d020f07cc",
+      "metrics": {
+        "ndcg@10": {
+          "adapted": 0.7143321612064727,
+          "adapted_minus_base": 0.008742398139010085,
+          "base": 0.7055897630674626,
+          "eligible": 50,
+          "excluded_zero_ideal_gain": 0
+        }
+      },
+      "schema_version": "ordivo-neural-heldout-v1",
+      "scored_adapted": 50,
+      "scored_base": 50,
+      "selected_episodes": 50,
+      "selected_units": 50,
+      "selected_units_sha256": "f4af35cfddaa544cdac993014d4e131e80814b2daeb0e713579fa2132181d15a",
+      "source": "amazon_esci"
+    },
+    "expedia": {
+      "admitted_queries": 29,
+      "excluded": {
+        "fewer_than_two_available": 0,
+        "not_exactly_one_booking": 21,
+        "prompt_overflow": 0
+      },
+      "failed_queries": 0,
+      "manifest_sha256": "c72552b8fe1acd0cab0480610dd65b5dd6aed575313047d2da2f2786953b4a2b",
+      "metrics": {
+        "choice_accuracy@1": {
+          "adapted": 0.13793103448275862,
+          "adapted_minus_base": 0.06896551724137931,
+          "base": 0.06896551724137931,
+          "eligible": 29,
+          "excluded_zero_ideal_gain": 0
+        },
+        "choice_brier": {
+          "adapted": 0.941649769757057,
+          "adapted_minus_base": -0.02614751089870816,
+          "base": 0.9677972806557652,
+          "eligible": 29,
+          "excluded_zero_ideal_gain": 0
+        },
+        "choice_nll": {
+          "adapted": 3.016046840048777,
+          "adapted_minus_base": 0.05435822228821995,
+          "base": 2.961688617760557,
+          "eligible": 29,
+          "excluded_zero_ideal_gain": 0
+        }
+      },
+      "schema_version": "ordivo-neural-heldout-v1",
+      "scored_adapted": 29,
+      "scored_base": 29,
+      "selected_episodes": 50,
+      "selected_units": 50,
+      "selected_units_sha256": "a5296fafb3ac8bc4e5dcb2d21442f39c2f5f7a5003bf328ee062e5b8725aad4d",
+      "source": "expedia_personalized_sort_2013"
+    },
+    "swissmetro": {
+      "admitted_queries": 450,
+      "excluded": {
+        "fewer_than_two_available": 0,
+        "not_exactly_one_booking": 0,
+        "prompt_overflow": 0
+      },
+      "failed_queries": 0,
+      "manifest_sha256": "dd3dc4b0713506f1664149993ca11022614a3ee850c335944ae37b5525af592a",
+      "metrics": {
+        "choice_accuracy@1": {
+          "adapted": 0.6622222222222223,
+          "adapted_minus_base": -0.017777777777777778,
+          "base": 0.68,
+          "eligible": 450,
+          "excluded_zero_ideal_gain": 0
+        },
+        "choice_brier": {
+          "adapted": 0.4637035571493307,
+          "adapted_minus_base": 0.004449526945523426,
+          "base": 0.4592540302038073,
+          "eligible": 450,
+          "excluded_zero_ideal_gain": 0
+        },
+        "choice_nll": {
+          "adapted": 0.782650820136904,
+          "adapted_minus_base": -0.023226984018029074,
+          "base": 0.8058778041549332,
+          "eligible": 450,
+          "excluded_zero_ideal_gain": 0
+        }
+      },
+      "schema_version": "ordivo-neural-heldout-v1",
+      "scored_adapted": 450,
+      "scored_base": 450,
+      "selected_episodes": 450,
+      "selected_units": 50,
+      "selected_units_sha256": "c546c7af44ce27b4cfb8988d6621222cbd230881fd68f32bfa9b2356843f97dc",
+      "source": "swissmetro"
+    }
+  },
+  "claim_scope": "exploratory_bounded_probe_not_protected_release_test",
+  "elapsed_seconds": 122.89688809588552,
+  "evaluation_config_sha256": "b4d889f639cdeaafd46fb24e9b2dccb078e5958178d1553f03acc4a9573594c1",
+  "paired_interpretation": "small_bounded_heldout_probe_no_calibration",
+  "pilot_best_step": 90,
+  "pilot_config_sha256": "1ad185a26779248dc0b9bf1635eb4c2a6460304cd34479de77941b898ab6403c",
+  "revision": "051bcc464b01b9f92942b364d9586b0ef5912432",
+  "schema_version": "ordivo-neural-heldout-run-v1",
+  "seed": 42,
+  "source_identity": {
+    "archive_sha256": "c8d240a0836de19d66c3ee2adfef71dba6ae645980da05bd2f8bf92c792e9f38",
+    "commit": "10232089368296680c75461da2dffe5254ae7590"
+  },
+  "status": "complete"
+}

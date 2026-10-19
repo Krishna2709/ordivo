@@ -81,6 +81,24 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   This is selection-validation learning only; held-out quality, calibration
   and transfer remain pending.
 
+- A separate S0b exploratory paired held-out probe at integrated source
+  `10232089368296680c75461da2dffe5254ae7590` measured mixed results.
+  Swissmetro base→S0b top-1 was 306/450→298/450, NLL
+  0.805878→0.782651, Brier 0.459254→0.463704. ESCI NDCG@10 was
+  0.705590→0.714332 on 50/50 selected queries, zero overflow. Expedia
+  exactly-one-booking choice admitted 29/50 searches (21 target-ineligible):
+  top-1 2/29→4/29, NLL 2.961689→3.016047, Brier 0.967797→0.941650.
+  All admitted units scored, zero inference failures. Aggregate SHA-256
+  `86753c1356cdf8524a3ea28a2f5b4ff31fb4ef20afaf3f96d6db1cb0fd4b086d`.
+  A private-ID join confirms old S0's 27 ESCI admitted queries are all in
+  S0b's 50; on those same 27, base NDCG 0.778290, S0 0.752276 and S0b
+  0.787842. Join receipt SHA-256
+  `494a1a0a6f2795a3c4f9962fc58f6194a7508f3aa5e9a7cc9ad24cde17479672`.
+  The 12 private output files plus manifest passed forced-download SHA
+  readback at Hub commit `9f7110952dbd64aeb8eaa703a328cf196765fa8f`;
+  retention-manifest SHA-256
+  `2ab1be61a5709ca8b736d32c9085c8e152a58e65b208e887beb2902b358113c4`.
+  This is not a protected test, interval, calibration or transfer result.
 - V2 behavioral data reviewer-fix tests at `2f417cbe28e77e7303d3c7fbfdf3d3d80bcf720f`
   passed 19/0 on the remote pod. Release-report source tests at `178d1fd4`
   passed 7/0. These are component tests, not real-data performance evidence.

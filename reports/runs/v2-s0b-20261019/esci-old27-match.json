@@ -1,0 +1,32 @@
+{
+  "intersection": 27,
+  "new_admitted": 50,
+  "new_full": {
+    "adapted_minus_base": 0.008742398139010121,
+    "adapted_ndcg10": 0.7143321612064727,
+    "base_ndcg10": 0.7055897630674626
+  },
+  "new_matched": {
+    "adapted_minus_base": 0.009551320671623786,
+    "adapted_ndcg10": 0.7878417627974978,
+    "base_ndcg10": 0.7782904421258741
+  },
+  "new_only": 23,
+  "new_per_query_sha256": "838d2ad280ade5d5cd008a9efcdc34abfd3cdc94fb38696b07086d8aac59b947",
+  "old_admitted": 27,
+  "old_full": {
+    "adapted_minus_base": -0.026014581742018317,
+    "adapted_ndcg10": 0.7522758603838557,
+    "base_ndcg10": 0.7782904421258741
+  },
+  "old_matched": {
+    "adapted_minus_base": -0.026014581742018317,
+    "adapted_ndcg10": 0.7522758603838557,
+    "base_ndcg10": 0.7782904421258741
+  },
+  "old_only": 0,
+  "old_per_query_sha256": "dc0075d4d7333b8faa2853035a41b1a9593c08409a6602b70d6bb5b711456262",
+  "schema_version": "ordivo-esci-private-id-match-v1",
+  "selection_sha256": "f4af35cfddaa544cdac993014d4e131e80814b2daeb0e713579fa2132181d15a",
+  "source": "amazon_esci"
+}

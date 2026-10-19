@@ -1,6 +1,6 @@
 # Ordivo v2 research adapter (private)
 
-**Status:** preliminary, access-controlled pilot, **not a release candidate**. This repository is not a public v2 release or a claim of held-out neural improvement. It is separate from the published Ordivo v1 synthetic adapter. The retained bounded pilot trained one shared adapter on Swissmetro stated choice and Amazon ESCI graded relevance. A separate three-source S0b pilot has now completed training with sampled Expedia conditional-booking choice, but has no held-out result yet; its private best adapter passed file-level readback. Neither establishes three-domain generality or a public release dossier. The model repository is `blackOrder/Ordivo-v2-research` and should remain private.
+**Status:** preliminary, access-controlled pilot, **not a release candidate**. This repository is not a public v2 release or a claim of held-out neural improvement. It is separate from the published Ordivo v1 synthetic adapter. The retained bounded pilot trained one shared adapter on Swissmetro stated choice and Amazon ESCI graded relevance. A separate three-source S0b pilot has now completed training with sampled Expedia conditional-booking choice, and a separate bounded held-out probe now has mixed results; its private best adapter passed file-level readback. Neither establishes three-domain generality or a public release dossier. The model repository is `blackOrder/Ordivo-v2-research` and should remain private.
 
 ## Exact model and task boundary
 
@@ -75,10 +75,44 @@ plus manifest passed forced-download SHA readback. Adapter directory SHA-256
 `e9bc879b31a32e5546d238345babd7d9fc5eedad7e015510804e03fde8a77c50`;
 retention-manifest SHA-256
 `1bbd441f8ccb2d276ed4028681cb5d550276fd7b690a47642aa02973d24801e5`.
-Final cloud readback, held-out efficacy, calibration and cross-domain transfer
-remain pending. These
-are model-selection validation losses only; they do not overturn the earlier
-negative/mixed held-out probe of the frozen two-source pilot.
+Final cloud readback, calibration and cross-domain transfer remain pending.
+These are model-selection validation losses only; a separate bounded S0b
+held-out probe follows below.
+
+### S0b bounded paired held-out probe
+
+A separate, exploratory paired probe compared base d1 and the S0b best-step-90
+adapter on the same selected units within each source. Exact aggregate SHA-256:
+`86753c1356cdf8524a3ea28a2f5b4ff31fb4ef20afaf3f96d6db1cb0fd4b086d`;
+executed evaluation source `10232089368296680c75461da2dffe5254ae7590`,
+config SHA-256 `b4d889f639cdeaafd46fb24e9b2dccb078e5958178d1553f03acc4a9573594c1`.
+
+| Endpoint | Base d1 | S0b | Eligible coverage |
+|---|---:|---:|---|
+| Swissmetro choice accuracy@1 | 0.680000 (306/450) | 0.662222 (298/450) | 450/450 scenarios from 50 held-out respondents |
+| Swissmetro choice NLL ↓ | 0.805878 | 0.782651 | Same 450 |
+| Swissmetro choice Brier ↓ | 0.459254 | 0.463704 | Same 450 |
+| ESCI judged-pool NDCG@10 | 0.705590 | 0.714332 | 50/50 selected test groups; zero overflow |
+| Expedia exactly-one-booking accuracy@1 | 0.068966 (2/29) | 0.137931 (4/29) | 29/50 selected searches; 21 lack target event |
+| Expedia booking-choice NLL ↓ | 2.961689 | 3.016047 | Same 29 |
+| Expedia booking-choice Brier ↓ | 0.967797 | 0.941650 | Same 29 |
+
+All admitted units were scored by both models with zero inference failures.
+The private per-query outputs and aggregate are retained under
+`heldout/20261019T030009Z/s0b-paired-50-1023208` at Hub commit
+`9f7110952dbd64aeb8eaa703a328cf196765fa8f`: 12 files plus manifest
+passed forced-download SHA readback; retention-manifest SHA-256
+`2ab1be61a5709ca8b736d32c9085c8e152a58e65b208e887beb2902b358113c4`. Swiss
+accuracy and Brier worsened; ESCI NDCG and Expedia accuracy/Brier improved on
+small cohorts, while Expedia NLL worsened. The old S0 ESCI probe scored only 27/50 selected groups; a private-ID
+intersection confirms all 27 are in the new 50. On those same 27, base NDCG@10
+was 0.778290 in both, old S0 0.752276 and S0b 0.787842. The 23 newly
+admitted groups change the 50-group mean, so do not directly compare the old
+27-group mean with the new 50-group mean. Intersection receipt SHA-256 is
+`494a1a0a6f2795a3c4f9962fc58f6194a7508f3aa5e9a7cc9ad24cde17479672`. No intervals, calibration fit, multiple seeds or
+entire-domain transfer were measured. This is not a protected release test or
+a general improvement claim. Expedia is conditional booking within its bounded
+exposed-search sample, not general booking probability.
 
 A validation-only candidate-order probe of this frozen pilot found
 52/180 Swissmetro top-choice flips (28.89%) across 20 selected respondents,

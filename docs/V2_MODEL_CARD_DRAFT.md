@@ -1,6 +1,6 @@
 # Ordivo v2 model card — draft, unreleased
 
-**Research status:** a preliminary two-domain v2 adapter exists in a **private** research repository; its bounded held-out neural probe measured negative/mixed results. A separate three-source S0b training run has completed with better selected-validation loss, but no S0b held-out result yet; the private S0b adapter passed file-level readback. No public release claim is established here. This is the intended public card template; replace remaining pending fields with immutable receipts before publication. [Release criteria](V2_RELEASE_CRITERIA.md) control promotion. `blackOrder/Ordivo-v1` and its [synthetic-only results](../reports/V2_RESEARCH_AUDIT.md) are a separate historical model.
+**Research status:** a preliminary two-domain v2 adapter exists in a **private** research repository; its bounded held-out neural probe measured negative/mixed results. A separate three-source S0b training run has completed with better selected-validation loss, and a bounded S0b held-out probe now shows mixed source-specific outcomes; the private S0b adapter passed file-level readback. No public release claim is established here. This is the intended public card template; replace remaining pending fields with immutable receipts before publication. [Release criteria](V2_RELEASE_CRITERIA.md) control promotion. `blackOrder/Ordivo-v1` and its [synthetic-only results](../reports/V2_RESEARCH_AUDIT.md) are a separate historical model.
 
 A bounded remote compatibility check at integrated source commit
 `22707ed34fd125e96aade9123f9baaf34cd64a18` completed one A40 BF16
@@ -55,9 +55,26 @@ supervised event). The receipt SHA-256 is
 `85426d547c1fbc88cc52cf9c4fc9c9bfac99fb3bfbd7b256b177c3f069e24565`.
 ESCI training overflow excluded 4/1,000 selected groups; Expedia target
 exclusions were 315/1,000 selected training groups. Expedia used only the
-predeclared 20k/2k/2k/5k complete-search sample, not the full source. This is
-selection-validation evidence, not held-out accuracy, booking probability,
-calibration or cross-domain generality. Private S0b adapter readback passed at `blackOrder/Ordivo-v2-research` commit `df6405c575629dfaf9083f7b068ab8ef34b6eeb3`, directory SHA-256 `e9bc879b31a32e5546d238345babd7d9fc5eedad7e015510804e03fde8a77c50`; no S0b held-out inference is established by storage.
+predeclared 20k/2k/2k/5k complete-search sample, not the full source. This training loss is selection-validation evidence, not held-out accuracy, booking probability, calibration or cross-domain generality. Private S0b adapter readback passed at `blackOrder/Ordivo-v2-research` commit `df6405c575629dfaf9083f7b068ab8ef34b6eeb3`, directory SHA-256 `e9bc879b31a32e5546d238345babd7d9fc5eedad7e015510804e03fde8a77c50`; no S0b held-out inference is established by storage.
+
+A separate [exploratory paired S0b probe](../reports/runs/v2-s0b-20261019/heldout-aggregate.json) at evaluation source
+`10232089368296680c75461da2dffe5254ae7590` has aggregate SHA-256
+`86753c1356cdf8524a3ea28a2f5b4ff31fb4ef20afaf3f96d6db1cb0fd4b086d`.
+Swissmetro base→S0b accuracy fell 0.680000→0.662222 on 450/450 scenarios;
+NLL improved 0.805878→0.782651 while Brier worsened 0.459254→0.463704.
+ESCI NDCG@10 rose 0.705590→0.714332 on 50/50 selected groups, zero
+overflow. Expedia conditional-booking accuracy rose 2/29→4/29 and Brier
+improved 0.967797→0.941650, while NLL worsened 2.961689→3.016047;
+21/50 selected searches lacked the exactly-one-booking target. These are
+small, already-exposed test cohorts with no intervals/calibration/multi-seed or
+protected-release test. Their 12 private files plus manifest passed forced-
+download SHA readback at Hub commit `9f7110952dbd64aeb8eaa703a328cf196765fa8f`
+(retention-manifest SHA-256
+`2ab1be61a5709ca8b736d32c9085c8e152a58e65b208e887beb2902b358113c4`). A [private-ID aggregate intersection](../reports/runs/v2-s0b-20261019/esci-old27-match.json) confirms the old 27 ESCI groups are all in the
+new 50; on those same 27, base NDCG@10 is 0.778290, S0 0.752276, and S0b
+0.787842. The other 23 alter the new mean, so comparing the unpaired 27-
+and 50-group means directly is invalid. Intersection receipt SHA-256
+`494a1a0a6f2795a3c4f9962fc58f6194a7508f3aa5e9a7cc9ad24cde17479672`.
 
 ## Research inference interface
 
