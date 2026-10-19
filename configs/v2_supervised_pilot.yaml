@@ -9,6 +9,7 @@ max_length: 2048
 learning_rate: 0.0001
 wandb_project: liquid-mcdm-lab
 wandb_mode: offline
+publish_model_artifacts: false
 lora:
   r: 8
   alpha: 16

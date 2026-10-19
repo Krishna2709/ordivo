@@ -38,6 +38,10 @@ validation loss, saves the best adapter, and checks reload. The sample config
 is not an execution authorization. Real source acquisition, rights and baseline
 evidence must be reviewed before starting this pilot; two domains would still
 be preliminary research.
+Model adapters and receipts remain on the remote runtime. The trainer rejects
+`publish_model_artifacts: true`; changing W&B mode can publish aggregate metrics
+but cannot silently upload derived weights. Artifact publication needs a
+separate source-rights and destination-visibility review.
 
 ## Remote evidence gates
 
