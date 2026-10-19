@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib
 import json
 from pathlib import Path
 
@@ -16,7 +17,7 @@ REVISION = '051bcc464b01b9f92942b364d9586b0ef5912432'
 def run(output: Path):
     import torch
     from peft import LoraConfig, PeftModel, get_peft_model
-    from transformers import AutoModelForImageTextToText, AutoTokenizer
+    from transformers import AutoModel, AutoModelForImageTextToText, AutoTokenizer
 
     runtime = require_remote_gpu()
     output.mkdir(parents=True, exist_ok=False)
@@ -25,8 +26,9 @@ def run(output: Path):
     question = d1_prompt.Choice('Select one eligible option.',
                                 {'opt0': 'First option', 'opt1': 'Second option',
                                  'opt2': 'Unavailable option'})
-    prompt = d1_prompt.render(tokenizer, {'task_type': 'stated_choice',
-                                           'alternatives': ['First', 'Second', 'Third']},
+    state = {'task_type': 'stated_choice',
+             'alternatives': ['First', 'Second', 'Third']}
+    prompt = d1_prompt.render(tokenizer, state,
                               question, bos=tokenizer.bos_token)
     groups = d1_prompt.readout_ids(tokenizer, question)
     encoded = tokenizer(prompt, add_special_tokens=False, return_tensors='pt').to('cuda')
@@ -42,6 +44,20 @@ def run(output: Path):
     parity = float((tensor_probs - pinned_probs).abs().max())
     if parity > 1e-6:
         raise RuntimeError(f'pinned inference readout parity failed: {parity}')
+    custom = AutoModel.from_pretrained(MODEL, revision=REVISION,
+                                        trust_remote_code=True, dtype=dtype).to('cuda')
+    remote_module = importlib.import_module(custom.__class__.__module__)
+    custom.__dict__['engine'] = remote_module.SystemOne(model=custom, tokenizer=tokenizer)
+    schema = {'type': 'choice', 'instructions': question.instructions,
+              'criteria': dict(question.criteria)}
+    custom_result = custom.system_one_batch([(state, {'winner': schema})])[0]
+    custom_probabilities = custom_result['answers']['winner']['probabilities']
+    custom_vector = torch.tensor([custom_probabilities[key] for key in question.criteria])
+    custom_delta = float((tensor_probs - custom_vector).abs().max())
+    if custom_delta > 0.05 or tensor_probs.argmax() != custom_vector.argmax():
+        raise RuntimeError(f'custom/standard inference parity failed: {custom_delta}')
+    del custom
+    torch.cuda.empty_cache()
     if option_probabilities(base_logits, groups, eligible)[-1].item() != 0:
         raise RuntimeError('unavailable option was not masked')
 
@@ -86,6 +102,7 @@ def run(output: Path):
         raise RuntimeError(f'adapter reload parity failed: {reload_delta}')
     receipt = {'passed': True, 'model': MODEL, 'revision': REVISION, 'runtime': runtime,
                'dtype': str(dtype), 'readout_parity_max_delta': parity,
+               'custom_standard_parity_max_delta': custom_delta,
                'finite_loss': float(loss.detach().cpu()),
                'trainable_tensors_with_nonzero_gradient': nonzero,
                'unavailable_probability': 0.0, 'reload_max_delta': reload_delta,
