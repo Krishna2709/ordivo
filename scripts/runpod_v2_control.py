@@ -15,6 +15,7 @@ import re
 import shlex
 import subprocess
 import sys
+import tarfile
 import time
 
 from runpod_control import request, ssh_target
@@ -81,7 +82,9 @@ def preflight():
     catalog = request('GET',
                       'https://api.runpod.io/v2/catalog/gpus?include=AVAILABILITY&product=POD',
                       absolute=True, token=load_secret('RUNPOD_API_KEY'))
-    items = catalog if isinstance(catalog, list) else catalog.get('data', [])
+    items = catalog if isinstance(catalog, list) else next(
+        (catalog[key] for key in ('data', 'items', 'gpus')
+         if isinstance(catalog.get(key), list)), [])
     gpu = next((x for x in items if x.get('id') == CONFIG['gpu_type_id']), None)
     if gpu is None or gpu.get('availability') == 'NONE':
         raise RuntimeError('A40 is unavailable')
@@ -148,8 +151,11 @@ def reap(path):
         if remaining <= 0:
             try:
                 api('DELETE', f"/pods/{state['pod_id']}")
+                if any(p.get('id') == state['pod_id'] for p in pods()):
+                    raise RuntimeError('Pod still present after delete')
                 state['status'] = 'deleted'
                 state['deleted_utc'] = utcnow().isoformat()
+                state['provider_absence_confirmed'] = True
                 write_state(path, state)
                 return
             except Exception:
@@ -199,6 +205,16 @@ def wait_ssh(timeout=600):
 
 def setup():
     pod = wait_ssh()
+    gpu = ssh(pod, 'nvidia-smi --query-gpu=name,uuid,memory.total --format=csv,noheader',
+              timeout=30)
+    if gpu.returncode or len(gpu.stdout.strip().splitlines()) != 1 or 'A40' not in gpu.stdout:
+        raise RuntimeError('Expected exactly one NVIDIA A40 on remote pod')
+    path, state, _ = live_pod()
+    if 'setup_utc' in state:
+        state['gpu_identity'] = gpu.stdout.strip()
+        write_state(path, state)
+        return {'setup': 'complete', 'freeze_sha256': state['setup_freeze_sha256'],
+                'gpu_identity': state['gpu_identity']}
     root = CONFIG['remote_root']
     packages = shlex.join(CONFIG['cpu_packages'])
     tokenizers = shlex.join(CONFIG['tokenizer_packages'])
@@ -209,12 +225,12 @@ def setup():
               f'{shlex.quote(root)}/cpu-venv/bin/python -c "import torch; print(torch.__version__)"; '
               f'{shlex.quote(root)}/cpu-venv/bin/python -m pip freeze')
     result = ssh(pod, script, timeout=1800)
-    path, state, _ = live_pod()
     (path.parent / 'setup.log').write_text(result.stdout[-30000:] + result.stderr[-10000:])
     if result.returncode:
         raise RuntimeError('Remote CPU environment setup failed; inspect setup.log')
     state['setup_utc'] = utcnow().isoformat()
     state['setup_freeze_sha256'] = hashlib.sha256(result.stdout.encode()).hexdigest()
+    state['gpu_identity'] = gpu.stdout.strip()
     write_state(path, state)
     return {'setup': 'complete', 'freeze_sha256': state['setup_freeze_sha256']}
 
@@ -242,74 +258,158 @@ def run_task(task, repo, commit, command, secret_names=(), outputs=()):
         raise RuntimeError('Task ID already used; receipts are immutable')
     task_dir.mkdir(parents=True)
     archive = task_dir / 'source.tar'
+    source_allow = {'ARCHITECTURE.md', 'CITATION.cff', 'CONTRIBUTING.md', 'LICENSE',
+                    'NOTICE', 'PROJECT_BRIEF.md', 'README.md', 'configs', 'docs',
+                    'notebooks', 'pyproject.toml', 'research', 'scripts', 'src',
+                    'tests', 'uv.lock', 'requirements-cpu.lock',
+                    'requirements-colab-candidate.txt', 'requirements-behavioral.txt'}
+    tracked = subprocess.run(['git', '-C', str(repo), 'ls-tree', '--name-only', commit],
+                             check=True, capture_output=True, text=True).stdout.splitlines()
+    paths = sorted(source_allow.intersection(tracked))
     with archive.open('wb') as stream:
-        subprocess.run(['git', '-C', str(repo), 'archive', '--format=tar', commit],
+        subprocess.run(['git', '-C', str(repo), 'archive', '--format=tar', commit, *paths],
                        check=True, stdout=stream)
+    with tarfile.open(archive) as source:
+        members = source.getmembers()
+        for member in members:
+            name = Path(member.name)
+            lowered = [part.lower() for part in name.parts]
+            if (name.is_absolute() or '..' in name.parts or member.issym() or member.islnk()
+                    or any(part in {'.env', '.kaggle', '.wandb', 'credentials', 'secrets',
+                                    'reports', 'dist', 'checkpoints', 'models'}
+                           for part in lowered)
+                    or name.suffix.lower() in {'.safetensors', '.pt', '.pth', '.ckpt',
+                                               '.parquet', '.arrow'}):
+                raise RuntimeError('Archive contains forbidden source member')
+            if not (member.isfile() or member.isdir()):
+                raise RuntimeError('Archive contains unsupported member type')
+    member_count = len(members)
     source_sha = hashlib.sha256(archive.read_bytes()).hexdigest()
     remote = f"{CONFIG['remote_root']}/tasks/{task}"
     base, scp, target = ssh_args(pod)
     subprocess.run([*base, f'mkdir -p {shlex.quote(remote)}/src'], check=True)
     subprocess.run([*scp, str(archive), f'{target}:{remote}/source.tar'], check=True)
-    if secret_names:
-        env_text = ''.join(f'export {allowed[name][0]}={shlex.quote(load_secret(allowed[name][1]))}\n'
-                           for name in secret_names)
-        secret_path = f'{remote}/secrets.sh'
-        transfer = subprocess.run([*base, f'umask 077; cat > {shlex.quote(secret_path)}'],
-                                  input=env_text, capture_output=True, text=True, timeout=30)
-        if transfer.returncode:
-            raise RuntimeError('Scoped remote secret transfer failed')
+    remote_hash = ssh(pod, f'sha256sum {shlex.quote(remote)}/source.tar', timeout=30)
+    if remote_hash.returncode or remote_hash.stdout.split()[0] != source_sha:
+        raise RuntimeError('Remote source archive hash mismatch')
     wrapped = (f'set -o pipefail; cd {shlex.quote(remote)}/src; '
-               f'tar -xf {shlex.quote(remote)}/source.tar; '
+               f'tar -xf {shlex.quote(remote)}/source.tar || exit 90; '
                f'export PATH={shlex.quote(CONFIG["remote_root"] + "/cpu-venv/bin")}:$PATH; '
                f'export RUNPOD_POD_ID={shlex.quote(state["pod_id"])}; '
-               + (f'. {shlex.quote(remote)}/secrets.sh; '
-                  f'trap "rm -f {shlex.quote(remote)}/secrets.sh" EXIT; '
-                  if secret_names else '') +
                f'({command}) > {shlex.quote(remote)}/stdout.log 2>&1; '
                f'code=$?; echo "$code" > {shlex.quote(remote)}/exit_code; exit "$code"')
+    # Secret values travel only over SSH stdin, never command argv or a remote file.
+    secret_values = {allowed[name][0]: load_secret(allowed[name][1]) for name in secret_names}
+    exports = ''.join(f'export {key}={shlex.quote(value)}\n'
+                      for key, value in secret_values.items())
+    remote_script = exports + wrapped + '\n'
     receipt = {'task': task, 'commit': commit, 'command': command,
-               'source_sha256': source_sha, 'started_utc': utcnow().isoformat(),
+               'source_sha256': source_sha, 'remote_source_sha256': remote_hash.stdout.split()[0],
+               'source_member_count': member_count, 'started_utc': utcnow().isoformat(),
                'remote_dir': remote, 'pod_id': state['pod_id'],
-               'secret_aliases': list(secret_names), 'outputs': list(outputs)}
+               'gpu_identity': state.get('gpu_identity'), 'secret_aliases': list(secret_names),
+               'outputs': list(outputs), 'status': 'running'}
     write_once(task_dir / 'receipt.json', receipt)
-    result = subprocess.run([*base, 'bash -lc ' + shlex.quote(wrapped)],
-                            capture_output=True, text=True, timeout=3600)
+    try:
+        result = subprocess.run([*base, 'bash -s'], input=remote_script,
+                                capture_output=True, text=True, timeout=3600)
+    except (subprocess.TimeoutExpired, KeyboardInterrupt):
+        # The SSH process may have died before an EXIT trap; no secret file exists.
+        write_once(task_dir / 'interrupted.json', {'status': 'incomplete',
+                    'finished_utc': utcnow().isoformat()})
+        raise
     receipt['finished_utc'] = utcnow().isoformat()
     receipt['returncode'] = result.returncode
-    write_state(task_dir / 'receipt.json', receipt)
-    (task_dir / 'ssh.log').write_text(result.stdout[-10000:] + result.stderr[-10000:])
-    fetch_task(task)
+    receipt['status'] = 'command_finished'
+    write_once(task_dir / 'finished.json', receipt)
+    ssh_log = result.stdout[-10000:] + result.stderr[-10000:]
+    for value in secret_values.values():
+        ssh_log = ssh_log.replace(value, '[REDACTED]')
+    (task_dir / 'ssh.log').write_text(ssh_log)
+    fetch_task(task, secret_values=secret_values)
     if outputs:
         output_root = task_dir / 'outputs'
-        output_root.mkdir()
+        output_root.mkdir(mode=0o700)
+        pack_code = '''import hashlib,os,pathlib,sys,tarfile
+root=pathlib.Path(sys.argv[1]).resolve(strict=True)
+archive=pathlib.Path(sys.argv[2])
+paths=sys.argv[3:]
+with tarfile.open(archive,'w') as out:
+ for name in paths:
+  p=root/name
+  if not p.exists(): raise RuntimeError('requested output missing')
+  entries=[p] if p.is_file() else [p,*p.rglob('*')]
+  for item in entries:
+   if item.is_symlink() or not (item.is_file() or item.is_dir()): raise RuntimeError('unsafe output type')
+   resolved=item.resolve(strict=True)
+   if not resolved.is_relative_to(root): raise RuntimeError('output escapes checkout')
+   out.add(item,arcname=str(item.relative_to(root)),recursive=False)
+'''
+        pack_cmd = shlex.join(['python', '-c', pack_code, f'{remote}/src',
+                               f'{remote}/outputs.tar', *outputs])
+        packed = ssh(pod, pack_cmd, timeout=120)
+        if packed.returncode:
+            raise RuntimeError('Remote output rejected or packaging failed')
+        local_tar = task_dir / 'outputs.tar'
+        subprocess.run([*scp, f'{target}:{remote}/outputs.tar', str(local_tar)],
+                       check=True, capture_output=True)
         hashes = {}
-        for output in outputs:
-            local = output_root / output
-            local.parent.mkdir(parents=True, exist_ok=True)
-            subprocess.run([*scp, '-r', f'{target}:{remote}/src/{output}', str(local)],
-                           check=True, capture_output=True)
-            if local.is_file():
-                hashes[output] = hashlib.sha256(local.read_bytes()).hexdigest()
-            else:
-                hashes[output] = {str(p.relative_to(output_root)):
-                                  hashlib.sha256(p.read_bytes()).hexdigest()
-                                  for p in local.rglob('*') if p.is_file()}
-        receipt['output_sha256'] = hashes
-        write_state(task_dir / 'receipt.json', receipt)
+        with tarfile.open(local_tar) as archive_out:
+            for member in archive_out.getmembers():
+                name = Path(member.name)
+                if (name.is_absolute() or '..' in name.parts or
+                        not (member.isfile() or member.isdir())):
+                    raise RuntimeError('Unsafe output archive member')
+                local = output_root / name
+                if any(parent.is_symlink() for parent in [local, *local.parents]):
+                    raise RuntimeError('Local output symlink detected')
+                if member.isdir():
+                    local.mkdir(parents=True, exist_ok=True)
+                else:
+                    local.parent.mkdir(parents=True, exist_ok=True)
+                    with archive_out.extractfile(member) as source, local.open('xb') as dest:
+                        dest.write(source.read())
+                    hashes[str(name)] = hashlib.sha256(local.read_bytes()).hexdigest()
+        write_once(task_dir / 'outputs.json', {'sha256': hashes,
+                   'archive_sha256': hashlib.sha256(local_tar.read_bytes()).hexdigest()})
     return {key: receipt[key] for key in ('task', 'commit', 'returncode', 'source_sha256')}
 
 
-def fetch_task(task):
+def fetch_task(task, *, secret_values=None):
     path, _, pod = live_pod()
     task_dir = path.parent / 'tasks' / task
     if not task_dir.exists():
         raise RuntimeError('Unknown task')
     remote = f"{CONFIG['remote_root']}/tasks/{task}"
     _, scp, target = ssh_args(pod)
+    if secret_values is None:
+        aliases = json.loads((task_dir / 'receipt.json').read_text()).get('secret_aliases', [])
+        mapping = {'wandb': 'WEIGHTS_AND_BIASES_API_KEY', 'hf': 'HUGGINGFACE_API_KEY'}
+        secret_values = {x: load_secret(mapping[x]) for x in aliases}
+    base, _, _ = ssh_args(pod)
+    received = {}
+    prior_path = task_dir / 'fetched.json'
+    prior = json.loads(prior_path.read_text()) if prior_path.exists() else None
     for filename in ('stdout.log', 'exit_code'):
-        subprocess.run([*scp, f'{target}:{remote}/{filename}', str(task_dir / filename)],
-                       check=True, capture_output=True)
-    return {'task': task, 'log_sha256': hashlib.sha256((task_dir / 'stdout.log').read_bytes()).hexdigest()}
+        fetched = subprocess.run([*base, f'cat {shlex.quote(remote)}/{filename}'],
+                                 check=True, capture_output=True)
+        content = fetched.stdout
+        for value in secret_values.values():
+            content = content.replace(value.encode(), b'[REDACTED]')
+        digest = hashlib.sha256(content).hexdigest()
+        if prior:
+            expected = prior['log_sha256' if filename == 'stdout.log' else 'exit_code_sha256']
+            if digest != expected or hashlib.sha256((task_dir / filename).read_bytes()).hexdigest() != expected:
+                raise RuntimeError('Fetched evidence changed locally or remotely')
+        else:
+            with (task_dir / filename).open('xb') as dest:
+                dest.write(content)
+        received[filename] = digest
+    result = {'task': task, 'log_sha256': received['stdout.log'],
+              'exit_code_sha256': received['exit_code']}
+    if not prior:
+        write_once(prior_path, result)
+    return result
 
 
 def cleanup():
@@ -324,8 +424,15 @@ def cleanup():
         except RuntimeError as exc:
             if '404' not in str(exc):
                 raise
+        for attempt in range(12):
+            if not any(p.get('id') == pod_id for p in pods()):
+                break
+            time.sleep(5)
+        else:
+            raise RuntimeError('Provider still lists pod after delete; receipt remains active')
     state['status'] = 'deleted'
     state['deleted_utc'] = utcnow().isoformat()
+    state['provider_absence_confirmed'] = True
     if state.get('hourly_usd'):
         elapsed = (utcnow() - datetime.fromisoformat(state['created_utc'])).total_seconds()
         state['estimated_compute_usd'] = round(elapsed / 3600 * float(state['hourly_usd']), 4)

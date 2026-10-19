@@ -34,6 +34,14 @@ def test_preflight_enforces_secure_hourly_cap(control, monkeypatch):
         control.preflight()
 
 
+def test_preflight_reads_current_catalog_gpus_shape(control, monkeypatch):
+    monkeypatch.setattr(control, 'pods', lambda: [])
+    monkeypatch.setattr(control, 'load_secret', lambda name: 'hidden')
+    monkeypatch.setattr(control, 'request', lambda *a, **kw: {'gpus': [
+        {'id': 'NVIDIA A40', 'availability': 'HIGH', 'price': {'secure': 0.59}}]})
+    assert control.preflight() == .59
+
+
 def test_launch_uses_no_volume_and_arms_reaper(control, monkeypatch):
     monkeypatch.setattr(control, 'preflight', lambda: .59)
     monkeypatch.setattr(control, 'active_run', lambda: None)
