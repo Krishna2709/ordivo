@@ -175,6 +175,16 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   [sanitized receipt](../../reports/runs/v2-continuation-20261019/summary.json)
   has SHA-256 `cc686cf66ee3d7daa777ecc8b3c1ccaedda5d546da96107ad1f18ea0bf055cc5`;
   cloud and private-retention readbacks were pending at this ledger update.
+- Frozen pilot candidate-order sensitivity was measured on **validation only**
+  at diagnostic commit `a19d32d275db0012cecb50aafff84f4a125fbf7a`.
+  Swissmetro selected 20 respondents/180 scenarios, all paired, with 52/180
+  top-choice flips and mean probability L1 change 0.39663. ESCI selected 20
+  query groups, eight complete groups overflowed in both orders, 12 paired,
+  with 7/12 flips and mean L1 change 0.31887. There were no evaluation
+  failures after admission. The [sanitized aggregate](../../reports/runs/v2-order-20261019/aggregate.json)
+  has SHA-256 `1caff28407551758975ab5ebcf67abd3708f44fa8f2fa4a29ead7f04beeabad7`.
+  This is positional sensitivity of the adapted pilot, not accuracy loss or
+  evidence that fine-tuning caused it; base d1 was not tested in this probe.
 
 No local workload was executed. The integrated suite proves source behavior,
 not real-data neural efficacy or release readiness. Initial GitHub CPU runs were superseded by the
