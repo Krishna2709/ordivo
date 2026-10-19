@@ -34,15 +34,18 @@ observed-choice, stated-choice, relevance, and explicit-ranking supervision.
 Adapters own field semantics and split units; evaluators own task-specific
 metrics. The report contains trade-offs, assumptions and an analysis trace as
 well as rankings; mandatory constraints are enforced independently of model
-scores. Shared-model experiments must test entire held-out domains. GRPO and
-calibration-focused training are research options, not implemented trainers.
+scores. Shared-model experiments must test entire held-out domains. Bounded
+supervised and C1/R0 continuation experiments ran; GRPO remains unexecuted.
 See [ADR 0007](docs/decisions/0007-v2-multidomain-decision-learning.md).
-The deterministic foundation is now implemented in `decision/`; behavioral adapters, preference learning and RL trainers remain planned. See [ADR 0008](docs/decisions/0008-v2-verifier-and-research-order.md) and [verification contract](docs/DECISION_VERIFICATION.md).
+The deterministic foundation is implemented in `decision/`, and grouped
+behavioral adapters plus bounded SFT/R0 research paths exist. Preference
+learning and verifier-guided GRPO remain pending. See [ADR 0008](docs/decisions/0008-v2-verifier-and-research-order.md), the [verification contract](docs/DECISION_VERIFICATION.md), and the [v2 experiment report](reports/ordivo-v2-experiment.html).
 
 The next **planned** v2 research milestone first separates alias assignment from
 content-row order in a frozen validation diagnostic, then compares independent
 numerical candidate scoring with a masked set-context scorer. Shared text
-encoding and set attention are conditional later experiments. Candidate scores
+encoding is the later matched ESCI arm, alongside Expedia categorical support;
+set attention is conditional on a documented interaction need. Candidate scores
 remain separate from feasibility, weight provenance and exact verification; no
 new ranker or preference learner is implemented by this decision. See
 [ADR 0010](docs/decisions/0010-v2-permutation-consistent-ranking.md) and its
@@ -50,7 +53,13 @@ new ranker or preference learner is implemented by this decision. See
 
 Add a method by declaring its formula/domain/order/compromise contract and independent fixtures, then extend the generator/schema. Add behavioral datasets through a separate grouped loader; do not impersonate `synthetic_solver`. Add a model through the decision-input/probability boundary. Encoder set-ranking and full-ranking metrics are later distinct tasks, not implied by winner classification.
 
-The user requires remote resources only and selected Hugging Face Jobs after Colab allocation failures; see ADR0005. Pure functions remain reusable, but CLI/notebook entry points reject local workload execution. Source preparation stays local; generated datasets, caches, environments, runs and checkpoints stay remote. Colab is ephemeral: persistent artifacts and resumable checkpoints require an explicit remote destination.
+The user requires remote resources only. Current v2 execution and checks use
+guarded RunPod; Hugging Face Jobs and Colab remain documented alternatives
+([ADR 0005](docs/decisions/0005-hf-jobs.md)). Pure functions remain reusable,
+but CLI/notebook entry points reject local workload execution. Source
+preparation stays local; generated datasets, caches, environments, runs and
+checkpoints stay remote. Colab is ephemeral: persistent artifacts and
+resumable checkpoints require an explicit remote destination.
 
 Provider orchestration is outside the domain. `runpod_control.py` packages an
 allowlisted snapshot and controls one pod plus its network volume;

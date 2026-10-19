@@ -10,8 +10,9 @@ experiment does not mean a release criterion passed.
 factorial, then compare matched independent numerical and masked set-context
 scorers. The [decision](decisions/0010-v2-permutation-consistent-ranking.md)
 and [implementation plan](superpowers/plans/2026-10-19-v2-permutation-consistent-ranking.md)
-define the gates. Further R0/RL continuation and unexecuted G0/G1 GRPO work
-are deferred until architecture, reward and evaluation boundaries are validated.
+define the gates. Further R0/RL continuation and the unexecuted G0
+structured-action SFT and G1 GRPO arms are deferred until architecture, reward
+and evaluation boundaries are validated.
 The completed R0 row below remains historical evidence, not a pending run.
 
 | ID | Experiment | Data / target | Main comparison | Status |
