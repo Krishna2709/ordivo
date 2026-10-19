@@ -142,3 +142,17 @@ def test_pilot_group_subset_is_order_invariant_and_panel_atomic():
                                 source='source', split='train')
     kept = [unit for unit in panel_rows if unit in selected]
     assert len(kept) in (2, 3)
+
+
+def test_archive_identity_required_without_git_checkout(monkeypatch):
+    from scripts.train_v2_supervised import _source_identity
+
+    monkeypatch.delenv('ORDIVO_SOURCE_COMMIT', raising=False)
+    monkeypatch.delenv('ORDIVO_SOURCE_SHA256', raising=False)
+    with pytest.raises(ValueError, match='ORDIVO_SOURCE_COMMIT'):
+        _source_identity()
+    monkeypatch.setenv('ORDIVO_SOURCE_COMMIT', 'a' * 40)
+    with pytest.raises(ValueError, match='ORDIVO_SOURCE_SHA256'):
+        _source_identity()
+    monkeypatch.setenv('ORDIVO_SOURCE_SHA256', 'b' * 64)
+    assert _source_identity() == {'commit': 'a' * 40, 'archive_sha256': 'b' * 64}
