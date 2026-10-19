@@ -45,9 +45,10 @@ It reuses the same paired evaluator after a valid S0b pilot receipt exists.
 The evaluator loads fresh pinned base d1 and a separate fresh base with the
 S0b best adapter, then scores the exact same rendered candidate prompts. It
 enforces S0b's pilot feature policies and prompt limit; Expedia's
-`conditional_booking_choice` admits only exactly-one-booking searches, with
-zero/multiple booking and overflow exclusions counted explicitly. All
-candidate scores and selected episodes must be covered or the run fails.
+`conditional_booking_choice` admits only exactly-one-booking searches. Zero-
+and multiple-booking searches share the explicit `not_exactly_one_booking`
+exclusion count; prompt overflows have a separate count. Every admitted
+episode and its eligible candidates must have complete scores or the run fails.
 
 Swissmetro and ESCI source manifests, feature policies, and seed are proposed
 to remain the same as the first exploratory probe. Before comparing, check
@@ -57,7 +58,10 @@ and ESCI `f4af35cfddaa544cdac993014d4e131e80814b2daeb0e713579fa2132181d15a`.
 The earlier ESCI probe admitted 27 of 50 selected groups because 23 prompts
 exceeded its shorter token limit. Report S0b's full new admitted cohort and
 the episode-ID intersection with those original 27 separately, with paired
-base/S0b metrics on the intersection and any missing old IDs disclosed. A
+base/S0b metrics on the intersection and any missing old IDs disclosed. The
+unchanged evaluator does not produce that cross-run intersection; derive a
+separate private ID-matched comparison receipt from both retained per-query
+files before publishing such a claim. A
 longer S0b prompt limit may expand coverage, but the new aggregate must not
 silently substitute that larger population for the old one. The original
 per-query files are retained privately under
