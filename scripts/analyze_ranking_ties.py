@@ -28,8 +28,9 @@ def analyze(data: Path, baseline_dir: Path, output: Path) -> dict:
     if Path("/workspace") not in output.parents or output.exists():
         raise ValueError("new remote /workspace output required")
     aggregate_path = baseline_dir / "aggregate.json"
-    aggregate_sha256 = _hash(aggregate_path)
-    aggregate = json.loads(aggregate_path.read_text())
+    aggregate_bytes = aggregate_path.read_bytes()
+    aggregate_sha256 = hashlib.sha256(aggregate_bytes).hexdigest()
+    aggregate = json.loads(aggregate_bytes)
     manifest_path, test_path = data / "manifest.json", data / "test.jsonl"
     manifest = json.loads(manifest_path.read_text())
     if (_hash(manifest_path) != aggregate["manifest_sha256"] or
@@ -44,7 +45,8 @@ def analyze(data: Path, baseline_dir: Path, output: Path) -> dict:
     output.mkdir()
     for model in ("lambdarank", "lexical_overlap", "random_seed42"):
         scores_path = baseline_dir / f"{model}_scores.json"
-        scores = json.loads(scores_path.read_text())
+        scores_bytes = scores_path.read_bytes()
+        scores = json.loads(scores_bytes)
         if set(scores) != expected:
             raise ValueError("incomplete tie-analysis score coverage")
         rows = []
@@ -74,7 +76,7 @@ def analyze(data: Path, baseline_dir: Path, output: Path) -> dict:
                            "canonical_ndcg@10": canonical_macro,
                            "uniform_tie_expected_ndcg@10": expected_macro,
                            "expected_minus_canonical": expected_macro - canonical_macro,
-                           "scores_sha256": _hash(scores_path)}
+                           "scores_sha256": hashlib.sha256(scores_bytes).hexdigest()}
     report = {"schema_version": "ordivo-tie-analysis-v1", "code_revision": commit,
               "baseline_code_revision": aggregate["code_revision"],
               "baseline_aggregate_sha256": aggregate_sha256,
