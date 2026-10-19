@@ -54,3 +54,14 @@ def test_log_loss_can_exceed_one(monkeypatch, tmp_path: Path):
     monkeypatch.setattr(report, "ROOT", tmp_path)
     record = row() | {"metric": "nll", "value": 1.52}
     assert "1.5200" in report.render_rows(payload(record))
+
+
+def test_symlinked_receipt_is_rejected(monkeypatch, tmp_path: Path):
+    artifact = tmp_path / "outside.json"
+    artifact.write_text("{}", encoding="utf-8")
+    link = tmp_path / "reports/runs/v2_pilot/aggregate.json"
+    link.parent.mkdir(parents=True)
+    link.symlink_to(artifact)
+    monkeypatch.setattr(report, "ROOT", tmp_path)
+    with pytest.raises(ValueError, match="symlink"):
+        report.render_rows(payload(row()))
