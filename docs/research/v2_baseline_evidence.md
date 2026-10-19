@@ -36,7 +36,11 @@ train only, with unknown categories mapped to `-1` and missingness channels.
 Input fields pass the data contract's inference allowlist. The fit API accepts
 train and model-selection validation only. The remote runner reads a separate
 calibration split for integrity counts but never uses its labels, and reserves
-test for final scoring. No probability temperature or calibration claim exists.
+test for final scoring. Expedia's inference policy explicitly names
+`prediction_event: booking_bool`; click and booking remain separate evaluated
+endpoints. Its LambdaRank training objective is the declared combined 0/1/5
+gain, so the ranking score is not a booking probability. No probability
+temperature or calibration claim exists.
 
 The runner calls `require_remote_gpu()`, writes bundles and complete per-query
 scores to `/workspace`, and emits a sanitized aggregate file without raw query

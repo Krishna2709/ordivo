@@ -120,6 +120,10 @@ def benchmark(config_path: Path, data_dir: Path, output_dir: Path) -> dict:
                 "source_terms": manifest.get("source_terms"),
                 "split_policy_id": manifest.get("split_policy_id"),
                 "candidate_pool_scope": manifest.get("candidate_pool_scope"),
+                "prediction_event": config["feature_policy"].get("prediction_event"),
+                "ranking_objective": ("expedia_declared_click_booking_gain_0_1_5" if
+                                      config["source"] == "expedia_personalized_sort_2013" else
+                                      "source_graded_relevance_gain"),
                 "split_counts": {"train": len(train), "validation": len(validation),
                                  "calibration_unused": len(calibration), "test": len(test)},
                 "model_best_iteration": receipt["bundle"]["best_iteration"],
