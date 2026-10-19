@@ -60,7 +60,7 @@ def test_temperature_fit_is_manifest_bound(tmp_path):
 
 def test_manifest_hash_and_split_overlap_guard(tmp_path):
     manifest = frozen_bundle(tmp_path)
-    (tmp_path / 'test.jsonl').write_text((tmp_path / 'test.jsonl').read_text() + ' ') 
+    (tmp_path / 'test.jsonl').write_text((tmp_path / 'test.jsonl').read_text() + ' ')
     with pytest.raises(ValueError, match='frozen manifest'):
         load_calibration_evidence(manifest, event='stated_choice',
                                   candidate_population='eligible_stated_choice_group')
