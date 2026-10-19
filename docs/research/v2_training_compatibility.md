@@ -50,6 +50,11 @@ panel respondents remain intact. It records source totals, selected counts and
 digests, and loss exclusions including zero/no event and prompt overflow. Actual
 selected IDs remain in a remote-only file outside W&B metrics. The wall-clock cap
 covers integrity passes, rendering, model loading, updates and validation.
+The controller must supply `ORDIVO_SOURCE_COMMIT` (40 hex) and
+`ORDIVO_SOURCE_SHA256` (64 hex) from the verified source archive; the runtime
+does not need a `.git` checkout. The Swissmetro plus ESCI fallback config uses
+reviewed allowlists and remains a preliminary two-domain pilot if Expedia
+access is blocked.
 
 ## Remote evidence gates
 

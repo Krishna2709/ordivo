@@ -4,10 +4,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import random
+import re
 import sqlite3
-import subprocess
 import tempfile
 import time
 
@@ -19,6 +20,16 @@ from liquid_mcdm.training.option_policy import option_logits
 
 MODEL = 'LiquidAI/d1-3B'
 REVISION = '051bcc464b01b9f92942b364d9586b0ef5912432'
+
+
+def _source_identity():
+    commit = os.environ.get('ORDIVO_SOURCE_COMMIT', '')
+    digest = os.environ.get('ORDIVO_SOURCE_SHA256', '')
+    if not re.fullmatch(r'[0-9a-f]{40}', commit):
+        raise ValueError('ORDIVO_SOURCE_COMMIT requires controller-verified 40-hex archive commit')
+    if not re.fullmatch(r'[0-9a-f]{64}', digest):
+        raise ValueError('ORDIVO_SOURCE_SHA256 requires controller-verified 64-hex archive digest')
+    return {'commit': commit, 'archive_sha256': digest}
 
 
 def _select_unit_ids(units, *, limit, seed, source, split):
@@ -221,8 +232,7 @@ def run(config_path, output):
     runtime = require_remote_gpu()
     config_bytes = Path(config_path).read_bytes()
     config = yaml.safe_load(config_bytes)
-    code_revision = subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True,
-                                   text=True, check=True).stdout.strip()
+    source_identity = _source_identity()
     if config.get('publish_model_artifacts', False):
         raise ValueError('model artifact publication requires separate rights and destination review')
     if config['model_id'] != MODEL or config['revision'] != REVISION:
@@ -286,7 +296,7 @@ def run(config_path, output):
     run = wandb.init(project=config['wandb_project'], group='ordivo-v2-behavioral',
                      mode=config.get('wandb_mode', 'offline'),
                      config={'model_id': MODEL, 'revision': REVISION,
-                             'code_revision': code_revision,
+                             'source_identity': source_identity,
                              'config_sha256': hashlib.sha256(config_bytes).hexdigest(),
                              'sources': provenance, 'seed': config['seed']})
     cursors = {source: 0 for source in training}
@@ -348,7 +358,7 @@ def run(config_path, output):
             raise RuntimeError(f'best adapter reload changed probe loss: {reload_delta}')
         receipt = {'status': 'pilot_completed', 'claim_scope': 'preliminary bounded two-domain pilot',
                    'model_id': MODEL, 'revision': REVISION, 'runtime': runtime,
-                   'code_revision': code_revision,
+                   'source_identity': source_identity,
                    'seed': config['seed'], 'best_step': best_step,
                    'nonzero_lora_update': observed_update,
                    'best_validation_macro_source_loss': best,
