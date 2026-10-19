@@ -43,6 +43,13 @@ Model adapters and receipts remain on the remote runtime. The trainer rejects
 `publish_model_artifacts: true`; changing W&B mode can publish aggregate metrics
 but cannot silently upload derived weights. Artifact publication needs a
 separate source-rights and destination-visibility review.
+The pilot streams all four source files to verify hashes and split-unit
+disjointness, then selects whole groups by a fixed seed/hash before rendering.
+Defaults cap selection at 1,000 train and 100 validation split units per source;
+panel respondents remain intact. It records source totals, selected counts and
+digests, and loss exclusions including zero/no event and prompt overflow. Actual
+selected IDs remain in a remote-only file outside W&B metrics. The wall-clock cap
+covers integrity passes, rendering, model loading, updates and validation.
 
 ## Remote evidence gates
 

@@ -4,6 +4,8 @@ revision: 051bcc464b01b9f92942b364d9586b0ef5912432
 seed: 42
 max_steps: 40
 max_runtime_seconds: 1800
+max_train_groups: 1000
+max_validation_groups: 100
 validation_interval: 10
 max_length: 2048
 learning_rate: 0.0001
