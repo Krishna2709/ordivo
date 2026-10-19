@@ -1,0 +1,17 @@
+{
+  "account_pods_after_deletion": 0,
+  "actual_provider_bill": "unavailable",
+  "cloud_summary_readback": {
+    "hardware/account_pods_after_deletion": 0,
+    "hardware/elapsed_seconds_to_provider_deletion": 6232.198,
+    "hardware/estimated_compute_usd_at_quoted_rate": 1.0214,
+    "hardware/provider_absence_confirmed": 1
+  },
+  "elapsed_seconds": 6232.198,
+  "estimated_compute_usd": 1.0214,
+  "pod_receipt_sha256": "1d54be5bfb1e0d43cfaba0c46efef54b659a7afdf45344fc677281d7552192e8",
+  "provider_absence_confirmed": true,
+  "quoted_rate_usd_per_hour": 0.59,
+  "run_url": "https://wandb.ai/black-order/liquid-mcdm-lab/runs/mohpt86v",
+  "state": "finished"
+}
