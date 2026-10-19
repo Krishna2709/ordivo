@@ -18,7 +18,9 @@ probabilities. We do not use them as a GRPO completion log probability.
 The supervised reference remains alias-plus-EOS completion CE through
 `AutoModelForImageTextToText` and PEFT LoRA, following the
 [official Liquid TRL notebook](https://github.com/Liquid4All/cookbook/blob/744c5b628a27adb4f219ff4a1d11e3d70259b369/finetuning/notebooks/sft_for_decision_models_with_trl.ipynb).
-Direct NLL/Brier is a separate controlled experiment. Temperature calibration
+The bounded v2 behavioral pilot below uses direct option NLL for choice and
+normalized-gain listwise loss for relevance; it is not an alias-plus-EOS CE
+replication. Direct NLL/Brier is a separate controlled experiment. Temperature calibration
 fits only a fourth, disjoint calibration partition for an explicitly named
 event; SFT/early-stop validation and final test cannot enter the fitting function.
 The fitting API reads all four frozen split files, checks hashes and group
@@ -93,14 +95,18 @@ data and baseline evidence reviewed by the root task owner.
 ## Next RL interface proposal (unimplemented)
 
 After the supervised pilot has a reviewed receipt, an R0 probability-report
-experiment can use the same complete conditional-booking groups and frozen SFT
-start as direct Brier/NLL control C1. Let the d1 option scores produce `p` by
+experiment can use complete `conditional_booking_choice` or `stated_choice`
+groups and the same frozen supervised start as direct Brier/NLL control C1.
+Each run must freeze one event and its candidate-population protocol; do not
+pool their calibration rewards. Let the d1 option scores produce `p` by
 the pinned masked MAX/softmax readout. Fix concentration `kappa` in the run
 config, sample a continuous report `r ~ Dirichlet(kappa * p)`, and use the exact
 Dirichlet `log_prob(r)` for a score-function gradient. The action is the full
 reported distribution, never a generated alias token. Reward is the declared
 unclipped multiclass negative Brier score `-sum_i(r_i - y_i)^2` for the one
-observed booked option among an eligible exactly-one-booking group. Use at
+observed booked option in an eligible exactly-one-booking exposed group or the
+one selected option in an eligible stated-choice group. ESCI graded relevance
+does not enter this probability-calibration reward. Use at
 least four independent reports per query, a detached leave-one-out reward
 baseline, and a separately reported analytic Dirichlet KL to the frozen SFT
 report policy. Record reward variance, zero-variance groups, entropy, KL,
