@@ -1,0 +1,16 @@
+{
+  "claim_scope": "research_evidence_not_public_release",
+  "cloud_summary": {
+    "heldout/esci_scored": 50,
+    "operations/immutable_failed_task_count_before_audit": 23,
+    "order/esci_pairs": 20,
+    "tests/latest_passed": 255,
+    "tests/latest_skipped": 0
+  },
+  "config_sha256": "f428a5af7701790e51609c28f6c6ac97bce26d156d0476b482f84b59a537c7b2",
+  "local_metric_count": 37,
+  "run_id": "mohpt86v",
+  "source_commit": "b621461315dc5fe276c563106375ab22ab6b06d7",
+  "state": "finished",
+  "url": "https://wandb.ai/black-order/liquid-mcdm-lab/runs/mohpt86v"
+}

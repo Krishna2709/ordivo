@@ -135,14 +135,14 @@ flips in 65/180 pairs (36.11%, mean probability L1 0.34010), ESCI 10/20
 five of 20 selected searches target-ineligible). All admitted pairs scored,
 with zero overflow/failures. This positional sensitivity remains material
 after train-only candidate shuffling; it is not an accuracy metric or proof
-that training caused the sensitivity. Sanitized diagnostic SHA-256
+that training caused the sensitivity. [Sanitized diagnostic](https://github.com/Krishna2709/ordivo/blob/bc8a8bcd7e485b7bec9356046b94e390ea88d6ae/reports/runs/v2-s0b-order-20261019/aggregate.json) SHA-256
 `9be6417337ac574cc6fd38b95fe7f5c0b6e873848601db04eed3993110c344c4`.
 An exact-ID aggregate join shows the same Swissmetro 180 changed from
 52 S0 top-choice flips to 65 S0b, even as mean L1 fell 0.39663→0.34010.
 All 12 old admitted ESCI groups appear in the new 20; on those same 12,
 flips changed 7→9 and mean L1 0.31887→0.28642. Eight new groups change
 the full-20 mean. These small comparisons neither establish robustness
-improvement nor isolate a training cause. Match receipt SHA-256
+improvement nor isolate a training cause. [Matched aggregate](https://github.com/Krishna2709/ordivo/blob/bc8a8bcd7e485b7bec9356046b94e390ea88d6ae/reports/runs/v2-s0b-order-20261019/old-match.json) SHA-256
 `25689eff2d9aecebeed627c0bfdfee04f54e15bafce5cd46828a182369968207`.
 The corrected integrated source suite passed 255 tests, zero skips at
 `b621461315dc5fe276c563106375ab22ab6b06d7`, archive SHA-256
@@ -155,9 +155,9 @@ Hub commit `bf1d425b4e6ffc392121d8fb0776e41b1af48c4a`. It does not load
 or validate the separate S0b checkpoint. S0b requires its own Hub folder/revision (`supervised-s0b/20261019T030009Z/s0b-945fe6e/`
 at `df6405c575629dfaf9083f7b068ab8ef34b6eeb3`) and run-specific feature
 policy, including Expedia `conditional_booking_choice`. Its private retention
-is verified, but that checkpoint has not been exercised through this tested
-fixture or a held-out result; its parameters are not silently substituted
-into this S0 example.
+is verified and a separate bounded S0b held-out probe is documented above,
+but that checkpoint has not been exercised through this tested illustrative
+fixture. Its parameters are not silently substituted into this S0 example.
 
 Use integrated project source `bd24814429211ad4dad4e9a58ba0137daa0bc76b` or a reviewed descendant with its dependency lock. The label-free `render_predictor_input` uses the same prompt/readout core as the executed pilot; the remote scoped 16-test and integrated 244-test suites passed at this source commit (archive SHA-256 `778a3689f90c44afa572fc4ecd968a8853e53f5c5bb81e3356338485dd57c2a0`). The private adapter files were force-downloaded and matched upload SHA-256 at Hub commit `bf1d425b4e6ffc392121d8fb0776e41b1af48c4a`; inspect its private artifact manifest when reproducing. The **illustrative** Swissmetro-style input below has no target, supervision, exposure, provenance, respondent, group or source identifier. Its numbers are examples, not a dataset row or expected model prediction. Apply the exact feature allowlist from the frozen pilot config to real authorized inputs.
 
@@ -272,6 +272,21 @@ conditional distribution only over an exposed complete search group eligible
 under the exactly-one-booking policy; it is not a marginal booking rate. The
 S0b readout was evaluated on the bounded held-out groups above, but this
 illustrative S0 request was not rerun with S0b.
+
+## Operations closeout
+
+The final [W&B research audit](https://wandb.ai/black-order/liquid-mcdm-lab/runs/mohpt86v)
+finished with 37 sanitized metrics, including the last 255/0 source suite,
+50 scored ESCI S0b held-out queries and 20 ESCI order pairs. Its metadata
+receipt SHA-256 is
+`00739d7dbbdcb5a7f2d2bb56dbf86d9328b3179c1d728308d7c0903c09513ecb`.
+The single A40 pod was deleted with provider absence confirmed at 04:44:01 UTC
+on 19 October 2026. At the quoted $0.59/hour, the elapsed compute estimate
+is $1.0214; actual billed total, storage and taxes are unknown. Sanitized
+pod-summary SHA-256 is
+`d65af5869ce4432042e0a47c81d6b2fc477318270835eb951b1694595a071480`.
+Neither operations telemetry nor private artifact retention confers public
+release readiness.
 
 ## Use and distribution
 

@@ -11,9 +11,13 @@ packages, generate data, run tests or download models locally.
 
 **V2 research status (2026-10-19):** official Swissmetro, Amazon ESCI and
 Expedia sources have grouped four-way remote builds. Swissmetro and ESCI have full source-defined classical benchmarks; Expedia has
-a bounded 5,000-search classical ranking benchmark; a private two-domain neural pilot has a bounded paired
-probe with mixed/negative held-out results and material ESCI prompt overflow.
-There is no public v2 model release or demonstrated cross-domain generality.
+a bounded 5,000-search classical ranking benchmark. The private two-domain
+neural pilot had mixed/negative bounded held-out outcomes and ESCI prompt overflow.
+A separate three-domain S0b pilot completed training; its bounded paired probe
+has mixed source-specific results, and candidate-order sensitivity remains
+material. Private adapters, per-query outputs and W&B telemetry have verified
+readbacks. There is no public v2 model release or demonstrated cross-domain
+generality.
 See the [current v2 experiment report](reports/ordivo-v2-experiment.html) and
 [release criteria](docs/V2_RELEASE_CRITERIA.md) for exact denominators and pending work.
 

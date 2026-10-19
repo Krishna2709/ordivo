@@ -122,6 +122,17 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   tokenizer setup (72+72+72+39); archive SHA-256
   `4be1e9c6587ea460435b8732bdb22a7944aa33a7584e6bbc95bdafcb9b912c41`.
   This is source verification, not model efficacy.
+- Final W&B operations audit run `mohpt86v` finished/read back with 37
+  sanitized metrics and metadata receipt SHA-256
+  `00739d7dbbdcb5a7f2d2bb56dbf86d9328b3179c1d728308d7c0903c09513ecb`.
+  It logs the latest 255/0 source-suite count and 23 immutable failed
+  attempts, including expected RED/setup diagnostics; those are not 23
+  production model failures. The single A40 pod was deleted at 04:44:01 UTC
+  on 19 October 2026 and provider absence confirmed. Pod receipt SHA-256
+  `1d54be5bfb1e0d43cfaba0c46efef54b659a7afdf45344fc677281d7552192e8`.
+  The quoted $0.59/hour gives $1.0214 elapsed compute estimate only; actual
+  invoice/storage/taxes are unknown. Sanitized public summaries are in
+  `reports/runs/v2-operations-closeout-20261019/`.
 - V2 behavioral data reviewer-fix tests at `2f417cbe28e77e7303d3c7fbfdf3d3d80bcf720f`
   passed 19/0 on the remote pod. Release-report source tests at `178d1fd4`
   passed 7/0. These are component tests, not real-data performance evidence.
