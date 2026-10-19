@@ -45,8 +45,11 @@ def _require_eligible_metrics(report: dict) -> None:
 
 
 def _source(source_spec: dict, expected_manifest_sha: str, *, seed: int, limit: int,
-            max_episodes: int, deadline: float | None = None) -> tuple[list[dict], dict]:
-    if type(limit) is not int or not 1 <= limit <= 50:
+            max_episodes: int, deadline: float | None = None,
+            partition: str = "test", max_units: int = 50) -> tuple[list[dict], dict]:
+    if partition not in SPLITS or partition in ("train", "calibration"):
+        raise ValueError("paired evaluation partition must be validation or test")
+    if type(limit) is not int or not 1 <= limit <= max_units:
         raise ValueError("held-out selection limit must be 1..50 whole split units")
     directory = Path(source_spec["directory"])
     manifest_bytes = (directory / "manifest.json").read_bytes()
@@ -87,11 +90,11 @@ def _source(source_spec: dict, expected_manifest_sha: str, *, seed: int, limit: 
         for right in SPLITS[index + 1:]:
             if units_by_split[left] & units_by_split[right]:
                 raise ValueError(f"split unit overlap: {left}/{right}")
-    selected_units = sorted(units_by_split["test"], key=lambda unit: (
-        hashlib.sha256(f"{seed}|{source_name}|test|{unit}".encode()).digest(), unit))[:limit]
+    selected_units = sorted(units_by_split[partition], key=lambda unit: (
+        hashlib.sha256(f"{seed}|{source_name}|{partition}|{unit}".encode()).digest(), unit))[:limit]
     chosen = set(selected_units)
     rows = []
-    with (directory / "test.jsonl").open("r", encoding="utf-8") as handle:
+    with (directory / f"{partition}.jsonl").open("r", encoding="utf-8") as handle:
         for line in handle:
             if deadline is not None and time.monotonic() > deadline:
                 raise TimeoutError("held-out selected-group load time cap reached")
@@ -102,15 +105,23 @@ def _source(source_spec: dict, expected_manifest_sha: str, *, seed: int, limit: 
                     rows.append(episode)
                     if len(rows) > max_episodes:
                         raise ValueError("selected whole units exceed episode bound")
-    checked, checked_units = select_whole_test_units(rows, source=source_name, seed=seed,
-                                                     limit=limit)
-    if {e["episode_id"] for e in checked} != {e["episode_id"] for e in rows} or set(checked_units) != chosen:
+    checked_ids = {e["episode_id"] for e in rows}
+    if (partition == "test"):
+        checked, checked_units = select_whole_test_units(rows, source=source_name, seed=seed,
+                                                         limit=limit)
+        materialized = ({e["episode_id"] for e in checked} == checked_ids and
+                        set(checked_units) == chosen)
+    else:
+        materialized = {split_unit(e) for e in rows} == chosen
+    if not materialized or len(checked_ids) != len(rows):
         raise ValueError("selected unit materialization changed")
     return rows, {"source": source_name, "manifest_sha256": digest,
+                  "selected_partition": partition,
                   "source_sha256": manifest.get("source_sha256", {}),
                   "split_sha256": manifest["split_sha256"],
                   "complete_episode_counts": counts,
                   "complete_test_units": len(units_by_split["test"]),
+                  "complete_partition_units": len(units_by_split[partition]),
                   "selected_units": len(selected_units),
                   "selected_units_sha256": selected_units_sha256(selected_units)}
 

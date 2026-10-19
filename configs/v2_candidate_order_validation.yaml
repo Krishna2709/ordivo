@@ -1,0 +1,7 @@
+# Validation-only positional diagnostic; never used to choose or tune a checkpoint.
+seed: 42
+max_runtime_seconds: 1800
+max_selected_episodes_per_source: 250
+max_validation_units_per_source:
+  swissmetro: 20
+  esci: 20
