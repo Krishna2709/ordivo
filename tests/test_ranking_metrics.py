@@ -1,6 +1,7 @@
 """Hand-calculated grouped metrics; fixtures are invented, never source rows."""
 
 import math
+import json
 
 import pytest
 
@@ -8,6 +9,7 @@ from liquid_mcdm.evaluation.ranking import (
     evaluate_ranking, ndcg_at_k, ranked_ids, tie_expected_ndcg_at_k,
 )
 from liquid_mcdm.evaluation.target_policy import targets
+from scripts.analyze_ranking_ties import _read_jsonl
 
 
 def episode(kind="observed_choice", source="expedia_personalized_sort_2013", suffix="one"):
@@ -78,6 +80,15 @@ def test_uniform_tie_expectation_only_flags_metric_relevant_ties():
     expected, sensitive = tie_expected_ndcg_at_k({"a": 2, "b": 1, "c": 1},
                                                  {"a": 1, "b": 1, "c": 0}, 1)
     assert expected == 1 and not sensitive
+
+
+def test_tie_analysis_jsonl_uses_physical_lf_not_unicode_line_separators(tmp_path):
+    path = tmp_path / "test.jsonl"
+    rows = [{"episode_id": "amazon_esci:q1", "query": "first\u2028second"},
+            {"episode_id": "amazon_esci:q2", "query": "third\u2029fourth"}]
+    path.write_bytes(b"\n".join(json.dumps(row, ensure_ascii=False).encode("utf-8")
+                                 for row in rows) + b"\n")
+    assert _read_jsonl(path) == rows
 
 
 def test_esci_categories_are_relevance_not_events():
