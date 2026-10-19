@@ -164,14 +164,14 @@ def test_sql_pilot_selection_is_order_invariant_and_panel_atomic(tmp_path):
     from scripts.train_v2_supervised import _load_source
 
     train = [
-        {'episode_id': 's:a1', 'source': 's', 'group_id': 'a1',
+        {'episode_id': 'swissmetro:a1', 'source': 'swissmetro', 'group_id': 'a1',
          'supervision': {'respondent_id': 'panel-a'}},
-        {'episode_id': 's:a2', 'source': 's', 'group_id': 'a2',
+        {'episode_id': 'swissmetro:a2', 'source': 'swissmetro', 'group_id': 'a2',
          'supervision': {'respondent_id': 'panel-a'}},
-        {'episode_id': 's:b1', 'source': 's', 'group_id': 'b1',
+        {'episode_id': 'swissmetro:b1', 'source': 'swissmetro', 'group_id': 'b1',
          'supervision': {'respondent_id': 'panel-b'}},
     ]
-    other = {split: [{'episode_id': f's:{split}', 'source': 's',
+    other = {split: [{'episode_id': f'swissmetro:{split}', 'source': 'swissmetro',
                       'group_id': split, 'supervision': {'respondent_id': split}}]
              for split in ('validation', 'calibration', 'test')}
 
@@ -181,8 +181,13 @@ def test_sql_pilot_selection_is_order_invariant_and_panel_atomic(tmp_path):
             content = ''.join(json.dumps(row) + '\n' for row in rows).encode()
             (tmp_path / f'{split}.jsonl').write_bytes(content)
             hashes[split] = hashlib.sha256(content).hexdigest()
-        (tmp_path / 'manifest.json').write_text(json.dumps({'split_sha256': hashes}))
-        return _load_source({'directory': str(tmp_path), 'name': 's'}, seed=42,
+        (tmp_path / 'manifest.json').write_text(json.dumps({
+            'source': 'swissmetro', 'split_sha256': hashes,
+            'split_policy_id': 'swissmetro-respondent-v2-calibration',
+            'candidate_pool_scope': 'three_survey_modes',
+            'target_policy_id': 'swissmetro-choice-v1'}))
+        return _load_source({'directory': str(tmp_path), 'name': 's',
+                             'expected_source': 'swissmetro'}, seed=42,
                             max_train_groups=1, max_validation_groups=1,
                             deadline=time.monotonic() + 10)
 
@@ -193,3 +198,18 @@ def test_sql_pilot_selection_is_order_invariant_and_panel_atomic(tmp_path):
     assert {row['episode_id'] for row in left_rows['train']} == {
         row['episode_id'] for row in right_rows['train']}
     assert len(left_rows['train']) in (1, 2)  # whole respondent panel selected
+
+    with pytest.raises(ValueError, match='source contract'):
+        _load_source({'directory': str(tmp_path), 'name': 's',
+                      'expected_source': 'amazon_esci'}, seed=42,
+                     max_train_groups=1, max_validation_groups=1,
+                     deadline=time.monotonic() + 10)
+
+
+def test_pilot_rejects_duplicate_domain_specs():
+    from scripts.train_v2_supervised import _validate_source_specs
+
+    with pytest.raises(ValueError, match='distinct canonical domains'):
+        _validate_source_specs([
+            {'name': 'a', 'expected_source': 'swissmetro', 'directory': '/tmp/a'},
+            {'name': 'b', 'expected_source': 'swissmetro', 'directory': '/tmp/b'}])
