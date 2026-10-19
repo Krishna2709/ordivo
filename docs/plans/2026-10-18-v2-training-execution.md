@@ -42,7 +42,8 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   raw 10,728 survey rows yielded 10,719 retained choice groups after nine
   no-choice exclusions. Four partitions contain 8,532 train, 549 selection,
   594 calibration, and 1,044 final-test groups. Source-specific redistribution
-  rights and any neural held-out model result remain unresolved. Receipt:
+  rights remain unresolved; this source-build receipt alone contains no neural
+  result. A later bounded neural probe is recorded below. Receipt:
   `v2-swarm-20261019T030009Z/swiss_source`.
 - First Swissmetro classical held-out benchmark at exact evaluator commit
   `9c532d98050e40ab3c9056e0bec1eeace123ccef` scored all 1,044 expected
