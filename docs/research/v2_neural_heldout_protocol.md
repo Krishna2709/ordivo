@@ -36,3 +36,36 @@ features; the fallback neural pilot uses title, brand and color. Any
 comparison between them has different feature budgets. A matched-input
 control and a fresh protected release protocol are required before claiming
 neural superiority or general-purpose transfer.
+
+## S0b three-domain exploratory reuse, not yet run
+
+`configs/v2_neural_heldout_s0b.yaml` freezes seed 42, a 600-second task cap,
+and at most 50 whole test split units each for Swissmetro, ESCI, and Expedia.
+It reuses the same paired evaluator after a valid S0b pilot receipt exists.
+The evaluator loads fresh pinned base d1 and a separate fresh base with the
+S0b best adapter, then scores the exact same rendered candidate prompts. It
+enforces S0b's pilot feature policies and prompt limit; Expedia's
+`conditional_booking_choice` admits only exactly-one-booking searches, with
+zero/multiple booking and overflow exclusions counted explicitly. All
+candidate scores and selected episodes must be covered or the run fails.
+
+Swissmetro and ESCI source manifests, feature policies, and seed are proposed
+to remain the same as the first exploratory probe. Before comparing, check
+that S0b's selected-unit hashes equal the first probe's Swissmetro
+`c546c7af44ce27b4cfb8988d6621222cbd230881fd68f32bfa9b2356843f97dc`
+and ESCI `f4af35cfddaa544cdac993014d4e131e80814b2daeb0e713579fa2132181d15a`.
+The earlier ESCI probe admitted 27 of 50 selected groups because 23 prompts
+exceeded its shorter token limit. Report S0b's full new admitted cohort and
+the episode-ID intersection with those original 27 separately, with paired
+base/S0b metrics on the intersection and any missing old IDs disclosed. A
+longer S0b prompt limit may expand coverage, but the new aggregate must not
+silently substitute that larger population for the old one. The original
+per-query files are retained privately under
+`/workspace/ordivo-v2-data/neural-heldout/paired-854de-retry/`.
+
+This test cohort has already been exposed to exploratory analysis. Neither
+S0b nor its hyperparameters may be selected or retuned using these results.
+The probe is not a protected release test or a claim that S0b's changes caused
+any observed difference. Schedule it before the separate post-S0b validation
+candidate-order diagnostic if remote GPU time permits; do not access the test
+split for that validation-only diagnostic.

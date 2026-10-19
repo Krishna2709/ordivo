@@ -1,0 +1,9 @@
+# Frozen exploratory S0b paired probe on already-exposed test split units.
+# Reuse the existing evaluator; S0b receipt supplies exact feature policies and max_length.
+seed: 42
+max_runtime_seconds: 600
+max_selected_episodes_per_source: 500
+max_test_units_per_source:
+  swissmetro: 50
+  esci: 50
+  expedia: 50
