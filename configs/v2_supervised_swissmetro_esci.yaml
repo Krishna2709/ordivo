@@ -1,0 +1,30 @@
+# Preliminary two-domain fallback. Run only after root reviews data and baselines.
+model_id: LiquidAI/d1-3B
+revision: 051bcc464b01b9f92942b364d9586b0ef5912432
+seed: 42
+max_steps: 40
+max_runtime_seconds: 1800
+max_train_groups: 1000
+max_validation_groups: 100
+validation_interval: 10
+max_length: 2048
+learning_rate: 0.0001
+wandb_project: liquid-mcdm-lab
+wandb_mode: offline
+publish_model_artifacts: false
+lora:
+  r: 8
+  alpha: 16
+  dropout: 0.0
+  target_modules: [q_proj, k_proj, v_proj, out_proj, in_proj, w1, w2, w3]
+sources:
+  - name: swissmetro
+    directory: /workspace/data/swissmetro-frozen
+    feature_policy:
+      context_features: [purpose, ga, who, luggage]
+      alternative_features: [travel_time_minutes, cost_chf, headway_minutes]
+  - name: esci
+    directory: /workspace/data/esci-frozen
+    feature_policy:
+      context_features: [query]
+      alternative_features: [product_title, product_description]
