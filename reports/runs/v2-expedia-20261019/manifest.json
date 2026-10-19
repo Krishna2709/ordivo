@@ -1,0 +1,47 @@
+{
+  "candidate_pool_scope": "source_exposed_candidates",
+  "diagnostics": {
+    "multiple_click_bool_groups": 25969,
+    "zero_booking_bool_groups": 122751
+  },
+  "episode_count": 399344,
+  "episode_counts": {
+    "calibration": 20040,
+    "test": 39851,
+    "train": 319714,
+    "validation": 19739
+  },
+  "judgment_policy": "complete_observed_click_booking_per_exposed_candidate",
+  "manifest_version": "ordivo-grouped-v1",
+  "missing_candidate_feature_counts": {
+    "prop_location_score2": 2178380,
+    "prop_review_score": 14630
+  },
+  "source": "expedia_personalized_sort_2013",
+  "source_profile": {
+    "candidate_rows": 9917530,
+    "omitted_by_reason": {},
+    "omitted_groups_by_reason": {},
+    "raw_groups": 399344,
+    "raw_rows": 9917530,
+    "retained_groups": 399344,
+    "retained_rows": 9917530,
+    "selected_groups": 399344,
+    "selected_rows": 9917530
+  },
+  "source_sha256": {
+    "training": "84a53139ea92df1e9400f84852facbd78f3136f366a08440f4ab4518e71a49a9"
+  },
+  "source_terms": "https://www.kaggle.com/c/expedia-personalized-sort/rules",
+  "split_policy_id": "expedia-2013-split-v2-calibration",
+  "split_sha256": {
+    "calibration": "f601b23c3b3356e93afc781db9c760b9cc549772ad3fe79279494530cab9f9cb",
+    "test": "0cb2bde7ee0c912bf5c70a937b287a38c121fc2e9639ecb95d4f00bf268595b8",
+    "train": "84034a305d0ff5a80226c55e7cd8e9764fc1497576695c1580d00922da994e10",
+    "validation": "60248e91709aa7c3615f654eeb6d8954b09d923e30423d9ab7cc00fa2b6d9877"
+  },
+  "target_policy_id": "expedia-click-booking-v1",
+  "task_counts": {
+    "observed_choice": 399344
+  }
+}

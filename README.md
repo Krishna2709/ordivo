@@ -9,6 +9,14 @@ teacher-imitation adapter for Liquid d1; it does not implement the full v2 frame
 local workspace is for source and documentation editing only; do not install
 packages, generate data, run tests or download models locally.
 
+**V2 research status (2026-10-19):** official Swissmetro, Amazon ESCI and
+Expedia sources have grouped four-way remote builds. Swissmetro and ESCI have
+classical benchmarks; a private two-domain neural pilot has a bounded paired
+probe with mixed/negative held-out results and material ESCI prompt overflow.
+There is no public v2 model release or demonstrated cross-domain generality.
+See the [current v2 experiment report](reports/ordivo-v2-experiment.html) and
+[release criteria](docs/V2_RELEASE_CRITERIA.md) for exact denominators and pending work.
+
 The release run `20261019T005111Z` trained a d1-3B LoRA adapter for 400 steps on a remote A40 after a 130-test CPU acceptance suite. Across all 87 eligible held-out episodes, accuracy improved from 28.74% to 58.62%; on the original 16-episode comparison slice it improved from 37.5% to 75.0%. The published adapter, dataset, source, complete evaluation evidence, and W&B telemetry are linked below. [de01.ipynb](de01.ipynb) remains the Colab alternative, and the [Hugging Face Jobs runbook](docs/huggingface_jobs.md) remains available.
 
 Public release destinations:
@@ -21,15 +29,14 @@ Public release destinations:
 ## What is implemented
 
 **V2 research direction:** build the decision-analysis layer and a shared neural
-preference component across travel choices, retail/search relevance, and transport preferences. Expedia is
-the first dataset, with ESCI, MSLR and Swissmetro in the planned benchmark suite.
+preference component across travel choices, retail/search relevance, and transport preferences. Swissmetro, ESCI and Expedia now have remote grouped builds; MSLR remains a proposed benchmark.
 The [v1 audit](reports/V2_RESEARCH_AUDIT.md),
 [dataset register](docs/V2_DATASET_REGISTER.md), and
 [v2 implementation plan](docs/superpowers/plans/2026-10-18-ordivo-v2-baseline.md)
 define the next work. [GRPO and calibration-focused RLCD research](docs/research/v2_rl_and_decision_objectives.md)
 are additional training experiments, following supervised baselines.
-These are research plans; no real-data v2 model or
-benchmark results have been produced yet. The implemented items below are v1.
+Those documents describe the research program; current executed evidence is in
+the linked v2 report above. The published model usage and items below are v1.
 
 - Pure NumPy teachers with explicit domains, normalization, tie groups and VIKOR compromise conditions.
 - Synthetic JSONL generator, disjoint scenario families, seed lineage, source/data hashes, full-precision labels, and revalidation.

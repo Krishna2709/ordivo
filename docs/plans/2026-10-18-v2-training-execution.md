@@ -11,7 +11,7 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
 | Constraints, Pareto and numerical claim verification | Implemented | `decision/verification.py`, exact solver reference tests |
 | Explicit weight scenarios | Implemented | Recomputed scores and stability, not confidence |
 | Independent review | Complete, important issue fixed | Unknown feasibility regression reproduced then corrected |
-| Real multi-domain data adapters/grouped baselines | Two official grouped sources and classical held-out benchmarks complete; Expedia grouped build pending | Swissmetro and ESCI source-bound four-role manifests audited; source-specific classical metrics and denominators below. Expedia official archive and `train.csv` acquired after user-confirmed rules. |
+| Real multi-domain data adapters/grouped baselines | Three official sources grouped; Swissmetro/ESCI classical held-out benchmarks complete; Expedia benchmark pending | Swissmetro and ESCI source-bound four-role manifests audited; Expedia source-bound 399,344-search build passed. Source-specific classical metrics and denominators below. |
 | Differentiable d1 readout and training compatibility | Bounded remote check passed | Exact integrated commit `22707ed3`; one fixed A40 BF16 forward/backward, finite loss/gradients and reload parity. No optimizer step in this compatibility check. |
 | V2 SFT and direct calibration baselines | Preliminary two-domain SFT pilot completed; direct Brier C1 started, result pending | Pilot source `854de087`, 40 steps, private best adapter and selected-validation/paired-probe receipts below; C1 started at `f696437`, no result receipt yet. |
 | RLCD/GRPO experiments and DPO pairs | Stochastic report R0 started; outcomes pending | R0 started at `f696437` under a shared 1,800-second cap with C1; G0/G1/P0 not executed. |
@@ -75,10 +75,24 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   Python `zipfile` could not extract its Deflate64 CSV members. A versioned
   7-Zip 23.01 extraction succeeded: official `train.csv` is 2,358,114,793
   bytes, SHA-256 `84a53139ea92df1e9400f84852facbd78f3136f366a08440f4ab4518e71a49a9`.
-  No grouped Expedia manifest or benchmark exists yet.
+  A grouped Expedia manifest was built later; no benchmark exists yet.
   [Archive inventory](../../reports/runs/v2-expedia-20261019/inventory.json)
   and [source receipt](../../reports/runs/v2-expedia-20261019/acquisition.json)
   contain metadata only.
+- Official Expedia grouped source build at exact data commit
+  `919c67e494174f34d2436fa507e427b75fe866c2` exited 0 on the remote pod,
+  with source archive SHA-256
+  `0b804e89bb3d0050b934acb1a5a17d25fede4d671db2b72a95a408b123e7dcb9`.
+  It retained all 9,917,530 exposed candidate rows and all 399,344 complete
+  search groups. Four roles: 319,714 train, 19,739 model selection, 20,040
+  calibration, 39,851 final test. The
+  [sanitized manifest](../../reports/runs/v2-expedia-20261019/manifest.json)
+  has SHA-256 `3b14e3f30466a2da868ac636c8888bc42366f865737715a57a67f32866a02d92`
+  and records exact split hashes, candidate pool, judgment policy and 122,751
+  zero-booking groups. Focused data tests passed 20/0 remotely at the same
+  commit. No Expedia benchmark or neural training result has been measured;
+  source rows and grouped JSONLs stay private, and derivative-weight rights
+  remain source-specific.
 - Official Amazon ESCI Task 1 acquisition/build at `b352c14` exited 0: 2,621,288
   example rows, 1,503,277 outside the reduced ranking pool omitted,
   1,118,011 candidate rows across 48,300 groups. Four partitions contain
