@@ -99,3 +99,28 @@ def test_supervised_labels_respect_event_population_and_unjudged_mask():
     kind, target, mask = _label(relevance, ids, available, {})
     assert kind == 'ranking' and target.tolist() == [1., 0., 0.]
     assert mask.tolist() == [True, True, False]
+
+
+def test_supervised_exclusion_precedes_conditional_projection(monkeypatch):
+    from scripts import train_v2_supervised as trainer
+
+    called = []
+    def render(episode, tokenizer, policy, max_length):
+        called.append(episode['episode_id'])
+        return {'candidate_ids': ['a', 'b'], 'eligible': [True, True]}
+
+    monkeypatch.setattr(trainer, 'render_behavioral', render)
+    zero = {'episode_id': 'zero', 'task_type': 'observed_choice',
+            'alternatives': [{'id': 'a'}, {'id': 'b'}],
+            'supervision': {'outcomes_by_id': {
+                'a': {'booking_bool': 0, 'click_bool': 0},
+                'b': {'booking_bool': 0, 'click_bool': 0}}}}
+    one = {'episode_id': 'one', 'task_type': 'observed_choice',
+           'alternatives': [{'id': 'a'}, {'id': 'b'}],
+           'supervision': {'outcomes_by_id': {
+               'a': {'booking_bool': 1, 'click_bool': 1},
+               'b': {'booking_bool': 0, 'click_bool': 0}}}}
+    rows, excluded = trainer._examples([zero, one], None,
+                                        {'prediction_event': 'conditional_booking_choice'}, 100)
+    assert len(rows) == 1 and called == ['one']
+    assert excluded['no_supervised_event_or_positive_gain'] == 1

@@ -26,13 +26,25 @@ def _load_source(spec):
     if set(manifest['split_sha256']) != {'train', 'validation', 'calibration', 'test'}:
         raise ValueError('four-way frozen split manifest required')
     rows = {}
-    for split in ('train', 'validation'):
+    units = {}
+    for split in ('train', 'validation', 'calibration', 'test'):
         content = (directory / f'{split}.jsonl').read_bytes()
         if hashlib.sha256(content).hexdigest() != manifest['split_sha256'][split]:
             raise ValueError(f'{split} hash differs from source manifest')
-        rows[split] = [json.loads(line) for line in content.splitlines() if line.strip()]
-        if not rows[split]:
-            raise ValueError(f'empty {split} split')
+        parsed = [json.loads(line) for line in content.splitlines() if line.strip()]
+        units[split] = {
+            f"{row['source']}:{row['supervision'].get('respondent_id', row['group_id'])}"
+            for row in parsed}
+        if len({row['episode_id'] for row in parsed}) != len(parsed):
+            raise ValueError(f'duplicate episode in {split}')
+        if split in ('train', 'validation'):
+            if not parsed:
+                raise ValueError(f'empty {split} split')
+            rows[split] = parsed
+    for index, left in enumerate(units):
+        for right in list(units)[index + 1:]:
+            if units[left] & units[right]:
+                raise ValueError(f'group overlap between {left} and {right}')
     return rows, hashlib.sha256(manifest_bytes).hexdigest()
 
 
@@ -70,15 +82,24 @@ def _label(episode, ids, eligible, feature_policy):
 
 def _examples(rows, tokenizer, policy, max_length):
     examples = []
+    excluded = {'no_supervised_event_or_positive_gain': 0, 'fewer_than_two_eligible': 0}
     for episode in rows:
-        rendered = render_behavioral(episode, tokenizer, policy, max_length=max_length)
-        labeled = _label(episode, rendered['candidate_ids'], rendered['eligible'], policy)
-        if labeled is None:
+        ids = [candidate['id'] for candidate in episode['alternatives']]
+        eligible = [candidate.get('available', True) for candidate in episode['alternatives']]
+        if sum(eligible) < 2:
+            excluded['fewer_than_two_eligible'] += 1
             continue
+        labeled = _label(episode, ids, eligible, policy)
+        if labeled is None:
+            excluded['no_supervised_event_or_positive_gain'] += 1
+            continue
+        rendered = render_behavioral(episode, tokenizer, policy, max_length=max_length)
+        if rendered['candidate_ids'] != ids or rendered['eligible'] != eligible:
+            raise ValueError('rendered candidate coverage differs from episode')
         examples.append((rendered, labeled))
     if not examples:
         raise ValueError('no eligible supervised groups')
-    return examples
+    return examples, excluded
 
 
 def _loss(model, tokenizer, item, device):
@@ -120,6 +141,8 @@ def run(config_path, output):
     runtime = require_remote_gpu()
     config_bytes = Path(config_path).read_bytes()
     config = yaml.safe_load(config_bytes)
+    if config.get('publish_model_artifacts', False):
+        raise ValueError('model artifact publication requires separate rights and destination review')
     if config['model_id'] != MODEL or config['revision'] != REVISION:
         raise ValueError('unexpected base model identity')
     if not (1 <= config['max_steps'] <= 100 and 60 <= config['max_runtime_seconds'] <= 7200):
@@ -142,14 +165,18 @@ def run(config_path, output):
                 json.loads((Path(spec['directory']) / 'manifest.json').read_text()).get('candidate_pool_scope')
                 != 'source_exposed_candidates'):
             raise ValueError('conditional booking requires exposed candidate pool')
-        training[spec['name']] = _examples(rows['train'], tokenizer, spec['feature_policy'], config['max_length'])
-        validation[spec['name']] = _examples(rows['validation'], tokenizer, spec['feature_policy'], config['max_length'])
+        training[spec['name']], train_excluded = _examples(
+            rows['train'], tokenizer, spec['feature_policy'], config['max_length'])
+        validation[spec['name']], validation_excluded = _examples(
+            rows['validation'], tokenizer, spec['feature_policy'], config['max_length'])
         provenance[spec['name']] = {'manifest_sha256': manifest_hash,
                                     'feature_policy': spec['feature_policy'],
                                     'train_groups': len(rows['train']),
                                     'validation_groups': len(rows['validation']),
                                     'eligible_train_groups': len(training[spec['name']]),
-                                    'eligible_validation_groups': len(validation[spec['name']])}
+                                    'eligible_validation_groups': len(validation[spec['name']]),
+                                    'train_loss_exclusions': train_excluded,
+                                    'validation_loss_exclusions': validation_excluded}
     dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
     base = AutoModelForImageTextToText.from_pretrained(
         MODEL, revision=REVISION, dtype=dtype, device_map='auto')
@@ -234,11 +261,6 @@ def run(config_path, output):
         (output / 'pilot_receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')
         run.log({'selection/best_validation_macro_source_loss': best,
                  'selection/best_step': best_step})
-        artifact = wandb.Artifact(f'ordivo-v2-supervised-{run.id}', type='model',
-                                  metadata={'base_revision': REVISION, 'best_step': best_step})
-        artifact.add_dir(str(output / 'best_adapter'))
-        artifact.add_file(str(output / 'pilot_receipt.json'))
-        run.log_artifact(artifact)
         return receipt
     finally:
         run.finish()
