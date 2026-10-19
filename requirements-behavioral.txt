@@ -2,5 +2,6 @@
 # actual installed versions in the run receipt before claiming benchmark evidence.
 lightgbm==4.7.0
 numpy==2.2.6
+pyarrow==21.0.0
 PyYAML==6.0.2
 pytest==8.4.2

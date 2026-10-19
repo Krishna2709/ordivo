@@ -47,7 +47,9 @@ The runner calls `require_remote_gpu()`, writes bundles and complete per-query
 scores to `/workspace`, and emits a sanitized aggregate file without raw query
 IDs. Real source rows, fitted models, and complete per-query records stay in
 the permitted remote storage scope. The pinned dependency list is a candidate
-until versions and wheels are verified by a remote acceptance run.
+until versions and wheels are verified by a remote acceptance run. Remote
+dependency receipt `esci_deps` verified `pyarrow==21.0.0` with Python 3.12.3
+and NumPy 2.2.6; LightGBM/model tests remain separate gates.
 The runner requires the operations controller's `ORDIVO_SOURCE_COMMIT` from a
 SHA-verified git archive; that receipt must be reconciled against controller
 provenance. Candidate-pool scope is checked per source: exposed hotels for
