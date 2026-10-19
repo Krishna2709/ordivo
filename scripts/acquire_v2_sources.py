@@ -10,8 +10,10 @@ import argparse
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import urllib.request
+import zipfile
 from pathlib import Path
 
 ESCI_REPO = "https://github.com/amazon-science/esci-data.git"
@@ -78,6 +80,37 @@ def acquire_swissmetro(output: Path) -> dict:
                    "https://biogeme.epfl.ch/ (research/education data); verify dataset-specific redistribution terms")
 
 
+def acquire_expedia(output: Path) -> dict:
+    """Use the official Kaggle CLI with a scoped bearer token; never accept terms."""
+    if not os.environ.get("KAGGLE_API_TOKEN"):
+        raise RuntimeError("KAGGLE_API_TOKEN is required for official Expedia retrieval")
+    if shutil.which("kaggle") is None:
+        raise RuntimeError("official Kaggle CLI is unavailable")
+    output.mkdir(parents=True, exist_ok=False)
+    # The competition lists data.zip containing train.csv and unlabeled test.csv.
+    # The CLI enforces existing account access/rules; this command never joins
+    # the competition or accepts new terms.
+    _run("kaggle", "competitions", "download", "expedia-personalized-sort", "-f", "data.zip", "-p", str(output))
+    archive = output / "data.zip"
+    if not archive.exists():
+        raise RuntimeError("official Kaggle download did not produce data.zip")
+    archive_sha256 = _sha256(archive)
+    with zipfile.ZipFile(archive) as zipped:
+        matches = [name for name in zipped.namelist() if Path(name).name == "train.csv"]
+        if len(matches) != 1:
+            raise RuntimeError("official Expedia archive lacks a unique train.csv")
+        train = output / "train.csv"
+        with zipped.open(matches[0]) as source, train.open("wb") as destination:
+            shutil.copyfileobj(source, destination, length=1024 * 1024)
+    archive.unlink()
+    receipt = _record(output, "expedia_personalized_sort_2013", "kaggle-competition-data.zip", [train],
+                      "https://www.kaggle.com/c/expedia-personalized-sort/data",
+                      "https://www.kaggle.com/c/expedia-personalized-sort/rules (competition terms; no redistribution assumed)")
+    receipt["download_archive_sha256"] = archive_sha256
+    (output / "acquisition.json").write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n")
+    return receipt
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", choices=("esci", "swissmetro", "expedia", "build-esci", "build-swissmetro", "build-expedia"))
@@ -110,9 +143,7 @@ def main() -> None:
             episodes = expedia.iter_episodes(args.input, policy)
         print(json.dumps(write_dataset(episodes, args.output, policy), sort_keys=True))
         return
-    if args.source == "expedia":
-        raise SystemExit("Expedia requires authenticated official Kaggle competition access; no public mirror fallback")
-    manifest = acquire_esci(args.output) if args.source == "esci" else acquire_swissmetro(args.output)
+    manifest = acquire_esci(args.output) if args.source == "esci" else acquire_swissmetro(args.output) if args.source == "swissmetro" else acquire_expedia(args.output)
     print(json.dumps(manifest, sort_keys=True))
 
 

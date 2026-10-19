@@ -1,6 +1,7 @@
 source: expedia_personalized_sort_2013
 split_policy_id: expedia-2013-split-v2-calibration
 target_policy_id: expedia-click-booking-v1
+prediction_event: combined_click_booking_relevance
 candidate_pool_scope: source_exposed_candidates
 judgment_policy: complete_observed_click_booking_per_exposed_candidate
 context_features: [srch_length_of_stay, srch_booking_window, srch_adults_count, srch_children_count, srch_room_count, srch_saturday_night_bool]

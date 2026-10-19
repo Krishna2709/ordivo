@@ -18,6 +18,7 @@ MODES = ((1, "train", "TRAIN_AV", "TRAIN_TT", "TRAIN_CO", "TRAIN_HE"),
 def iter_episodes(path: Path, policy: dict) -> Iterator[DecisionEpisode]:
     path = Path(path)
     raw_hash = file_sha256(path)
+    profile = policy["source_profile"] = {"raw_rows": 0, "selected_rows": 0, "omitted_by_reason": {"no_choice": 0}}
     with path.open(newline="", encoding="utf-8") as handle:
         reader = csv.DictReader(handle, delimiter="\t")
         required = {"ID", "CHOICE", "PURPOSE", "GA", "WHO", "LUGGAGE"}
@@ -29,6 +30,7 @@ def iter_episodes(path: Path, policy: dict) -> Iterator[DecisionEpisode]:
         if missing:
             raise ValueError(f"missing Swissmetro fields: {sorted(missing)}")
         for row_index, row in enumerate(reader, start=1):
+            profile["raw_rows"] += 1
             respondent = row["ID"]
             if not respondent:
                 raise ValueError(f"empty Swissmetro respondent at row {row_index}")
@@ -36,7 +38,9 @@ def iter_episodes(path: Path, policy: dict) -> Iterator[DecisionEpisode]:
             if choice == 0:
                 # Biogeme's official example excludes no-choice rows; record
                 # skipped count in the acquisition profile, not a fake target.
+                profile["omitted_by_reason"]["no_choice"] += 1
                 continue
+            profile["selected_rows"] += 1
             if choice not in (1, 2, 3):
                 raise ValueError(f"invalid Swissmetro choice {choice}")
             alternatives = []
