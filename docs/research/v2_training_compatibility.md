@@ -100,7 +100,7 @@ operations owner records actual package versions, runtime ID, costs and cleanup.
 No behavioral optimization pilot is authorized by this document; that requires
 data and baseline evidence reviewed by the root task owner.
 
-## Next RL interface proposal (unimplemented)
+## Next RL interface proposal (tensor foundation only)
 
 After the supervised pilot has a reviewed receipt, an R0 probability-report
 experiment can use complete `conditional_booking_choice` or `stated_choice`
@@ -138,3 +138,6 @@ The declared probability floor ensures positive concentration and changes the
 raw option distribution; the exact expected-Brier expression and tests account
 for that transform. The finite-concentration stochastic Brier optimum need not
 equal the deterministic strictly proper Brier optimum.
+A future trainer must bind the event and candidate-population protocol to the
+verified episode and manifest, and bind the frozen reference report policy to
+an immutable adapter/source receipt; caller strings alone do not prove either.
