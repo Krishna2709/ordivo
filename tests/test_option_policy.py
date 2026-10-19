@@ -30,7 +30,8 @@ def test_mask_coverage_brier_and_stability():
                        objective='brier')
     loss.backward()
     assert torch.isfinite(loss) and torch.isfinite(logits.grad).all()
-    assert logits.grad[1].abs().sum() == 0
+    assert logits.grad[0, 1] == 0  # masked option in the first group
+    assert logits.grad[1, 1] == 0  # non-max alias form in the second group
 
 
 @pytest.mark.parametrize('groups', [[], [[]], [[-1]], [[99]], [[0], [0]]])
