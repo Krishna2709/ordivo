@@ -11,7 +11,7 @@ from liquid_mcdm.models.ranking_baselines import (
     predict_conditional_logit, random_scores,
 )
 from scripts.benchmark_behavioral import (
-    _revision, validate_candidate_pool_scope, validate_respondent_splits,
+    _revision, objective_name, validate_candidate_pool_scope, validate_respondent_splits,
 )
 
 
@@ -140,6 +140,10 @@ def test_swissmetro_respondent_disjointness_beyond_episode_ids():
               "validation": [swissmetro(2, "person-a")], "calibration": [], "test": []}
     with pytest.raises(ValueError, match="respondent overlaps"):
         validate_respondent_splits(splits)
+
+
+def test_swissmetro_objective_is_stated_choice_not_relevance():
+    assert objective_name("swissmetro") == "stated_choice_conditional_logit_nll"
 
 
 def test_conditional_logit_only_scores_available_modes():

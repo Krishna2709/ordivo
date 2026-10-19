@@ -61,6 +61,12 @@ def validate_candidate_pool_scope(source: str, configured: str, declared: str) -
         raise ValueError("candidate pool scope differs from source/config policy")
 
 
+def objective_name(source: str) -> str:
+    return {"expedia_personalized_sort_2013": "declared_click_booking_gain_0_1_5_lambdarank",
+            "amazon_esci": "source_graded_relevance_gain_lambdarank",
+            "swissmetro": "stated_choice_conditional_logit_nll"}[source]
+
+
 def validate_respondent_splits(split_episodes: dict[str, list[dict]]) -> None:
     """Panel rows from one respondent may never cross a split boundary."""
     respondents = {}
@@ -175,9 +181,7 @@ def benchmark(config_path: Path, data_dir: Path, output_dir: Path) -> dict:
                 "split_policy_id": manifest.get("split_policy_id"),
                 "candidate_pool_scope": manifest.get("candidate_pool_scope"),
                 "prediction_event": config["feature_policy"].get("prediction_event"),
-                "ranking_objective": ("expedia_declared_click_booking_gain_0_1_5" if
-                                      config["source"] == "expedia_personalized_sort_2013" else
-                                      "source_graded_relevance_gain"),
+                "ranking_objective": objective_name(config["source"]),
                 "split_counts": {"train": len(train), "validation": len(validation),
                                  "calibration_unused": len(calibration), "test": len(test)},
                 "model": model_metadata,
