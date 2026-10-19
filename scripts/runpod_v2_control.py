@@ -241,7 +241,8 @@ def run_task(task, repo, commit, command, secret_names=(), outputs=()):
     if not re.fullmatch(r'[0-9a-f]{40}', commit):
         raise ValueError('Full 40-character commit required')
     allowed = {'wandb': ('WANDB_API_KEY', 'WEIGHTS_AND_BIASES_API_KEY'),
-               'hf': ('HF_TOKEN', 'HUGGINGFACE_API_KEY')}
+               'hf': ('HF_TOKEN', 'HUGGINGFACE_API_KEY'),
+               'kaggle': ('KAGGLE_API_TOKEN', 'KAGGLE_API_TOKEN')}
     if any(name not in allowed for name in secret_names):
         raise ValueError('Unknown secret alias')
     for output in outputs:
@@ -389,7 +390,8 @@ def fetch_task(task, *, secret_values=None):
     _, scp, target = ssh_args(pod)
     if secret_values is None:
         aliases = json.loads((task_dir / 'receipt.json').read_text()).get('secret_aliases', [])
-        mapping = {'wandb': 'WEIGHTS_AND_BIASES_API_KEY', 'hf': 'HUGGINGFACE_API_KEY'}
+        mapping = {'wandb': 'WEIGHTS_AND_BIASES_API_KEY', 'hf': 'HUGGINGFACE_API_KEY',
+                   'kaggle': 'KAGGLE_API_TOKEN'}
         secret_values = {x: load_secret(mapping[x]) for x in aliases}
     base, _, _ = ssh_args(pod)
     received = {}
@@ -468,7 +470,8 @@ def main():
     parser.add_argument('--repo', type=Path)
     parser.add_argument('--commit')
     parser.add_argument('--command')
-    parser.add_argument('--with-secret', action='append', choices=('wandb', 'hf'), default=[])
+    parser.add_argument('--with-secret', action='append', choices=('wandb', 'hf', 'kaggle'),
+                        default=[])
     parser.add_argument('--output', action='append', default=[])
     args = parser.parse_args()
     if args.reap:
