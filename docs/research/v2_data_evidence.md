@@ -237,6 +237,12 @@ A has a ten-item universe and B a hundred-item universe. The row-aligned
 respondent file contains 5,000 distinct noncontiguous IDs, and the item file
 contains IDs 0–99. The ranking target is isolated in `ordered_groups`;
 alternatives are sorted by item ID so presentation order cannot leak the target.
+The adapter pins all four extracted input SHA-256 values to that official
+structure audit and requires exactly 5,000 respondent rows and 10,000 ranking
+episodes. An equally truncated A/B/respondent fixture failed the remote RED
+test at `467c93a`; the pinned-source fix at `9ab4740` passed 23 focused remote
+tests with no skips. The build command uses strict verification by default;
+synthetic fixture tests explicitly disable it.
 The corrected 2016 score-file bug does not affect `.order` files. Four-way
 materialization and scored evaluation remain pending.
 No raw/derived data may be redistributed, and derivative-weight rights remain
