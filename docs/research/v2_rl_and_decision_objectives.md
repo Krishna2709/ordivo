@@ -12,6 +12,8 @@ verified Liquid d1 training recipe. An Ordivo implementation must be labeled
 an independently specified calibration-focused method, not a reproduction of
 TypeSafe's private implementation or guaranteed equivalent behavior.
 
+Laya also publishes a concrete calibrated-decision recipe. Its pinned code and the d1 adaptation requirements are now documented in [RL_RESEARCH_DESIGN.md](../RL_RESEARCH_DESIGN.md). This extends the earlier TypeSafe-only source review; it does not establish d1 compatibility.
+
 There is also an unrelated earlier [RLCD paper on Contrastive Distillation](https://arxiv.org/abs/2307.12950).
 Do not confuse its synthetic contrast-based alignment procedure with the
 calibrated-decisions method discussed here. Record the exact expansion in configs.

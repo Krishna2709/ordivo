@@ -4,6 +4,7 @@ The mathematical decision domain is independent of model training and telemetry.
 
 | Module | Responsibility | Boundary |
 |---|---|---|
+| `decision/` | Weight provenance, feasibility, Pareto, exact claim verification and weight scenarios | `validate_decision`, `resolve_weights`, `verify_decision` |
 | `mcdm/solvers.py` | Pure float64 formulas, validation, ties, VIKOR compromise | `solve(...) -> Result` |
 | `data/synthetic.py` | Scenario families, independent factor schedule, seed lineage, JSONL/hash persistence | `generate_dataset`, `load_dataset`, `validate_episode` |
 | `evaluation/metrics.py` | Winner probability metrics with explicit exclusions, slices and evaluated split identity | `evaluate_predictions`, `evaluate_dataset` |
@@ -36,7 +37,7 @@ well as rankings; mandatory constraints are enforced independently of model
 scores. Shared-model experiments must test entire held-out domains. GRPO and
 calibration-focused training are research options, not implemented trainers.
 See [ADR 0007](docs/decisions/0007-v2-multidomain-decision-learning.md).
-This design is not yet implemented by the v1 modules above.
+The deterministic foundation is now implemented in `decision/`; behavioral adapters, preference learning and RL trainers remain planned. See [ADR 0008](docs/decisions/0008-v2-verifier-and-research-order.md) and [verification contract](docs/DECISION_VERIFICATION.md).
 
 Add a method by declaring its formula/domain/order/compromise contract and independent fixtures, then extend the generator/schema. Add behavioral datasets through a separate grouped loader; do not impersonate `synthetic_solver`. Add a model through the decision-input/probability boundary. Encoder set-ranking and full-ranking metrics are later distinct tasks, not implied by winner classification.
 

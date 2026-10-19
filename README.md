@@ -295,3 +295,7 @@ The release run verified the pinned checkpoint, actual completion mask, frozen v
 Persist checkpoints, config, source snapshot, data manifest and environment freeze to a user-selected Google Drive folder or approved artifact store. A Colab disconnect can delete VM disk. Mounting Drive alone does not copy outputs; explicitly save/copy checkpoints there. Resume requires optimizer/scheduler/trainer state as well as adapter weights and the pinned base snapshot; verify reload predictions before scaling.
 
 Expedia and MSLR are optional pending their access/use agreements. UCI Car is a classification sanity task. Numerical neural/LightGBM controls and behavioral ranking remain future milestones.
+
+## V2 training plan and implemented foundation
+
+The accepted [research design](docs/RL_RESEARCH_DESIGN.md) preserves d1-3B and the v1 baseline, then compares supervised learning, calibrated probability objectives and verifier-guided RL. The first implemented slice provides [weight provenance](docs/WEIGHT_INFERENCE_POLICY.md), constraints, Pareto analysis, exact score verification and weight sensitivity. See [the executable input/output example](docs/DECISION_VERIFICATION.md), [reward design](docs/REWARD_DESIGN.md), [experiment matrix](docs/EXPERIMENT_MATRIX.md), and [remote test evidence](reports/V2_VERIFIER_VALIDATION.md). No v2 trained checkpoint is claimed. All workloads run on RunPod; the laptop is used for source editing and control only.
