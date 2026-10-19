@@ -67,7 +67,7 @@ Its time, cost and headway inputs are source fields, not invented weights.
 | Integrated remote suite | 214 tests, exit 0, no skips at integrated commit `9c532d98050e40ab3c9056e0bec1eeace123ccef`; controller archive SHA `4dd4793819f8d4507312894dbdbac9e510fc67d01afc6da7a6c292276f491838`. This includes evaluator fixtures and LightGBM save/reload parity fixture. |
 | Remote LightGBM save/reload parity | Fixture check included in the 214-test suite; real ESCI bundle persisted and scored. |
 | Real ESCI lexical and ranker results | Complete for frozen old manifest at commit `22707ed34fd125e96aade9123f9baaf34cd64a18`; source-bound rebuild has byte-identical train/validation/calibration/test split files. |
-| Real Expedia baseline | Pending authenticated source access and terms record. |
+| Real Expedia baseline | Official data acquired after terms acceptance and four-way source build completed; predeclared bounded complete-group benchmark remains pending. |
 | Swissmetro stated-choice baseline | Real 1,044-episode test run complete with full score coverage and model reload parity; figures and limits below. |
 
 Do not turn a fixture pass or a completed test process into a real-data result.
@@ -143,3 +143,17 @@ manifest SHA-256 is `9fd4065fc0db4586453a412123eb9ef393b1750cd8196bb11cad794d020
 an independent remote audit confirmed all four split-file byte hashes match
 the old manifest, so the evaluated groups are unchanged. Per-query files
 remain in private remote storage.
+
+## Expedia source and bounded-run plan
+
+Official Expedia acquisition and source-bound grouping completed remotely at
+data commit `919c67e494174f34d2436fa507e427b75fe866c2`. The full four-way
+manifest contains 399,344 complete searches and 9,917,530 exposed candidates;
+train/validation/calibration/test groups are 319,714/19,739/20,040/39,851.
+No groups or candidate rows were omitted in source construction. The source
+terms are `https://www.kaggle.com/c/expedia-personalized-sort/rules`, and the
+raw training CSV SHA-256 is
+`84a53139ea92df1e9400f84852facbd78f3136f366a08440f4ab4518e71a49a9`.
+The cgroup memory limit is 49,999,998,976 bytes; eager full-corpus baseline
+fitting is not a credible bounded run. The frozen complete-group sample protocol
+is in `v2_expedia_bounded_protocol.md`; no Expedia baseline metric exists yet.

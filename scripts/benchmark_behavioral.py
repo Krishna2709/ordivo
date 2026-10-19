@@ -39,7 +39,11 @@ def _write_json(path: Path, value) -> None:
 
 
 def _digest(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
 
 
 def _aggregate(report: dict) -> dict:
@@ -179,6 +183,7 @@ def benchmark(config_path: Path, data_dir: Path, output_dir: Path) -> dict:
                 "source_sha256": manifest.get("source_sha256", {}),
                 "source_terms": manifest.get("source_terms"),
                 "split_policy_id": manifest.get("split_policy_id"),
+                "sampling": manifest.get("sampling"),
                 "candidate_pool_scope": manifest.get("candidate_pool_scope"),
                 "prediction_event": config["feature_policy"].get("prediction_event"),
                 "ranking_objective": objective_name(config["source"]),

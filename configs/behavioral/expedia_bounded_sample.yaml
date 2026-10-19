@@ -1,0 +1,9 @@
+# Predeclared exploratory complete-search sample from the built four-way source split.
+source: expedia_personalized_sort_2013
+seed: 42
+selection_policy: sha256_smallest_source_split_episode_id_v1
+group_caps:
+  train: 20000
+  validation: 2000
+  calibration: 2000
+  test: 5000
