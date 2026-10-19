@@ -260,7 +260,7 @@ def run_task(task, repo, commit, command, secret_names=(), outputs=()):
     archive = task_dir / 'source.tar'
     source_allow = {'ARCHITECTURE.md', 'CITATION.cff', 'CONTRIBUTING.md', 'LICENSE',
                     'NOTICE', 'PROJECT_BRIEF.md', 'README.md', 'configs', 'docs',
-                    'notebooks', 'pyproject.toml', 'research', 'scripts', 'src',
+                    'notebooks', 'de01.ipynb', 'pyproject.toml', 'research', 'scripts', 'src',
                     'tests', 'uv.lock', 'requirements-cpu.lock',
                     'requirements-colab-candidate.txt', 'requirements-behavioral.txt'}
     tracked = subprocess.run(['git', '-C', str(repo), 'ls-tree', '--name-only', commit],
@@ -275,7 +275,10 @@ def run_task(task, repo, commit, command, secret_names=(), outputs=()):
             name = Path(member.name)
             lowered = [part.lower() for part in name.parts]
             if (name.is_absolute() or '..' in name.parts or member.issym() or member.islnk()
-                    or any(part in {'.env', '.kaggle', '.wandb', 'credentials', 'secrets',
+                    or any(part.startswith('.env') or
+                           any(term in part for term in ('credential', 'secret', 'private_key',
+                                                          'kaggle.json', 'token.json')) or
+                           part in {'.kaggle', '.wandb',
                                     'reports', 'dist', 'checkpoints', 'models'}
                            for part in lowered)
                     or name.suffix.lower() in {'.safetensors', '.pt', '.pth', '.ckpt',
@@ -296,6 +299,8 @@ def run_task(task, repo, commit, command, secret_names=(), outputs=()):
                f'tar -xf {shlex.quote(remote)}/source.tar || exit 90; '
                f'export PATH={shlex.quote(CONFIG["remote_root"] + "/cpu-venv/bin")}:$PATH; '
                f'export RUNPOD_POD_ID={shlex.quote(state["pod_id"])}; '
+               f'export ORDIVO_SOURCE_COMMIT={commit}; '
+               f'export ORDIVO_SOURCE_SHA256={source_sha}; '
                f'({command}) > {shlex.quote(remote)}/stdout.log 2>&1; '
                f'code=$?; echo "$code" > {shlex.quote(remote)}/exit_code; exit "$code"')
     # Secret values travel only over SSH stdin, never command argv or a remote file.
