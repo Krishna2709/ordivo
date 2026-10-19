@@ -54,7 +54,13 @@ The controller must supply `ORDIVO_SOURCE_COMMIT` (40 hex) and
 `ORDIVO_SOURCE_SHA256` (64 hex) from the verified source archive; the runtime
 does not need a `.git` checkout. The Swissmetro plus ESCI fallback config uses
 reviewed allowlists and remains a preliminary two-domain pilot if Expedia
-access is blocked.
+access is blocked. Its ESCI evidence budget includes query and locale context,
+plus title, brand and color for every candidate; descriptions and bullets are
+excluded explicitly to limit context overflow. It does not silently remove
+candidates, and records overflows. A comparative baseline claim requires a
+baseline rerun with the same feature policy. Swissmetro uses survey context
+(`purpose`, `ga`, `who`, `luggage`) and recorded travel time, cost and headway;
+these are observed features, not a learned cost or GA preference rule.
 
 ## Remote evidence gates
 
@@ -71,7 +77,7 @@ Required command, after the source commit is copied to the remote checkout:
 
 ```bash
 python -m pytest -q tests/test_option_policy.py tests/test_behavioral_rendering.py tests/test_calibration.py
-    python scripts/check_v2_training_compatibility.py --output /workspace/receipts/v2-training-compatibility
+python scripts/check_v2_training_compatibility.py --output /workspace/receipts/v2-training-compatibility
 ```
 
 The GPU receipt must show finite loss, nonzero finite LoRA gradients, exact

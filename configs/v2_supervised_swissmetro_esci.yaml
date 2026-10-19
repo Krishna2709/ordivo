@@ -26,5 +26,5 @@ sources:
   - name: esci
     directory: /workspace/data/esci-frozen
     feature_policy:
-      context_features: [query]
-      alternative_features: [product_title, product_description]
+      context_features: [query, locale]
+      alternative_features: [product_title, product_brand, product_color]
