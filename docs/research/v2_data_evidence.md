@@ -244,7 +244,13 @@ test at `467c93a`; the pinned-source fix at `9ab4740` passed 23 focused remote
 tests with no skips. The build command uses strict verification by default;
 synthetic fixture tests explicitly disable it.
 The corrected 2016 score-file bug does not affect `.order` files. Four-way
-materialization and scored evaluation remain pending.
+materialization completed privately at code `9ab4740`; the sanitized manifest
+at [the operations receipt](../../../ordivo-v2-operations/reports/runs/v2-swarm-20261019T030009Z/sushi-manifest-9ab.json)
+has SHA-256 `bd6a19be2715ee3c43b45607b4c0177bd318c124f4c17dab082a14d3f866b6fa`.
+It reconciles 10,000 raw/selected/retained ranking episodes and 100,000
+candidate rows, no omissions, across train/validation/calibration/test counts
+7,912/518/586/984. All four source hashes match the pinned author files;
+respondent-disjoint readback and scored evaluation are pending.
 No raw/derived data may be redistributed, and derivative-weight rights remain
 unresolved, so SUSHI is excluded from neural training configuration.
 The [official MSLR page](https://www.microsoft.com/en-us/research/project/mslr/)
