@@ -163,6 +163,32 @@ def test_supervised_labels_respect_event_population_and_unjudged_mask():
     assert mask.tolist() == [True, True, False]
 
 
+def test_train_permutation_is_label_independent_and_preserves_id_mapped_targets():
+    from scripts.train_v2_supervised import _label, _permute_train_episode
+
+    base = episode()
+    base['episode_id'] = 'swissmetro:group7'
+    base['source'] = 'swissmetro'
+    base['alternatives'].append({'id': 'private-id-3', 'features': {'cost': 9},
+                                 'available': True})
+    changed_label = json.loads(json.dumps(base))
+    changed_label['supervision']['selected_id'] = 'private-id-3'
+    first = _permute_train_episode(base, seed=42)
+    second = _permute_train_episode(changed_label, seed=42)
+    assert [a['id'] for a in first['alternatives']] == [a['id'] for a in second['alternatives']]
+    assert {a['id']: a for a in first['alternatives']} == {a['id']: a for a in base['alternatives']}
+    assert base['alternatives'][0]['id'] == 'private-id-1'  # no mutation of source row
+    for row in (first, second):
+        ids = [a['id'] for a in row['alternatives']]
+        eligible = [a['available'] for a in row['alternatives']]
+        kind, target, mask = _label(row, ids, eligible, {})
+        assert kind == 'choice' and ids[int(target)] == row['supervision']['selected_id']
+        assert mask.tolist() == eligible
+    assert _permute_train_episode(base, seed=42)['alternatives'] == first['alternatives']
+    assert len({tuple(a['id'] for a in _permute_train_episode(base, seed=trial)['alternatives'])
+                for trial in range(20)}) > 1
+
+
 def test_supervised_exclusion_precedes_conditional_projection(monkeypatch):
     from scripts import train_v2_supervised as trainer
 
