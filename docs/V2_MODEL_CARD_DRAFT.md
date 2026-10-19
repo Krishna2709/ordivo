@@ -45,9 +45,20 @@ The preliminary adapter uses [LiquidAI/d1-3B](https://huggingface.co/LiquidAI/d1
 
 Research comparisons of candidate ordering, conditional choice, calibration and verifiable numerical decisions are in scope. Tasks must be declared: a click/booking event, a stated selected mode, a relevance grade, and an explicit preference ranking have different meanings. Human review and approved policy remain necessary for consequential procurement or healthcare decisions. The model is not an exact MCDM calculator, a causal estimate of preference from observational clicks, or an autonomous policy authority. It should not be used to infer hidden personal preferences, to treat relevance as purchasing probability, to recommend unavailable candidates, or to act on unknown constraints.
 
-## Interface planned for evaluation
+## Research inference interface
 
 Input: `schema_version=ordivo-behavioral-v1`, `task_type`, allowlisted context, declared criteria/constraints/preferences, and a complete variable-length set of alternatives with typed features and availability. Candidate IDs serve only as output keys and are remapped to aliases in neural prompts. Outcome labels, exposure/position, provenance, source/group identifiers and original row order cannot enter predictor features. Numeric units and missingness must be explicit; weights can be `null`.
+
+The integrated label-free `render_predictor_input` rejects supervision,
+exposure and provenance fields and requires the exact source feature allowlist;
+it shares the executed pilot's prompt and max-alias option-readout core. Remote
+source tests passed at `bd24814429211ad4dad4e9a58ba0137daa0bc76b` (244
+tests, zero skips; archive SHA-256
+`778a3689f90c44afa572fc4ecd968a8853e53f5c5bb81e3356338485dd57c2a0`).
+The [private research card](../hub/v2_research_model/README.md) gives an
+illustrative label-free request and pinned PEFT loading path. An end-to-end
+private adapter inference receipt for that example is still pending; this is
+not a production serving API.
 
 Output: one finite score per eligible candidate keyed by ID, explicit unavailable/failed status, and task-specific probability only where a named event and normalization are defined. Ranking a score vector is not proof of listwise training. The deterministic decision report separately records weight source, feasibility, exact method and parameters, computed score/trace, uncertainty or sensitivity, and verification status. A failed or truncated group is an error, not a reduced successful prediction.
 

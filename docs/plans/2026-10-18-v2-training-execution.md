@@ -33,6 +33,17 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   passed 221 tests with zero skips on RunPod A40; source archive SHA-256
   `4ec592756c7346dbbfd1df3ab2ecb4c77e4e3072975f2b0ceb080da0e3ad7a2c`
   matched remotely. Receipt: `v2-swarm-20261019T030009Z/final_suite_22707`.
+- Label-free predictor input was integrated at exact source commit
+  `bd24814429211ad4dad4e9a58ba0137daa0bc76b`. The remote full source
+  suite passed 244 tests, zero skips, using archive SHA-256
+  `778a3689f90c44afa572fc4ecd968a8853e53f5c5bb81e3356338485dd57c2a0`;
+  a scoped predictor suite passed 16 tests. A later direct command-path
+  diagnostic fix at `a19d32d275db0012cecb50aafff84f4a125fbf7a` passed
+  its focused 10-test remote check and exact help invocation. These are source
+  and boundary checks; an end-to-end private Hub adapter inference playthrough
+  has not yet been recorded. Receipts:
+  `v2-swarm-20261019T030009Z/full_suite_bd248`,
+  `candidate_predictor_tests_bd248_retry`, and `candidate_direct_green_a19d`.
 - V2 behavioral data reviewer-fix tests at `2f417cbe28e77e7303d3c7fbfdf3d3d80bcf720f`
   passed 19/0 on the remote pod. Release-report source tests at `178d1fd4`
   passed 7/0. These are component tests, not real-data performance evidence.

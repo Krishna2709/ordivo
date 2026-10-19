@@ -6,7 +6,7 @@
 
 The pilot uses `LiquidAI/d1-3B` at immutable revision `051bcc464b01b9f92942b364d9586b0ef5912432`, with a PEFT LoRA `best_adapter` selected on the **model-selection validation** groups. The executed source commit is `854de0877c8e7e380b7353a578e95ba9865d4e25`; source archive SHA-256 is `38454c8d667183d57c9c48ed0bcc3d3b32f214e2485c6bdb6bf99f6af0204faa`; config SHA-256 is `c152e64d839082531d4ece9e66d330fa35ffddfbc442685742b9fd171de5462b`. Prompt contract `behavioral-choice-v1` lives in `liquid_mcdm.training.behavioral_rendering`; option readout lives in `liquid_mcdm.training.option_policy` and the pinned `liquid_mcdm._vendor.d1_prompt`. The base model, project code, tokenizer, and adapter are all required. This is an answer-slot candidate scorer, not a generated-text decision assistant.
 
-Input is a complete `ordivo-behavioral-v1` episode with task type, declared context/criteria/constraints/preferences, and all candidates with typed source features and `available` masks. The rendering path uses a source-specific `feature_policy` allowlist. Candidate IDs are output keys; only positional aliases reach the model. Labels, exposure/position, provenance, source/group identifiers, and original row order must not be predictor features. The current evaluator accepts a validated full episode and projects its predictor-only input internally; an independent serving-input validator is not yet packaged. Do not pass arbitrary unvalidated dictionaries as if they were a supported public API.
+Input is a complete `ordivo-behavioral-v1` episode with task type, declared context/criteria/constraints/preferences, and all candidates with typed source features and `available` masks. The rendering path uses a source-specific `feature_policy` allowlist. Candidate IDs are output keys; only positional aliases reach the model. Labels, exposure/position, provenance, source/group identifiers, and original row order must not be predictor features. The label-free research renderer accepts only an exact predictor envelope and frozen feature-policy allowlist, without supervision, exposure or provenance. Its scoped/full source tests passed; a production serving API and end-to-end inference playthrough remain pending.
 
 For `stated_choice`, output is a conditional distribution over **the supplied available alternatives**. For ESCI `graded_relevance`, the current option distribution is a single-choice relevance probe over the **source Task 1 reduced judged candidate list**; it is not product retrieval recall, purchase probability, a calibrated confidence, or a universal utility scale. If an `observed_choice` source is added, `prediction_event` must distinguish `conditional_booking_choice` from `combined_click_booking_relevance`; a conditional booking distribution applies only to exposed groups with exactly one booking. Unavailable options are masked, and no complete candidate group may be truncated to fit the prompt.
 
@@ -36,11 +36,11 @@ An exploratory paired probe used the same selected held-out units for base d1 an
 | Swissmetro choice Brier ↓ | 0.459254 | 0.462190 | Same 450 scenarios |
 | ESCI judged-pool NDCG@10 | 0.778290 | 0.752276 | 27/50 selected held-out query groups; 23 prompt overflows |
 
-The adapted model loses 2 percentage points of Swissmetro top-1 accuracy and 0.0260146 ESCI NDCG@10 on admitted groups. NLL improves while Brier worsens on Swissmetro. There are no paired intervals, calibration fit, multi-seed replications, or entire-held-out-domain transfer result. ESCI prompt overflow is a material coverage failure; do not interpret 27/50 admitted queries as full test coverage. This probe is not the protected final release test. Private retention includes `heldout-probe/20261019T030009Z/paired-854de/aggregate.json` and per-query files; no per-query record belongs in a public report.
+The adapted model loses 2 percentage points of Swissmetro top-1 accuracy and 0.0260146 ESCI NDCG@10 on admitted groups. NLL improves while Brier worsens on Swissmetro. There are no paired intervals, calibration fit, multi-seed replications, or entire-held-out-domain transfer result. ESCI prompt overflow is a material coverage failure; do not interpret 27/50 admitted queries as full test coverage. This probe is not the protected final release test. Private retention includes eight files plus manifest under `heldout-probe/20261019T030009Z/paired-854de/` at Hub commit `04656dae99ff3d28a0e8a7ac3f22275335cb6ad3`; every file passed forced-download SHA readback. The local retention-manifest SHA-256 is `606510b5833b6264755ff805ea50df1f4bf90e76449831489f3553631dc3d163`. No per-query record belongs in a public report.
 
-## Loading and scoring a validated research episode
+## Loading and scoring a label-free research request
 
-Use the pinned project source and dependencies from the executed run. The private Hub files were force-downloaded and matched the upload SHA-256 values at commit `bf1d425b4e6ffc392121d8fb0776e41b1af48c4a`; inspect the private artifact manifest when reproducing. `episode` below is one authorized, complete `ordivo-behavioral-v1` episode validated under its source contract; do not upload or log it. Choose the matching allowlist from the frozen run config, not a superset constructed from labels.
+Use integrated project source `bd24814429211ad4dad4e9a58ba0137daa0bc76b` or a reviewed descendant with its dependency lock. The label-free `render_predictor_input` uses the same prompt/readout core as the executed pilot; the remote scoped 16-test and integrated 244-test suites passed at this source commit (archive SHA-256 `778a3689f90c44afa572fc4ecd968a8853e53f5c5bb81e3356338485dd57c2a0`). The private adapter files were force-downloaded and matched upload SHA-256 at Hub commit `bf1d425b4e6ffc392121d8fb0776e41b1af48c4a`; inspect its private artifact manifest when reproducing. The **illustrative** Swissmetro-style input below has no target, supervision, exposure, provenance, respondent, group or source identifier. Its numbers are examples, not a dataset row or expected model prediction. Apply the exact feature allowlist from the frozen pilot config to real authorized inputs.
 
 ```python
 from pathlib import Path
@@ -48,9 +48,29 @@ import torch
 from huggingface_hub import snapshot_download
 from peft import PeftModel
 from transformers import AutoModelForImageTextToText, AutoTokenizer
-from liquid_mcdm.training.behavioral_rendering import render_behavioral
+from liquid_mcdm.training.behavioral_rendering import render_predictor_input
 from liquid_mcdm.training.option_policy import option_probabilities
 
+request = {
+    "schema_version": "ordivo-behavioral-v1",
+    "task_type": "stated_choice",
+    "context": {"purpose": 1, "ga": 0, "who": 1, "luggage": 0},
+    "criteria": [
+        {"name": "travel_time_minutes", "direction": "min", "weight": None},
+        {"name": "cost_chf", "direction": "min", "weight": None},
+    ],
+    "constraints": [],
+    "preferences": {},
+    "alternatives": [
+        {"id": "train", "features": {"travel_time_minutes": 90.0, "cost_chf": 70.0, "headway_minutes": 30.0}, "available": True},
+        {"id": "swissmetro", "features": {"travel_time_minutes": 75.0, "cost_chf": 85.0, "headway_minutes": 20.0}, "available": True},
+        {"id": "car", "features": {"travel_time_minutes": 110.0, "cost_chf": 60.0, "headway_minutes": None}, "available": False},
+    ],
+}
+feature_policy = {
+    "context_features": ["purpose", "ga", "who", "luggage"],
+    "alternative_features": ["travel_time_minutes", "cost_chf", "headway_minutes"],
+}
 BASE = "LiquidAI/d1-3B"
 REVISION = "051bcc464b01b9f92942b364d9586b0ef5912432"
 RUN = "supervised-pilot/20261019T030009Z/pilot-854de"
@@ -60,14 +80,13 @@ snapshot = snapshot_download(
     allow_patterns=[f"{RUN}/best_adapter/*", f"{RUN}/artifact_manifest.json"],
 )
 adapter_dir = Path(snapshot) / RUN / "best_adapter"
-# `episode` and `feature_policy` are supplied by the authorized source adapter.
 tokenizer = AutoTokenizer.from_pretrained(BASE, revision=REVISION)
 base = AutoModelForImageTextToText.from_pretrained(
     BASE, revision=REVISION, dtype=torch.bfloat16, device_map="auto"
 )
 model = PeftModel.from_pretrained(base, adapter_dir)
 model.eval()
-rendered = render_behavioral(episode, tokenizer, feature_policy, max_length=2048)
+rendered = render_predictor_input(request, tokenizer, feature_policy, max_length=2048)
 inputs = tokenizer(rendered["prompt"], add_special_tokens=False, return_tensors="pt")
 inputs = inputs.to(next(model.parameters()).device)
 with torch.inference_mode():
@@ -79,7 +98,7 @@ with torch.inference_mode():
 scores_by_candidate_id = dict(zip(rendered["candidate_ids"], probabilities.cpu().tolist()))
 ```
 
-This softmax is conditional on this candidate group and rendering policy. Do not interpret it as calibrated real-world event probability. No expected prediction is asserted without a separately checked episode-level inference receipt.
+This softmax is conditional on this candidate group and rendering policy. It is not calibrated real-world event probability. The unavailable car remains in the complete prompt but receives probability zero. No expected prediction is asserted for the illustrative input without an independently checked inference receipt.
 
 ## Use and distribution
 
