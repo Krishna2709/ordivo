@@ -17,10 +17,13 @@ def renderer(monkeypatch):
     behavioral = types.ModuleType('liquid_mcdm.data.behavioral')
 
     def inference_input(episode, feature_policy):
-        assert feature_policy == {'context_features': ['purpose'],
-                                  'alternative_features': ['cost']}
-        return {key: episode[key] for key in ('task_type', 'context', 'criteria',
-                                               'constraints', 'preferences', 'alternatives')}
+        assert feature_policy['context_features'] == ['purpose']
+        assert feature_policy['alternative_features'] == ['cost']
+        keys = ('task_type', 'context', 'criteria', 'constraints', 'preferences', 'alternatives')
+        projection = {key: episode[key] for key in keys}
+        if episode['task_type'] == 'observed_choice':
+            projection['prediction_event'] = feature_policy['prediction_event']
+        return projection
 
     behavioral.inference_input = inference_input
     monkeypatch.setitem(sys.modules, behavioral.__name__, behavioral)
@@ -59,3 +62,18 @@ def test_rejects_truncation_and_missing_coverage(renderer):
     modified['alternatives'][1]['id'] = 'private-id-1'
     with pytest.raises(ValueError, match='unique'):
         renderer(modified, CharacterTokenizer(), policy)
+
+
+def test_observed_event_is_visible_and_target_is_not(renderer):
+    observed = episode()
+    observed['task_type'] = 'observed_choice'
+    policy = {'context_features': ['purpose'], 'alternative_features': ['cost'],
+              'prediction_event': 'conditional_booking_choice'}
+    booking = renderer(observed, CharacterTokenizer(), policy)
+    assert 'exactly one booking' in booking['prompt']
+    assert 'conditional_booking_choice' in booking['prompt']
+    assert 'selected_id' not in booking['prompt']
+    policy['prediction_event'] = 'combined_click_booking_relevance'
+    click = renderer(observed, CharacterTokenizer(), policy)
+    assert booking['prompt'] != click['prompt']
+    assert 'click' in click['prompt']
