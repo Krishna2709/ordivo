@@ -128,6 +128,9 @@ def acquire_expedia(output: Path, existing_archive: Path | None = None, expected
                       "https://www.kaggle.com/c/expedia-personalized-sort/data",
                       "https://www.kaggle.com/c/expedia-personalized-sort/rules (competition terms; no redistribution assumed)")
     receipt["download_archive_sha256"] = archive_sha256
+    receipt["download_archive_bytes"] = archive.stat().st_size
+    tool_probe = subprocess.run(("7z",), text=True, capture_output=True, check=False)
+    receipt["extraction_tool_version"] = next((line.strip() for line in tool_probe.stdout.splitlines() if "7-Zip" in line), "7z version unavailable")
     receipt["acquisition_method"] = "official_kaggle_cli" if existing_archive is None else "verified_preexisting_archive"
     (output / "acquisition.json").write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n")
     return receipt
