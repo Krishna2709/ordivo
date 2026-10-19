@@ -76,6 +76,12 @@ click/booking judgment policy. There are 122,751 groups with no booking and
 a single-booking choice label. Missing `prop_location_score2` and
 `prop_review_score` counts are 2,178,380 and 14,630 candidate rows. No Expedia
 benchmark, trained adapter, or public row redistribution follows from this build.
+An independent [four-way streaming audit](../reports/runs/v2-expedia-20261019/fourway-audit.json)
+(SHA-256 `d48db0af0be72b48c7244ca41e78dda5789c496bf6a29fc7a8bcb5211558c387`)
+re-read all split hashes and accounted for 399,344 unique search groups and
+9,917,530 candidates, with zero duplicate groups/candidate IDs, source
+mismatches or wrong-hash partitions. This is integrity evidence, not
+prediction quality.
 
 ## Risks and limitations
 

@@ -38,6 +38,16 @@ An exploratory paired probe used the same selected held-out units for base d1 an
 
 The adapted model loses 2 percentage points of Swissmetro top-1 accuracy and 0.0260146 ESCI NDCG@10 on admitted groups. NLL improves while Brier worsens on Swissmetro. There are no paired intervals, calibration fit, multi-seed replications, or entire-held-out-domain transfer result. ESCI prompt overflow is a material coverage failure; do not interpret 27/50 admitted queries as full test coverage. This probe is not the protected final release test. Private retention includes eight files plus manifest under `heldout-probe/20261019T030009Z/paired-854de/` at Hub commit `04656dae99ff3d28a0e8a7ac3f22275335cb6ad3`; every file passed forced-download SHA readback. The local retention-manifest SHA-256 is `606510b5833b6264755ff805ea50df1f4bf90e76449831489f3553631dc3d163`. No per-query record belongs in a public report.
 
+A subsequent matched C1 direct-Brier and R0 stochastic-report continuation
+completed 40 optimizer updates per arm from the same starting pilot adapter.
+Their best **post-update** checkpoints (step 10; step 0 excluded from that
+selection rule) both worsened selected-validation macro loss relative to the
+shared start: start 1.5817367, C1 1.6459532, R0 1.6163764. R0 degrading less
+than C1 is not evidence of improvement. The sanitized remote receipt SHA-256
+is `cc686cf66ee3d7daa777ecc8b3c1ccaedda5d546da96107ad1f18ea0bf055cc5`
+at source `f69643794a932b14dac46b2e866667f5a7814bc4`; no continuation
+held-out result, cloud readback or private Hub retention is asserted here.
+
 ## Loading and scoring a label-free research request
 
 Use integrated project source `bd24814429211ad4dad4e9a58ba0137daa0bc76b` or a reviewed descendant with its dependency lock. The label-free `render_predictor_input` uses the same prompt/readout core as the executed pilot; the remote scoped 16-test and integrated 244-test suites passed at this source commit (archive SHA-256 `778a3689f90c44afa572fc4ecd968a8853e53f5c5bb81e3356338485dd57c2a0`). The private adapter files were force-downloaded and matched upload SHA-256 at Hub commit `bf1d425b4e6ffc392121d8fb0776e41b1af48c4a`; inspect its private artifact manifest when reproducing. The **illustrative** Swissmetro-style input below has no target, supervision, exposure, provenance, respondent, group or source identifier. Its numbers are examples, not a dataset row or expected model prediction. Apply the exact feature allowlist from the frozen pilot config to real authorized inputs.

@@ -13,8 +13,8 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
 | Independent review | Complete, important issue fixed | Unknown feasibility regression reproduced then corrected |
 | Real multi-domain data adapters/grouped baselines | Three official sources grouped; Swissmetro/ESCI classical held-out benchmarks complete; Expedia benchmark pending | Swissmetro and ESCI source-bound four-role manifests audited; Expedia source-bound 399,344-search build passed. Source-specific classical metrics and denominators below. |
 | Differentiable d1 readout and training compatibility | Bounded remote check passed | Exact integrated commit `22707ed3`; one fixed A40 BF16 forward/backward, finite loss/gradients and reload parity. No optimizer step in this compatibility check. |
-| V2 SFT and direct calibration baselines | Preliminary two-domain SFT pilot completed; direct Brier C1 started, result pending | Pilot source `854de087`, 40 steps, private best adapter and selected-validation/paired-probe receipts below; C1 started at `f696437`, no result receipt yet. |
-| RLCD/GRPO experiments and DPO pairs | Stochastic report R0 started; outcomes pending | R0 started at `f696437` under a shared 1,800-second cap with C1; G0/G1/P0 not executed. |
+| V2 SFT and direct calibration baselines | Preliminary two-domain SFT pilot completed; direct Brier C1 completed with worse selected-validation loss | Pilot source `854de087`, 40 steps, private best adapter and selected-validation/paired-probe receipts below; C1 40-step continuation at `f696437`, best post-update loss 1.645953 versus start 1.581737; no held-out claim. |
+| RLCD/GRPO experiments and DPO pairs | Stochastic report R0 completed with worse selected-validation loss | R0 40-step continuation at `f696437`, best post-update loss 1.616376 versus start 1.581737; G0/G1/P0 not executed. |
 | Final model, held-out evaluation and release | Exploratory paired probe measured; protected release evidence pending | Preliminary weights retained privately. Adapted pilot scored below base on Swissmetro accuracy and ESCI NDCG@10 on admitted held-out groups; no public v2 model or release claim. |
 
 ## Verification chronology
@@ -162,6 +162,19 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   This is a bounded exploratory probe, not the protected final release test;
   intervals, multi-seed, calibration and entire-held-out-domain transfer remain
   pending.
+
+- Matched C1 direct Brier and R0 Dirichlet-REINFORCE continuations completed at
+  source `f69643794a932b14dac46b2e866667f5a7814bc4`, matched archive SHA
+  `15d4e0ef890f3691aa12423718dc1bfc83edeb02843fb66ad3b14d94d150836e`.
+  Both made 40 optimizer updates on the same schedule and selected best
+  **post-update** checkpoint at step 10; step 0 was excluded by design. Shared
+  starting selection-validation macro loss was 1.5817367; C1's best was
+  1.6459532 and R0's 1.6163764. Both are worse than the start. R0's smaller
+  degradation than C1 is not an improvement. This is selection-validation
+  evidence, not held-out test or release efficacy. The
+  [sanitized receipt](../../reports/runs/v2-continuation-20261019/summary.json)
+  has SHA-256 `cc686cf66ee3d7daa777ecc8b3c1ccaedda5d546da96107ad1f18ea0bf055cc5`;
+  cloud and private-retention readbacks were pending at this ledger update.
 
 No local workload was executed. The integrated suite proves source behavior,
 not real-data neural efficacy or release readiness. Initial GitHub CPU runs were superseded by the
