@@ -40,7 +40,10 @@ def iter_episodes(path: Path, policy: dict) -> Iterator[DecisionEpisode]:
             for row in reader:
                 profile["raw_rows"] += 1
                 profile["selected_rows"] += 1
-                yield row
+                # Keep only the approved dictionary/exposure/label columns in
+                # the disk spool; the competition CSV has many large excluded
+                # competitor/history fields.
+                yield {name: row[name] for name in required}
         with grouped_rows(counted_rows(), group_key="srch_id", row_key="prop_id", temp_dir=policy.get("temp_dir")) as groups:
             for group_id, rows in groups:
                 first = rows[0]
