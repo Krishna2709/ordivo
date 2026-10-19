@@ -176,6 +176,7 @@ def run(pilot_config_path: Path, pilot_output: Path, eval_config_path: Path, out
     from peft import PeftModel
 
     all_rendered, source_meta, excluded = {}, {}, {}
+    output.parent.mkdir(parents=True, exist_ok=True)
     output.mkdir()
     try:
         tokenizer = AutoTokenizer.from_pretrained(MODEL, revision=REVISION)
