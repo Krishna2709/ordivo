@@ -276,7 +276,7 @@ illustrative S0 request was not rerun with S0b.
 ## Operations closeout
 
 The final [W&B research audit](https://wandb.ai/black-order/liquid-mcdm-lab/runs/mohpt86v)
-finished with 37 sanitized metrics, including the last 255/0 source suite,
+logged 37 sanitized metrics and read back key cloud summary values, including the last 255/0 source suite,
 50 scored ESCI S0b held-out queries and 20 ESCI order pairs. Its metadata
 receipt SHA-256 is
 `00739d7dbbdcb5a7f2d2bb56dbf86d9328b3179c1d728308d7c0903c09513ecb`.
