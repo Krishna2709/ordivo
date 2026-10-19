@@ -1,8 +1,9 @@
-# Announcement draft: Liquid MCDM d1-3B LoRA
+# Announcement draft: Ordivo v1 — Neural Decision Intelligence Model
 
-We are releasing Liquid MCDM Lab: a reproducible experiment that teaches
-LiquidAI/d1-3B to imitate four exact multi-criteria decision methods—COPRAS,
-WASPAS, VIKOR, and TOPSIS—from structured decision episodes.
+We are releasing **Ordivo v1**, the first version of our Neural Decision
+Intelligence Model. It is a reproducible experiment that teaches LiquidAI/d1-3B
+to imitate four exact multi-criteria decision methods—COPRAS, WASPAS, VIKOR,
+and TOPSIS—from structured decision episodes.
 
 The release includes:
 
@@ -23,8 +24,8 @@ decision quality.
 
 Links:
 
-- Code: https://github.com/Krishna2709/liquid-mcdm-lab
+- Code: https://github.com/Krishna2709/ordivo-neural-decision-intelligence-model
 - Dataset: https://huggingface.co/datasets/blackOrder/liquid-mcdm-synthetic
-- Model: https://huggingface.co/blackOrder/d1-3b-mcdm-lora
+- Model: https://huggingface.co/blackOrder/Ordivo-v1
 - W&B release run: https://wandb.ai/black-order/liquid-mcdm-lab/runs/4vblgw80
 - Experiment report: `reports/experiment_report.html`

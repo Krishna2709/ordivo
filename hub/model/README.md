@@ -8,6 +8,8 @@ datasets:
 - blackOrder/liquid-mcdm-synthetic
 pipeline_tag: text-generation
 tags:
+- ordivo
+- neural-decision-intelligence
 - decision-model
 - mcdm
 - peft
@@ -18,10 +20,11 @@ tags:
 - topsis
 ---
 
-# d1-3B MCDM LoRA
+# Ordivo v1 — Neural Decision Intelligence Model
 
-PEFT LoRA adapter for single-choice imitation of COPRAS, WASPAS, VIKOR, and
-TOPSIS decision episodes. It is trained from
+Ordivo v1 is the first public model release: a PEFT LoRA adapter for
+single-choice imitation of COPRAS, WASPAS, VIKOR, and TOPSIS decision episodes.
+It is trained from
 [`LiquidAI/d1-3B`](https://huggingface.co/LiquidAI/d1-3B) at immutable revision
 `051bcc464b01b9f92942b364d9586b0ef5912432`.
 
@@ -134,7 +137,7 @@ python -m pip install \
   "peft==0.21.2" \
   "accelerate==1.15.0" \
   "safetensors==0.8.0" \
-  "git+https://github.com/Krishna2709/liquid-mcdm-lab.git@v0.1.0"
+  "git+https://github.com/Krishna2709/ordivo-neural-decision-intelligence-model.git@v0.1.0"
 ```
 
 After defining `decision` as above:
@@ -149,7 +152,7 @@ from liquid_mcdm.training.rendering import decision_input, option_probabilities
 
 BASE_MODEL = "LiquidAI/d1-3B"
 BASE_REVISION = "051bcc464b01b9f92942b364d9586b0ef5912432"
-ADAPTER = "blackOrder/d1-3b-mcdm-lora"
+ADAPTER = "blackOrder/Ordivo-v1"
 
 tokenizer = AutoTokenizer.from_pretrained(
     BASE_MODEL,
@@ -215,7 +218,7 @@ Small floating-point differences are possible across GPU and software stacks.
 The output is one winning alternative and a probability distribution over the
 provided alternatives; it is not a complete ranking. The probabilities are
 not calibrated confidence scores. The exact recorded row is available in the
-[release prediction evidence](https://huggingface.co/blackOrder/d1-3b-mcdm-lora/blob/main/evidence/prediction_rows.json).
+[release prediction evidence](https://huggingface.co/blackOrder/Ordivo-v1/blob/main/evidence/prediction_rows.json).
 
 ## Evaluation scope
 

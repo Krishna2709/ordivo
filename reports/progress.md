@@ -53,9 +53,9 @@ probability parity.
 
 ## Publication and tracking
 
-- Source and small receipts: https://github.com/Krishna2709/liquid-mcdm-lab
+- Source and small receipts: https://github.com/Krishna2709/ordivo-neural-decision-intelligence-model
 - Dataset: https://huggingface.co/datasets/blackOrder/liquid-mcdm-synthetic
-- Adapter and evaluation evidence: https://huggingface.co/blackOrder/d1-3b-mcdm-lora
+- Adapter and evaluation evidence: https://huggingface.co/blackOrder/Ordivo-v1
 - First W&B telemetry run: https://wandb.ai/liquid-mcdm-lab/runs/56i7klyd
 - Release W&B run: https://wandb.ai/black-order/liquid-mcdm-lab/runs/4vblgw80
 

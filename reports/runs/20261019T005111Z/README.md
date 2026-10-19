@@ -14,7 +14,7 @@ from Runpod to Hugging Face and were never copied to the local machine.
   delta 0.02147.
 - W&B: https://wandb.ai/black-order/liquid-mcdm-lab/runs/4vblgw80
 - Dataset: https://huggingface.co/datasets/blackOrder/liquid-mcdm-synthetic
-- Model: https://huggingface.co/blackOrder/d1-3b-mcdm-lora
+- Model: https://huggingface.co/blackOrder/Ordivo-v1
 - Cleanup: the pod cost an estimated $0.35 for 0.5978 hours; the pod and
   network volume were deleted and verified absent.
 

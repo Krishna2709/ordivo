@@ -1,10 +1,10 @@
-# Model card draft — bounded d1-3B LoRA adapter
+# Model card draft — Ordivo v1
 
 Base candidate: LiquidAI/d1-3B, revision 051bcc464b01b9f92942b364d9586b0ef5912432.
 Task: single-choice imitation of specified MCDM teachers on synthetic positive-valued matrices.
 Status: release run `20261019T005111Z` completed 400 LoRA steps on 512
 synthetic examples using an NVIDIA A40 and passed full evaluation and reload
-acceptance. The adapter is published at `blackOrder/d1-3b-mcdm-lora`; its exact
+acceptance. The adapter is published at `blackOrder/Ordivo-v1`; its exact
 file hashes are recorded in the Hugging Face publication receipt.
 
 Training: official Liquid TRL/PEFT text-only prompt/completion recipe for

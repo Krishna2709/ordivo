@@ -133,7 +133,7 @@ def main():
     parser.add_argument('--data', type=Path, required=True)
     parser.add_argument('--training', type=Path, required=True)
     parser.add_argument('--source-root', type=Path, required=True)
-    parser.add_argument('--model-repo', default='blackOrder/d1-3b-mcdm-lora')
+    parser.add_argument('--model-repo', default='blackOrder/Ordivo-v1')
     parser.add_argument('--dataset-repo', default='blackOrder/liquid-mcdm-synthetic')
     parser.add_argument('--receipt', type=Path, required=True)
     args = parser.parse_args()

@@ -1,14 +1,18 @@
-# Liquid MCDM Lab
+# Ordivo — Neural Decision Intelligence Model
 
-Research prototype for exact COPRAS/WASPAS/VIKOR/TOPSIS teachers and Liquid d1 winner prediction. **All workloads run remotely.** This local workspace is for source and documentation editing only; do not install packages, generate data, run tests or download models locally.
+Ordivo is a neural decision intelligence model for exact
+COPRAS/WASPAS/VIKOR/TOPSIS teacher imitation and Liquid d1 winner prediction.
+This first model release is **Ordivo v1**. **All workloads run remotely.** This
+local workspace is for source and documentation editing only; do not install
+packages, generate data, run tests or download models locally.
 
 The release run `20261019T005111Z` trained a d1-3B LoRA adapter for 400 steps on a remote A40 after a 130-test CPU acceptance suite. Across all 87 eligible held-out episodes, accuracy improved from 28.74% to 58.62%; on the original 16-episode comparison slice it improved from 37.5% to 75.0%. The published adapter, dataset, source, complete evaluation evidence, and W&B telemetry are linked below. [de01.ipynb](de01.ipynb) remains the Colab alternative, and the [Hugging Face Jobs runbook](docs/huggingface_jobs.md) remains available.
 
 Public release destinations:
 
-- Source and experiment report: https://github.com/Krishna2709/liquid-mcdm-lab
+- Source and experiment report: https://github.com/Krishna2709/ordivo-neural-decision-intelligence-model
 - Synthetic dataset: https://huggingface.co/datasets/blackOrder/liquid-mcdm-synthetic
-- LoRA adapter: https://huggingface.co/blackOrder/d1-3b-mcdm-lora
+- Ordivo v1 adapter: https://huggingface.co/blackOrder/Ordivo-v1
 - Release experiment: https://wandb.ai/black-order/liquid-mcdm-lab/runs/4vblgw80
 
 ## What is implemented
@@ -122,7 +126,7 @@ python -m pip install \
   "peft==0.21.2" \
   "accelerate==1.15.0" \
   "safetensors==0.8.0" \
-  "git+https://github.com/Krishna2709/liquid-mcdm-lab.git@v0.1.0"
+  "git+https://github.com/Krishna2709/ordivo-neural-decision-intelligence-model.git@v0.1.0"
 ```
 
 After defining `decision` as above:
@@ -137,7 +141,7 @@ from liquid_mcdm.training.rendering import decision_input, option_probabilities
 
 BASE_MODEL = "LiquidAI/d1-3B"
 BASE_REVISION = "051bcc464b01b9f92942b364d9586b0ef5912432"
-ADAPTER = "blackOrder/d1-3b-mcdm-lora"
+ADAPTER = "blackOrder/Ordivo-v1"
 
 tokenizer = AutoTokenizer.from_pretrained(
     BASE_MODEL,
@@ -203,7 +207,7 @@ Small floating-point differences are possible across GPU and software stacks.
 The output is one winning alternative and a probability distribution over the
 provided alternatives; it is not a complete ranking. The probabilities are
 not calibrated confidence scores. The exact recorded row is available in the
-[release prediction evidence](https://huggingface.co/blackOrder/d1-3b-mcdm-lora/blob/main/evidence/prediction_rows.json).
+[release prediction evidence](https://huggingface.co/blackOrder/Ordivo-v1/blob/main/evidence/prediction_rows.json).
 
 ## Transfer source to your connected Colab runtime
 

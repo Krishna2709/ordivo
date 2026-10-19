@@ -1,6 +1,6 @@
 ---
 license: cc-by-4.0
-pretty_name: Liquid MCDM Synthetic Decision Episodes
+pretty_name: Ordivo Synthetic Decision Episodes
 task_categories:
 - multiple-choice
 - text-ranking
@@ -23,7 +23,7 @@ configs:
     path: test.jsonl
 ---
 
-# Liquid MCDM Synthetic Decision Episodes
+# Ordivo Synthetic Decision Episodes
 
 A deterministic synthetic benchmark for single-choice imitation of four exact
 multi-criteria decision-making algorithms: COPRAS, WASPAS, VIKOR, and TOPSIS.
@@ -52,7 +52,7 @@ The manifest SHA-256 used by release run `20261019T005111Z` is
 - Test robustness across criteria counts, alternative counts, directions,
   scales, weighting schemes, near ties, and held-out scenario families.
 - Reproduce solver, prompt, and model experiments from
-  https://github.com/Krishna2709/liquid-mcdm-lab.
+  https://github.com/Krishna2709/ordivo-neural-decision-intelligence-model.
 
 ## Limitations
 

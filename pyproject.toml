@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "liquid-mcdm-lab"
 version = "0.1.0"
-description = "Reproducible exact MCDM teachers and decision-model research"
+description = "Ordivo v1 neural decision intelligence research and exact MCDM teachers"
 requires-python = ">=3.11,<3.14"
 dependencies = ["numpy==2.2.6", "PyYAML==6.0.2"]
 
