@@ -53,6 +53,16 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   diagnostic is not a model failure or a new zero-skip result. Receipts:
   `v2-swarm-20261019T030009Z/full_suite_bd248`,
   `candidate_predictor_tests_bd248_retry`, and `candidate_direct_green_a19d`.
+- A later full integrated source suite at exact `5b14f0d` passed 254 tests,
+  zero skips, with the verified pinned `.cache/d1-tokenizer` setup. Source
+  archive SHA-256:
+  `0a40a57fde6e4b3d81a7f87becc53cbba54280d826228e7ec9308680fc920bab`.
+  This supersedes the fresh-archive three-skip diagnostic as the current
+  integrated source check; neither result measures model efficacy.
+- S0b three-source supervised follow-up is configured for 90 updates,
+  6,144-token complete-group cap, learning rate 3e-5, 900-second cap and
+  training-only candidate shuffle. It has no executed result in this ledger
+  yet; validation/test and private retention claims await remote receipts.
 - V2 behavioral data reviewer-fix tests at `2f417cbe28e77e7303d3c7fbfdf3d3d80bcf720f`
   passed 19/0 on the remote pod. Release-report source tests at `178d1fd4`
   passed 7/0. These are component tests, not real-data performance evidence.
