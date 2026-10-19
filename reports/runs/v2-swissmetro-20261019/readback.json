@@ -1,0 +1,7 @@
+{
+  "task": "swiss_baseline",
+  "code_commit": "9c532d98050e40ab3c9056e0bec1eeace123ccef",
+  "remote_sha256": "6c7bd9fbbc8d53ecdaccd75f79a9d5e9a1369cd528a44ce91ec64dbc67c711b6",
+  "local_sha256": "6c7bd9fbbc8d53ecdaccd75f79a9d5e9a1369cd528a44ce91ec64dbc67c711b6",
+  "extraction": "JSON parsed from remote SSH readback, serialized locally with sorted keys and indentation"
+}
