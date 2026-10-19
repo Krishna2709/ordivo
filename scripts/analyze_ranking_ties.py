@@ -27,7 +27,9 @@ def analyze(data: Path, baseline_dir: Path, output: Path) -> dict:
     output = Path(output).resolve()
     if Path("/workspace") not in output.parents or output.exists():
         raise ValueError("new remote /workspace output required")
-    aggregate = json.loads((baseline_dir / "aggregate.json").read_text())
+    aggregate_path = baseline_dir / "aggregate.json"
+    aggregate_sha256 = _hash(aggregate_path)
+    aggregate = json.loads(aggregate_path.read_text())
     manifest_path, test_path = data / "manifest.json", data / "test.jsonl"
     manifest = json.loads(manifest_path.read_text())
     if (_hash(manifest_path) != aggregate["manifest_sha256"] or
@@ -75,6 +77,7 @@ def analyze(data: Path, baseline_dir: Path, output: Path) -> dict:
                            "scores_sha256": _hash(scores_path)}
     report = {"schema_version": "ordivo-tie-analysis-v1", "code_revision": commit,
               "baseline_code_revision": aggregate["code_revision"],
+              "baseline_aggregate_sha256": aggregate_sha256,
               "manifest_sha256": aggregate["manifest_sha256"],
               "method": "exact_uniform_permutation_within_equal_score_blocks",
               "by_model": by_model}
