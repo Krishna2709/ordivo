@@ -96,3 +96,4 @@ def test_stated_choice_uses_available_candidates_only():
     e["alternatives"][1]["available"] = False
     report = evaluate_ranking([e], {e["episode_id"]: {"a": 1}})
     assert report["per_query"][0]["metrics"]["choice_accuracy@1"] == 1
+    assert report["estimand"] == "choice_among_available_survey_modes"

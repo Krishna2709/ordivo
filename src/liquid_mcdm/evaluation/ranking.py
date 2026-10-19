@@ -31,6 +31,17 @@ def _macro(rows: list[dict], field: str) -> dict:
             "eligible": len(eligible), "excluded_zero_ideal_gain": len(values) - len(eligible)}
 
 
+def _estimand(rows: list[dict]) -> str:
+    names = {("observed_choice", "expedia_personalized_sort_2013"):
+             "ranking_within_exposed_hotel_search_candidates",
+             ("graded_relevance", "amazon_esci"):
+             "ranking_within_judged_task1_reduced_candidates",
+             ("stated_choice", "swissmetro"):
+             "choice_among_available_survey_modes"}
+    keys = {(row["task_type"], row["source"]) for row in rows}
+    return names.get(next(iter(keys)), "task_specific_candidate_pool_metrics") if len(keys) == 1 else "task_specific_candidate_pool_metrics"
+
+
 def evaluate_ranking(episodes: Iterable[Mapping], predictions: Mapping[str, Mapping[str, float]],
                      policy: Mapping | None = None) -> dict:
     """Evaluate all expected episodes; fail the whole call on missing/extra scores.
@@ -99,6 +110,6 @@ def evaluate_ranking(episodes: Iterable[Mapping], predictions: Mapping[str, Mapp
             "macro": {field: _macro(group, field) for field in fields}}
     return {"schema_version": "ordivo-ranking-eval-v1", "expected_queries": len(episodes),
             "scored_queries": len(rows), "failed_queries": 0, "missing_predictions": [],
-            "estimand": "ranking_within_observed_judged_candidate_pool",
+            "estimand": _estimand(rows),
             "prediction_tie_break": "canonical_candidate_id_ascending",
             "per_query": rows, "by_source_task_policy": slices}
