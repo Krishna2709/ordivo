@@ -88,8 +88,9 @@ def _check_proposal(proposal, report, names):
         candidate = proposal['decision']
         if candidate is not None and (not isinstance(candidate, str) or candidate not in names):
             raise ValueError('proposal decision must identify an alternative or be null')
+        feasibility = report['feasibility'].get(candidate)
         checks['constraints_satisfied'] = (
-            report['feasibility'][candidate] == 'feasible' if candidate is not None else None)
+            feasibility == 'feasible' if feasibility in ('feasible', 'infeasible') else None)
         checks['decision_verified'] = candidate == report['decision'] if complete else None
     if 'scores' in proposal:
         scores = proposal['scores']

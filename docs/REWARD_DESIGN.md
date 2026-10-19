@@ -60,7 +60,7 @@ zero-variance group fraction, invalid actions, reward distribution, clipping,
 KL, entropy, gradients, and generated token counts. All-zero reward groups are
 a diagnostic, never evidence that learning worked.
 
-References: [proper scoring rules, Gneiting & Raftery](https://sites.stat.washington.edu/raftery/Research/PDF/Gneiting2007jasa.pdf),
+References: [proper scoring rules, Gneiting & Raftery](https://sites.stat.washington.edu/people/raftery/Research/PDF/Gneiting2007jasa.pdf),
 [DeepSeekMath](https://arxiv.org/abs/2402.03300),
 [TRL GRPO](https://huggingface.co/docs/trl/grpo_trainer).
 
