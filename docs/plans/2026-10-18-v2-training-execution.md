@@ -29,6 +29,10 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
 - New RunPod A40 control replay at base `ddab9c4` exited 0 with zero skips after
   a pinned-tokenizer setup; this verifies the base suite, not integration of
   the v2 worker branches. Receipt: `v2-swarm-20261019T030009Z/baseline155_zero_skip`.
+- Integrated research source suite at exact `22707ed34fd125e96aade9123f9baaf34cd64a18`
+  passed 221 tests with zero skips on RunPod A40; source archive SHA-256
+  `4ec592756c7346dbbfd1df3ab2ecb4c77e4e3072975f2b0ceb080da0e3ad7a2c`
+  matched remotely. Receipt: `v2-swarm-20261019T030009Z/final_suite_22707`.
 - V2 behavioral data reviewer-fix tests at `2f417cbe28e77e7303d3c7fbfdf3d3d80bcf720f`
   passed 19/0 on the remote pod. Release-report source tests at `178d1fd4`
   passed 7/0. These are component tests, not real-data performance evidence.
@@ -51,8 +55,15 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   preserve the result. Source file SHA, split-manifest SHA and denominators were
   checked against the persisted remote task receipt.
 - Official Expedia `DownloadDataFile` returned HTTP 403 after file-list access;
-  no training rows were acquired and the cause is not established. Receipt:
+  no training rows were acquired at that point and the cause was not established. Receipt:
   `v2-swarm-20261019T030009Z/expedia_diagnostic`.
+- After the user confirmed applicable rules, an official Expedia archive was
+  acquired: 434,573,097 bytes, SHA-256
+  `f16b9622a73c015e2693284a5939a82817417f23f284bfd69081f1f35cdd0602`.
+  Python `zipfile` cannot extract its Deflate64 CSV members. A versioned
+  streaming extraction fix is in progress; no grouped Expedia manifest or
+  benchmark exists yet. [Archive inventory](../../reports/runs/v2-expedia-20261019/inventory.json)
+  is path-redacted metadata only.
 - Official Amazon ESCI Task 1 acquisition/build at `b352c14` exited 0: 2,621,288
   example rows, 1,503,277 outside the reduced ranking pool omitted,
   1,118,011 candidate rows across 48,300 groups. Four partitions contain
@@ -85,11 +96,13 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   was read back with aggregate test/data and Swissmetro baseline telemetry;
   sanitized [cloud receipt](../../reports/runs/v2-wandb-20261019/readback.json)
   has SHA-256 `b5074afd5532054c7a1b06f080f2042cf7654c6389fb5b490876344aec244d7f`.
-  It is not a trained-model artifact. A Hugging Face v2 research repo exists
-  privately; no public v2 model has been created.
+  It is not a trained-model artifact. A private Hugging Face v2 research repo
+  contains 22 readback-verified allowlisted classical artifacts at private repo
+  commit `1a64f477f66413b25adad68b297c2cdcd4f5ba7e`; no public v2 model
+  or trained neural adapter has been created.
 
-No local workload was executed. The v2 worker branches have not yet passed a
-single integrated remote suite. Initial GitHub CPU runs were superseded by the
+No local workload was executed. The integrated suite proves source behavior,
+not real-data neural efficacy or release readiness. Initial GitHub CPU runs were superseded by the
 user's explicit RunPod instruction; GPU execution guards were never bypassed.
 
 ## Deferred review improvements
