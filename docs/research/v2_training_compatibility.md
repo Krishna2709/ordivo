@@ -89,3 +89,29 @@ masking, pinned readout agreement, and adapter save/reload agreement. The
 operations owner records actual package versions, runtime ID, costs and cleanup.
 No behavioral optimization pilot is authorized by this document; that requires
 data and baseline evidence reviewed by the root task owner.
+
+## Next RL interface proposal (unimplemented)
+
+After the supervised pilot has a reviewed receipt, an R0 probability-report
+experiment can use the same complete conditional-booking groups and frozen SFT
+start as direct Brier/NLL control C1. Let the d1 option scores produce `p` by
+the pinned masked MAX/softmax readout. Fix concentration `kappa` in the run
+config, sample a continuous report `r ~ Dirichlet(kappa * p)`, and use the exact
+Dirichlet `log_prob(r)` for a score-function gradient. The action is the full
+reported distribution, never a generated alias token. Reward is the declared
+unclipped multiclass negative Brier score `-sum_i(r_i - y_i)^2` for the one
+observed booked option among an eligible exactly-one-booking group. Use at
+least four independent reports per query, a detached leave-one-out reward
+baseline, and a separately reported analytic Dirichlet KL to the frozen SFT
+report policy. Record reward variance, zero-variance groups, entropy, KL,
+gradient norms and invalid reports. No TRL GRPO completion API is implied.
+
+This stochastic objective need not remain strictly proper for the mean `p` at
+finite `kappa`, because sampling adds report variance. Compare it with direct
+Brier/NLL C1 from the same SFT checkpoint, prompts, seed, selected train groups,
+optimizer-update budget, validation rule and artifact rights. Fit any final
+temperature only on the disjoint calibration split after model selection. Do
+not call the report-policy result a calibration gain without held-out NLL/Brier,
+ECE and ranking/coverage evidence. A separate G1 structured-action GRPO would
+require a real sequence-action log-probability adapter and its own reward
+variance and verifier audit; this proposal does not supply that interface.
