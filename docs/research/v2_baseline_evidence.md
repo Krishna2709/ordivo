@@ -64,10 +64,35 @@ Its time, cost and headway inputs are source fields, not invented weights.
 | Gate | Status |
 |---|---|
 | Source code and hand-authored tests | Present on the evaluation branch; remote execution pending. |
-| Independent remote metric tests | Pending exact commit and data-contract integration. |
-| Remote LightGBM save/reload parity | Pending dependency verification. |
+| Integrated remote suite | 214 tests, exit 0, no skips at integrated commit `9c532d98050e40ab3c9056e0bec1eeace123ccef`; controller archive SHA `4dd4793819f8d4507312894dbdbac9e510fc67d01afc6da7a6c292276f491838`. This includes evaluator fixtures and LightGBM save/reload parity fixture. |
+| Remote LightGBM save/reload parity | Fixture check included in the 214-test suite; real ESCI/Expedia model bundle pending. |
 | Real ESCI lexical and ranker results | Pending source acquisition, manifested dataset, remote run. |
 | Real Expedia baseline | Pending authenticated source access and terms record. |
-| Swissmetro stated-choice baseline | Runner/config ready; respondent-disjoint real manifest, remote tests and result pending. |
+| Swissmetro stated-choice baseline | Real 1,044-episode test run complete with full score coverage and model reload parity; figures and limits below. |
 
 Do not turn a fixture pass or a completed test process into a real-data result.
+
+## Swissmetro held-out stated-choice receipt
+
+The private sanitized aggregate was read back from the operations receipt for
+integrated commit `9c532d98050e40ab3c9056e0bec1eeace123ccef`. The grouped
+manifest SHA-256 is `028e5f2fc87cda849ca72213d8ba846fb00ac0784b7595e942f0644c1167b53a`;
+raw survey SHA-256 is `27432693cf052985d79a950b4b888be3efca798fc89b0d3ffefe40608ede00f2`.
+Respondent-disjoint split counts are train 8,532, model-selection validation
+549, unused calibration 594, and test 1,044. All 1,044 test situations were
+scored with zero failed queries and zero choice-metric exclusions. Conditional
+logit saved/reloaded validation scores matched. Per-query scores remain under
+the remote `/workspace/ordivo-v2-data/baselines/swissmetro-9c532d/` directory.
+
+| Baseline | Held-out accuracy@1 | Eligible |
+|---|---:|---:|
+| Conditional logit | 0.624521 | 1,044 |
+| Travel time ascending | 0.636973 | 1,044 |
+| Cost ascending | 0.281609 | 1,044 |
+| Seeded random score | 0.359195 | 1,044 |
+
+The simple travel-time heuristic is numerically ahead of this fitted control
+on this split. No uncertainty interval or causal interpretation has been
+computed. The source terms field points to Biogeme's site but redistribution
+rights have not been established; keep model/per-query artifacts private and
+do not promote a public efficacy claim from this receipt.
