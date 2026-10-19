@@ -23,7 +23,8 @@ fits only a fourth, disjoint calibration partition for an explicitly named
 event; SFT/early-stop validation and final test cannot enter the fitting function.
 The fitting API reads all four frozen split files, checks hashes and group
 disjointness against the manifest, verifies the selected calibration group IDs,
-and records their digest. Applying the temperature requires the same event,
+requires the full eligible calibration population, and records its digest.
+Applying the temperature requires the same event,
 candidate-population protocol, and manifest hash. Accepted events are
 `conditional_booking_choice` (only among exposed, eligible, exactly-one-booking
 groups) and `stated_choice`. Graded relevance is not a choice event.
