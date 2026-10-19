@@ -59,6 +59,21 @@ def test_expedia_rejects_duplicate_and_conflicting_context(tmp_path):
         list(expedia.iter_episodes(path, {"temp_dir": tmp_path}))
 
 
+def test_expedia_official_null_sentinel_is_missing_not_zero(tmp_path):
+    path = tmp_path / "expedia_null.csv"
+    rows = [expedia_row("1", "a"), expedia_row("1", "b")]
+    rows[0]["prop_review_score"] = "NULL"
+    rows[1]["prop_location_score2"] = " NULL "
+    rows[0]["srch_children_count"] = "NULL"
+    rows[1]["srch_children_count"] = "NULL"
+    write_csv(path, rows)
+    episode = list(expedia.iter_episodes(path, {"temp_dir": tmp_path}))[0]
+    assert episode["context"]["srch_children_count"] is None
+    assert episode["alternatives"][0]["features"]["prop_review_score"] is None
+    assert episode["alternatives"][1]["features"]["prop_location_score2"] is None
+    assert episode["alternatives"][1]["features"]["prop_review_score"] == 0
+
+
 def test_failed_materialization_leaves_no_dataset(tmp_path):
     path = tmp_path / "bad.csv"
     rows = [expedia_row("1", "a"), expedia_row("1", "b")]
