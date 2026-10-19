@@ -51,6 +51,8 @@ def test_temperature_fit_is_manifest_bound(tmp_path):
             fitted.apply(scores, **kwargs)
     with pytest.raises(ValueError, match='calibration split'):
         fit_temperature(scores, target, evidence=evidence, group_ids=['s:c', 's:e'])
+    with pytest.raises(ValueError, match='full eligible calibration population'):
+        fit_temperature(scores[:1], target[:1], evidence=evidence, group_ids=['s:c'])
     with pytest.raises(ValueError, match='unavailable'):
         fit_temperature(scores, torch.tensor([2, 0]), evidence=evidence,
                         group_ids=['s:c', 's:d'])
