@@ -20,6 +20,14 @@ from liquid_mcdm.training.option_policy import option_logits
 
 MODEL = 'LiquidAI/d1-3B'
 REVISION = '051bcc464b01b9f92942b364d9586b0ef5912432'
+SOURCE_CONTRACTS = {
+    'expedia_personalized_sort_2013': ('expedia-2013-split-v2-calibration',
+                                       'source_exposed_candidates', 'expedia-click-booking-v1'),
+    'amazon_esci': ('esci-official-train-test-v2-calibration',
+                    'source_task1_reduced_candidate_list', 'esci-task1-official-gain-v1'),
+    'swissmetro': ('swissmetro-respondent-v2-calibration',
+                   'three_survey_modes', 'swissmetro-choice-v1'),
+}
 
 
 def _source_identity():
@@ -43,6 +51,18 @@ def _unit(row):
     return f"{row['source']}:{row['supervision'].get('respondent_id', row['group_id'])}"
 
 
+def _validate_source_specs(specs):
+    names = [spec.get('name') for spec in specs]
+    sources = [spec.get('expected_source') for spec in specs]
+    directories = [str(Path(spec['directory']).resolve()) for spec in specs]
+    if len(specs) < 2 or len(set(names)) != len(names) or any(not name for name in names):
+        raise ValueError('shared pilot needs distinct named domains')
+    if len(set(sources)) != len(sources) or any(source not in SOURCE_CONTRACTS for source in sources):
+        raise ValueError('shared pilot needs distinct canonical domains')
+    if len(set(directories)) != len(directories):
+        raise ValueError('duplicate source manifest directory')
+
+
 def _load_source(spec, *, seed, max_train_groups, max_validation_groups, deadline):
     if (not isinstance(max_train_groups, int) or not 1 <= max_train_groups <= 1000 or
             not isinstance(max_validation_groups, int) or not 1 <= max_validation_groups <= 100):
@@ -50,6 +70,12 @@ def _load_source(spec, *, seed, max_train_groups, max_validation_groups, deadlin
     directory = Path(spec['directory'])
     manifest_bytes = (directory / 'manifest.json').read_bytes()
     manifest = json.loads(manifest_bytes)
+    expected_source = spec['expected_source']
+    expected = SOURCE_CONTRACTS.get(expected_source)
+    if expected is None or (manifest.get('source'), manifest.get('split_policy_id'),
+                            manifest.get('candidate_pool_scope'), manifest.get('target_policy_id')) != (
+                                expected_source, *expected):
+        raise ValueError('manifest source contract differs from pilot spec')
     if set(manifest['split_sha256']) != {'train', 'validation', 'calibration', 'test'}:
         raise ValueError('four-way frozen split manifest required')
     counts = {}
@@ -69,6 +95,8 @@ def _load_source(spec, *, seed, max_train_groups, max_validation_groups, deadlin
                         if not line.strip():
                             continue
                         row = json.loads(line)
+                        if row.get('source') != expected_source:
+                            raise ValueError('row source contract differs from pilot spec')
                         unit = _unit(row)
                         selector = hashlib.sha256(
                             f"{seed}|{spec['name']}|{split}|{unit}".encode()).digest()
@@ -110,6 +138,8 @@ def _load_source(spec, *, seed, max_train_groups, max_validation_groups, deadlin
                     raise TimeoutError('pilot time cap reached during subset loading')
                 if line.strip():
                     row = json.loads(line)
+                    if row.get('source') != expected_source:
+                        raise ValueError('row source contract differs from pilot spec')
                     if _unit(row) in selected[split]:
                         rows[split].append(row)
                         if len(rows[split]) > 5 * (max_train_groups if split == 'train' else max_validation_groups):
@@ -242,8 +272,7 @@ def run(config_path, output):
     if not (1 <= config['validation_interval'] <= config['max_steps']):
         raise ValueError('invalid validation interval')
     specs = config['sources']
-    if len(specs) < 2 or len({spec['name'] for spec in specs}) != len(specs):
-        raise ValueError('shared pilot needs at least two named domains')
+    _validate_source_specs(specs)
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
     started = time.monotonic()
@@ -251,11 +280,15 @@ def run(config_path, output):
     torch.manual_seed(config['seed'])
     tokenizer = AutoTokenizer.from_pretrained(MODEL, revision=REVISION)
     training, validation, provenance = {}, {}, {}
+    seen_manifest_hashes = set()
     for spec in specs:
         rows, source_info = _load_source(
             spec, seed=config['seed'], max_train_groups=config.get('max_train_groups', 1000),
             max_validation_groups=config.get('max_validation_groups', 100),
             deadline=started + config['max_runtime_seconds'])
+        if source_info['manifest_sha256'] in seen_manifest_hashes:
+            raise ValueError('duplicate source manifest across domains')
+        seen_manifest_hashes.add(source_info['manifest_sha256'])
         (output / f"selected_ids_{spec['name']}.json").write_text(
             json.dumps(source_info.pop('selected_unit_ids'), indent=2) + '\n')
         if (spec['feature_policy'].get('prediction_event') == 'conditional_booking_choice' and
@@ -271,6 +304,7 @@ def run(config_path, output):
         if time.monotonic() > started + config['max_runtime_seconds']:
             raise TimeoutError('pilot time cap reached before model load')
         provenance[spec['name']] = {**source_info,
+                                    'canonical_source': spec['expected_source'],
                                     'feature_policy': spec['feature_policy'],
                                     'selected_train_episodes': len(rows['train']),
                                     'selected_validation_episodes': len(rows['validation']),

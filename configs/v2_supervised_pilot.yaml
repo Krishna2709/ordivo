@@ -19,12 +19,14 @@ lora:
   target_modules: [q_proj, k_proj, v_proj, out_proj, in_proj, w1, w2, w3]
 sources:
   - name: expedia
+    expected_source: expedia_personalized_sort_2013
     directory: /workspace/data/expedia-frozen
     feature_policy:
       context_features: [srch_length_of_stay]
       alternative_features: [price_usd, prop_review_score]
       prediction_event: conditional_booking_choice
   - name: esci
+    expected_source: amazon_esci
     directory: /workspace/data/esci-frozen
     feature_policy:
       context_features: [query, locale]
