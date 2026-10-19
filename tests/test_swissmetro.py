@@ -2,7 +2,7 @@ import csv
 
 import pytest
 
-from liquid_mcdm.data.grouped import assign_split
+from liquid_mcdm.data.grouped import assign_split, write_dataset
 from liquid_mcdm.data.swissmetro import iter_episodes
 
 
@@ -25,6 +25,9 @@ def test_respondent_disjoint_and_availability(tmp_path):
     policy = {"split_policy_id": "swissmetro-respondent-v2-calibration"}
     splits = [assign_split(e["source"], e["supervision"]["respondent_id"], policy) for e in episodes]
     assert splits[0] == splits[1]
+    dataset_policy = {"split_policy_id": "swissmetro-respondent-v2-calibration", "source_files": {"survey": path}}
+    manifest = write_dataset(iter_episodes(path, dataset_policy), tmp_path / "processed", dataset_policy)
+    assert manifest["source_profile"] == {"raw_rows": 4, "selected_rows": 3, "omitted_by_reason": {"no_choice": 1}, "retained_rows": 3, "retained_groups": 3, "candidate_rows": 9}
     rows[0]["TRAIN_AV"] = "0"
     with path.open("w", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=rows[0], delimiter="\t")

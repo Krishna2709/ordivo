@@ -26,8 +26,11 @@ def fixture(kind="observed_choice"):
 def test_projection_has_no_labels_or_provenance(kind):
     episode = fixture(kind)
     validate_episode(episode)
-    projected = inference_input(episode, {"context_features": ["query"], "alternative_features": ["price"]})
-    assert set(projected) == {"task_type", "context", "criteria", "constraints", "preferences", "alternatives"}
+    policy = {"context_features": ["query"], "alternative_features": ["price"]}
+    if kind == "observed_choice":
+        policy["prediction_event"] = "combined_click_booking_relevance"
+    projected = inference_input(episode, policy)
+    assert set(projected) == ({"task_type", "context", "criteria", "constraints", "preferences", "alternatives"} | ({"prediction_event"} if kind == "observed_choice" else set()))
     assert set(projected["alternatives"][0]) == {"id", "features", "available"}
     assert projected["context"] == {"query": "shoes"}
     assert projected["alternatives"][0]["features"] == {"price": 2}
@@ -37,11 +40,26 @@ def test_projection_has_no_labels_or_provenance(kind):
 
 def test_rejects_forbidden_feature_request_and_nested_preference_leak():
     episode = fixture()
+    policy = {"context_features": ["query"], "alternative_features": ["price"], "prediction_event": "combined_click_booking_relevance"}
     with pytest.raises(ValueError):
-        inference_input(episode, {"context_features": ["position"], "alternative_features": ["price"]})
+        inference_input(episode, {**policy, "context_features": ["position"]})
     episode["preferences"] = {"source": "hidden"}
     with pytest.raises(ValueError):
-        inference_input(episode, {"context_features": ["query"], "alternative_features": ["price"]})
+        inference_input(episode, policy)
+
+
+def test_observed_event_is_explicit_and_not_derived_from_label():
+    episode = fixture()
+    policy = {"context_features": ["query"], "alternative_features": ["price"]}
+    with pytest.raises(ValueError, match="prediction_event"):
+        inference_input(episode, policy)
+    ranking = inference_input(episode, {**policy, "prediction_event": "combined_click_booking_relevance"})
+    with pytest.raises(ValueError, match="exactly one booking"):
+        inference_input(episode, {**policy, "prediction_event": "conditional_booking_choice"})
+    episode["supervision"]["outcomes_by_id"]["a"]["booking_bool"] = 1
+    choice = inference_input(episode, {**policy, "prediction_event": "conditional_booking_choice"})
+    assert ranking["prediction_event"] == "combined_click_booking_relevance"
+    assert choice["prediction_event"] == "conditional_booking_choice"
 
 
 @pytest.mark.parametrize("change", [
