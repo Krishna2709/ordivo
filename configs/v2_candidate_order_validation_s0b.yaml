@@ -1,0 +1,9 @@
+# S0b validation-only positional diagnostic; no checkpoint selection or test access.
+# Swissmetro and ESCI limits/seed match the first pilot's order diagnostic.
+seed: 42
+max_runtime_seconds: 1800
+max_selected_episodes_per_source: 250
+max_validation_units_per_source:
+  swissmetro: 20
+  esci: 20
+  expedia: 20
