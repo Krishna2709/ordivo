@@ -21,6 +21,8 @@ BIOGEME_REPO = "https://github.com/michelbierlaire/biogeme.git"
 ESCI_FILES = ("shopping_queries_dataset/shopping_queries_dataset_examples.parquet",
               "shopping_queries_dataset/shopping_queries_dataset_products.parquet")
 SWISSMETRO_FILE = "src/biogeme/data/data/swissmetro.dat"
+SUSHI_URL = "https://www.kamishima.net/asset/sushi3-2016.zip"
+SUSHI_MEMBERS = ("sushi3a.5000.10.order", "sushi3b.5000.10.order", "sushi3.idata", "sushi3.udata")
 
 
 def _run(*args: str, cwd: Path | None = None, env: dict | None = None) -> str:
@@ -78,6 +80,30 @@ def acquire_swissmetro(output: Path) -> dict:
         raise RuntimeError("Swissmetro download too small")
     return _record(output, "swissmetro", revision, [file], url,
                    "https://biogeme.epfl.ch/ (research/education data); verify dataset-specific redistribution terms")
+
+
+def acquire_sushi(output: Path) -> dict:
+    """Fetch only the author's corrected archive; keep it private on remote storage."""
+    output.mkdir(parents=True, exist_ok=False)
+    archive = output / "sushi3-2016.zip"
+    with urllib.request.urlopen(SUSHI_URL, timeout=90) as response, archive.open("wb") as handle:
+        for block in iter(lambda: response.read(1024 * 1024), b""):
+            handle.write(block)
+    files = []
+    with zipfile.ZipFile(archive) as zipped:
+        for basename in SUSHI_MEMBERS:
+            member = f"sushi3-2016/{basename}"
+            if member not in zipped.namelist():
+                raise RuntimeError(f"official SUSHI archive lacks {member}")
+            destination = output / basename
+            with zipped.open(member) as source, destination.open("wb") as target:
+                shutil.copyfileobj(source, target, length=1024 * 1024)
+            files.append(destination)
+    receipt = _record(output, "sushi3_2016", "2016-corrected-archive", [archive, *files],
+                      SUSHI_URL, "https://www.kamishima.net/sushi/ (research use; redistribution prohibited)")
+    receipt["acquisition_method"] = "official_author_site"
+    (output / "acquisition.json").write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n")
+    return receipt
 
 
 def acquire_expedia(output: Path, existing_archive: Path | None = None, expected_archive_sha256: str | None = None) -> dict:
@@ -138,7 +164,7 @@ def acquire_expedia(output: Path, existing_archive: Path | None = None, expected
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("source", choices=("esci", "swissmetro", "expedia", "build-esci", "build-swissmetro", "build-expedia"))
+    parser.add_argument("source", choices=("esci", "swissmetro", "expedia", "sushi", "build-esci", "build-swissmetro", "build-expedia", "build-sushi"))
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--input", type=Path, help="remote raw source file, or ESCI acquisition repo directory")
     parser.add_argument("--existing-archive", type=Path, help="already downloaded data.zip in --output; no download")
@@ -148,7 +174,7 @@ def main() -> None:
         if args.input is None:
             parser.error("--input required for build")
         from liquid_mcdm.data.grouped import write_dataset
-        from liquid_mcdm.data import esci, expedia, swissmetro
+        from liquid_mcdm.data import esci, expedia, swissmetro, sushi
         kind = args.source.removeprefix("build-")
         if kind == "esci":
             root = args.input
@@ -163,6 +189,14 @@ def main() -> None:
                       "candidate_pool_scope": "three_survey_modes", "judgment_policy": "one_stated_available_choice_per_survey_scenario",
                       "source_terms": "https://biogeme.epfl.ch/", "source_files": {"survey": args.input}}
             episodes = swissmetro.iter_episodes(args.input, policy)
+        elif kind == "sushi":
+            root = args.input
+            files = [root / name for name in SUSHI_MEMBERS]
+            policy = {"source": "sushi3_2016", "split_policy_id": "sushi3-2016-respondent-v1-calibration", "target_policy_id": "sushi3-2016-order-v1",
+                      "candidate_pool_scope": "original_ten_item_questionnaire_sets", "judgment_policy": "complete_strict_order_of_exposed_ten",
+                      "source_terms": "https://www.kamishima.net/sushi/ (research use; redistribution prohibited)",
+                      "source_files": dict(zip(("order_a", "order_b", "items", "respondents"), files))}
+            episodes = sushi.iter_episodes(*files, policy)
         else:
             policy = {"source": "expedia_personalized_sort_2013", "split_policy_id": "expedia-2013-split-v2-calibration", "target_policy_id": "expedia-click-booking-v1",
                       "candidate_pool_scope": "source_exposed_candidates", "judgment_policy": "complete_observed_click_booking_per_exposed_candidate",
@@ -172,7 +206,10 @@ def main() -> None:
         return
     if args.source == "expedia" and args.existing_archive and not args.expected_archive_sha256:
         parser.error("--expected-archive-sha256 required with --existing-archive")
-    manifest = acquire_esci(args.output) if args.source == "esci" else acquire_swissmetro(args.output) if args.source == "swissmetro" else acquire_expedia(args.output, args.existing_archive, args.expected_archive_sha256)
+    manifest = (acquire_esci(args.output) if args.source == "esci" else
+                acquire_swissmetro(args.output) if args.source == "swissmetro" else
+                acquire_sushi(args.output) if args.source == "sushi" else
+                acquire_expedia(args.output, args.existing_archive, args.expected_archive_sha256))
     print(json.dumps(manifest, sort_keys=True))
 
 

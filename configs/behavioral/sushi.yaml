@@ -1,0 +1,10 @@
+source: sushi3_2016
+split_policy_id: sushi3-2016-respondent-v1-calibration
+target_policy_id: sushi3-2016-order-v1
+candidate_pool_scope: original_ten_item_questionnaire_sets
+judgment_policy: complete_strict_order_of_exposed_ten
+context_features: []
+alternative_features: [item_name, style, major_group, minor_group, oiliness, eating_frequency, normalized_price, shop_availability]
+source_terms: https://www.kamishima.net/sushi/
+use_scope: research_evaluation_only
+public_redistribution: prohibited

@@ -31,7 +31,8 @@ position, randomization, provenance and respondent IDs are excluded. Missing
 values remain null. Weights remain null when they are unknown.
 
 The `candidate_pool_scope` is source-exposed candidates for Expedia, the source
-Task 1 reduced candidate list for ESCI, and three survey modes for Swissmetro.
+Task 1 reduced candidate list for ESCI, three survey modes for Swissmetro, and
+the original ten-item questionnaire sets for SUSHI.
 Complete source groups do **not** imply all products, hotels, or travel options
 that could have been retrieved or considered.
 
@@ -86,6 +87,8 @@ as test. Split assignment happens before target filtering or augmentation.
   by a separate stable query/locale hash to train, validation or calibration.
 - Swissmetro: hash respondent ID; all repeated scenarios for a respondent
   inherit one train/validation/calibration/test assignment.
+- SUSHI: hash actual respondent ID from row-aligned `.udata`; both A and B
+  ranking records for each respondent inherit one partition.
 
 Adapters spool arbitrary row order to a temporary SQLite table on disk, sort by
 source group and row identity, and only hold one completed group in Python
@@ -193,7 +196,18 @@ same frozen CSV is pending remote validation.
 For a third research/evaluation control, the [SUSHI author page](https://www.kamishima.net/sushi/)
 explicitly permits research use and prohibits redistribution. Its corrected
 `sushi3-2016.zip` archive and ranking order files support a respondent-disjoint
-explicit-ranking adapter; source inventory, adapter, and receipts are pending.
+explicit-ranking adapter. The official author archive was acquired only in the
+private remote scope: 222,176 bytes, SHA-256
+`4f8bbf3acd6f796cb3d0add6c73c394664982c57d3b48e75e92014e5278558a8`.
+The [sanitized structure audit](../../../ordivo-v2-operations/reports/runs/v2-swarm-20261019T030009Z/sushi-order-structure-audit.json)
+has SHA-256 `ed80f83514fe7312c0b192573a80c55849c600c82d59b499bdfbdde2a2d138f5`.
+It records 5,000 rows in each A/B order file, each a strict length-ten ranking;
+A has a ten-item universe and B a hundred-item universe. The row-aligned
+respondent file contains 5,000 distinct noncontiguous IDs, and the item file
+contains IDs 0–99. The ranking target is isolated in `ordered_groups`;
+alternatives are sorted by item ID so presentation order cannot leak the target.
+The corrected 2016 score-file bug does not affect `.order` files. Four-way
+materialization and scored evaluation remain pending.
 No raw/derived data may be redistributed, and derivative-weight rights remain
 unresolved, so SUSHI is excluded from neural training configuration.
 The [official MSLR page](https://www.microsoft.com/en-us/research/project/mslr/)
