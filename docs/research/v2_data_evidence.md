@@ -40,7 +40,7 @@ that could have been retrieved or considered.
 
 | Source | Primary reference | Labels and fields | Terms evidence | Status |
 |---|---|---|---|---|
-| Expedia Personalized Sort | [official Kaggle data dictionary](https://www.kaggle.com/c/expedia-personalized-sort/data) | `srch_id` search, `prop_id` hotel, click and booking flags; position and `random_bool` are exposure | [competition rules](https://www.kaggle.com/c/expedia-personalized-sort/rules) require account review | Official archive acquired after user accepted rules; four-way group build pending |
+| Expedia Personalized Sort | [official Kaggle data dictionary](https://www.kaggle.com/c/expedia-personalized-sort/data) | `srch_id` search, `prop_id` hotel, click and booking flags; position and `random_bool` are exposure | [competition rules](https://www.kaggle.com/c/expedia-personalized-sort/rules) require account review | Official archive and source-bound four-way materialization completed; see receipt below |
 | Amazon ESCI | [official Amazon Science repository](https://github.com/amazon-science/esci-data) | Task 1 uses `small_version=1`, E/S/C/I judgments, `split`, product join on `(product_locale, product_id)` | [Apache-2.0](https://github.com/amazon-science/esci-data/blob/main/LICENSE) and [NOTICE](https://github.com/amazon-science/esci-data/blob/main/NOTICE) | Official acquisition and source-bound four-way materialization completed; see receipt below |
 | Swissmetro | [official Biogeme source data](https://github.com/michelbierlaire/biogeme/blob/master/src/biogeme/data/data/swissmetro.dat) and [example loader](https://biogeme.epfl.ch/sphinx/_modules/biogeme/data/swissmetro.html) | Stated `CHOICE`, respondent `ID`, `TRAIN_AV`/`SM_AV`/`CAR_AV`, times/costs/headways; `CHOICE=0` excluded as in the example | [Biogeme data page](https://biogeme.epfl.ch/) makes data available for research and education; source-specific redistribution terms still require confirmation | Official acquisition and source-bound four-way materialization completed; see receipt below |
 
@@ -114,6 +114,17 @@ the four-way materialization. Authentication or a rules-denied response must
 be reported as a blocker; there is no mirror fallback. Raw source data and JSONL derived
 records remain in the approved remote storage scope.
 
+For reproducibility, retain the official Expedia `data.zip` and extracted
+`train.csv` with their acquisition receipt, the completed versioned four-way
+dataset and manifest, and the prior frozen baseline/source-bound datasets in
+private remote storage. Retain the ESCI and Swissmetro official raw files and
+source-bound outputs under their existing versioned paths as well. Sanitized
+hash/count receipts may be copied for review; raw rows, derived JSONL, and
+SUSHI source records must not be uploaded to public release artifacts. Keep
+the original archives and split files until baseline comparability and any
+later reinforcement-learning data needs have been separately resolved; no
+cleanup is authorized by this evidence note.
+
 ## Remaining evidence gates
 
 ### Executed source receipts (RunPod, 2026-10-19 UTC)
@@ -126,7 +137,23 @@ bytes, SHA-256 `84a53139ea92df1e9400f84852facbd78f3136f366a08440f4ab4518e71a49a9
 The sanitized acquisition receipt SHA-256 is
 `ad43012124f073b6b9ee925555a2b40c2b207638b4a9baea149c93ca90edcb44`.
 The competition's `test.csv` lacks outcomes and is not used for training or
-held-out metrics. Full group materialization is still pending.
+held-out metrics. The completed source-bound manifest at private remote path
+`/workspace/ordivo-v2-data/processed/expedia-source-bound-v2/manifest.json`
+has SHA-256 `3b14e3f30466a2da868ac636c8888bc42366f865737715a57a67f32866a02d92`.
+Its source profile reconciles 9,917,530 raw, selected, and retained candidate
+rows across 399,344 raw, selected, and retained search groups, with no
+omissions. The train/validation/calibration/test partitions contain
+319,714/19,739/20,040/39,851 groups. Their byte SHA-256 values are
+`84034a305d0ff5a80226c55e7cd8e9764fc1497576695c1580d00922da994e10`,
+`60248e91709aa7c3615f654eeb6d8954b09d923e30423d9ab7cc00fa2b6d9877`,
+`f601b23c3b3356e93afc781db9c760b9cc549772ad3fe79279494530cab9f9cb`,
+and `0cb2bde7ee0c912bf5c70a937b287a38c121fc2e9639ecb95d4f00bf268595b8`.
+The JSONL files total 2,475,946,949 bytes in private remote storage.
+Remote GREEN at code `919c67e494174f34d2436fa507e427b75fe866c2`
+passed 20 focused tests with no skips; the build at the same code exited zero.
+The manifest records 25,969 groups with multiple clicks and 122,751 with zero
+bookings. Group-integrity readback is pending; manifest conservation and split
+hashes alone are not scored held-out evaluation.
 
 The official ESCI acquisition pinned Amazon revision
 `7916cdf6ab75a462e77f20ab40428a10923998d5`; examples Parquet SHA-256
@@ -182,8 +209,8 @@ fields. The scan receipt is
 (SHA-256 `1d3fe19c4e011de2146f80c8d1cee647a3fc7761e5c19b215730b8255e3baade`).
 The adapter preserves these optional values as missing `null`, distinct from
 numeric zero, and rejects missing IDs or binary outcomes. The failed build
-left no finalized dataset under the atomic materializer; a rebuild from the
-same frozen CSV is pending remote validation.
+left no finalized dataset under the atomic materializer. The successful rebuild
+from the same frozen CSV reports exactly these two missing feature counts.
 
 For a third research/evaluation control, the [SUSHI author page](https://www.kamishima.net/sushi/)
 explicitly permits research use and prohibits redistribution. Its corrected
