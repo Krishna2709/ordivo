@@ -48,9 +48,9 @@ def _label(episode, ids, eligible, feature_policy):
                      supervision['outcomes_by_id'][id_]['booking_bool']]
         if len(positives) != 1:
             return None
-        return 'choice', torch.tensor(positives[0], dtype=torch.long)
+        return 'choice', torch.tensor(positives[0], dtype=torch.long), torch.tensor(eligible)
     if task == 'stated_choice':
-        return 'choice', torch.tensor(ids.index(supervision['selected_id']), dtype=torch.long)
+        return 'choice', torch.tensor(ids.index(supervision['selected_id']), dtype=torch.long), torch.tensor(eligible)
     if task == 'observed_choice' and event == 'combined_click_booking_relevance':
         gains = [5. if supervision['outcomes_by_id'][id_]['booking_bool'] else
                  1. if supervision['outcomes_by_id'][id_]['click_bool'] else 0. for id_ in ids]
@@ -64,7 +64,8 @@ def _label(episode, ids, eligible, feature_policy):
     values[~torch.tensor(eligible)] = 0
     if values.sum() <= 0:
         return None
-    return 'ranking', values / values.sum()
+    judged = [id_ in supervision['grades_by_id'] for id_ in ids] if task == 'graded_relevance' else eligible
+    return 'ranking', values / values.sum(), torch.tensor(judged)
 
 
 def _examples(rows, tokenizer, policy, max_length):
@@ -84,11 +85,12 @@ def _loss(model, tokenizer, item, device):
     import torch
     import torch.nn.functional as F
 
-    row, (kind, target) = item
+    row, (kind, target, loss_mask) = item
     inputs = tokenizer(row['prompt'], add_special_tokens=False, return_tensors='pt').to(device)
     output = model(**inputs, logits_to_keep=1).logits[0, -1]
     eligible = torch.tensor(row['eligible'], dtype=torch.bool, device=device)
     scores = option_logits(output, row['readout_groups'], eligible).float()
+    scores = scores.masked_fill(~loss_mask.to(device), -torch.inf)
     if kind == 'choice':
         return F.cross_entropy(scores[None], target.to(device)[None])
     logp = F.log_softmax(scores, dim=-1)
@@ -136,6 +138,10 @@ def run(config_path, output):
     training, validation, provenance = {}, {}, {}
     for spec in specs:
         rows, manifest_hash = _load_source(spec)
+        if (spec['feature_policy'].get('prediction_event') == 'conditional_booking_choice' and
+                json.loads((Path(spec['directory']) / 'manifest.json').read_text()).get('candidate_pool_scope')
+                != 'source_exposed_candidates'):
+            raise ValueError('conditional booking requires exposed candidate pool')
         training[spec['name']] = _examples(rows['train'], tokenizer, spec['feature_policy'], config['max_length'])
         validation[spec['name']] = _examples(rows['validation'], tokenizer, spec['feature_policy'], config['max_length'])
         provenance[spec['name']] = {'manifest_sha256': manifest_hash,
@@ -155,6 +161,8 @@ def run(config_path, output):
                                             exclude_modules='.*vision_tower.*'))
     optimizer = torch.optim.AdamW((p for p in model.parameters() if p.requires_grad),
                                   lr=config['learning_rate'])
+    probe_parameter = next(p for p in model.parameters() if p.requires_grad)
+    observed_update = False
     run = wandb.init(project=config['wandb_project'], group='ordivo-v2-behavioral',
                      mode=config.get('wandb_mode', 'offline'),
                      config={'model_id': MODEL, 'revision': REVISION,
@@ -181,7 +189,9 @@ def run(config_path, output):
             if not torch.isfinite(loss):
                 raise RuntimeError('nonfinite supervised loss')
             loss.backward()
+            before_update = probe_parameter.detach().clone()
             optimizer.step()
+            observed_update |= bool(torch.count_nonzero(probe_parameter.detach() - before_update).item())
             if step % config['validation_interval'] == 0 or step == config['max_steps']:
                 by_source, macro = _validate(model, tokenizer, validation, 'cuda')
                 run.log({'train/query_loss': float(loss.detach()),
@@ -198,6 +208,8 @@ def run(config_path, output):
                     tokenizer.save_pretrained(output / 'best_adapter')
         if best_step == 0:
             raise RuntimeError('no validation checkpoint before runtime cap')
+        if not observed_update:
+            raise RuntimeError('no nonzero LoRA optimizer update')
         # Compare the saved best checkpoint, not the final step, with a fresh base.
         del model, base
         torch.cuda.empty_cache()
@@ -213,6 +225,7 @@ def run(config_path, output):
         receipt = {'status': 'pilot_completed', 'claim_scope': 'preliminary bounded two-domain pilot',
                    'model_id': MODEL, 'revision': REVISION, 'runtime': runtime,
                    'seed': config['seed'], 'best_step': best_step,
+                   'nonzero_lora_update': observed_update,
                    'best_validation_macro_source_loss': best,
                    'source_provenance': provenance,
                    'wall_seconds': time.monotonic() - started,
