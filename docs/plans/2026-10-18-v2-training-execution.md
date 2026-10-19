@@ -13,8 +13,8 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
 | Independent review | Complete, important issue fixed | Unknown feasibility regression reproduced then corrected |
 | Real multi-domain data adapters/grouped baselines | Two official grouped sources and classical held-out benchmarks complete; Expedia grouped build pending | Swissmetro and ESCI source-bound four-role manifests audited; source-specific classical metrics and denominators below. Expedia official archive and `train.csv` acquired after user-confirmed rules. |
 | Differentiable d1 readout and training compatibility | Bounded remote check passed | Exact integrated commit `22707ed3`; one fixed A40 BF16 forward/backward, finite loss/gradients and reload parity. No optimizer step in this compatibility check. |
-| V2 SFT and direct calibration baselines | Preliminary two-domain SFT pilot completed; calibration and matched controls pending | Pilot source `854de087`, 40 steps, private best adapter and selected-validation receipt below; S0/C0/C1 held-out conclusions pending. |
-| RLCD/GRPO experiments and DPO pairs | Pending | Experiment R0/G0/G1/P0 |
+| V2 SFT and direct calibration baselines | Preliminary two-domain SFT pilot completed; direct Brier C1 started, result pending | Pilot source `854de087`, 40 steps, private best adapter and selected-validation/paired-probe receipts below; C1 started at `f696437`, no result receipt yet. |
+| RLCD/GRPO experiments and DPO pairs | Stochastic report R0 started; outcomes pending | R0 started at `f696437` under a shared 1,800-second cap with C1; G0/G1/P0 not executed. |
 | Final model, held-out evaluation and release | Exploratory paired probe measured; protected release evidence pending | Preliminary weights retained privately. Adapted pilot scored below base on Swissmetro accuracy and ESCI NDCG@10 on admitted held-out groups; no public v2 model or release claim. |
 
 ## Verification chronology

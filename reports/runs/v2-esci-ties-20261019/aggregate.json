@@ -1,0 +1,37 @@
+{
+  "baseline_aggregate_sha256": "d4e953a11ba9102b09fb5dd515b059731db856f6b26d4e8bb97fe66643be2673",
+  "baseline_code_revision": "22707ed34fd125e96aade9123f9baaf34cd64a18",
+  "by_model": {
+    "lambdarank": {
+      "canonical_ndcg@10": 0.6595536707876613,
+      "eligible_ndcg_queries": 14496,
+      "expected_minus_canonical": -0.0031504211910793334,
+      "expected_queries": 14496,
+      "scores_sha256": "768593959e06f7b919320c1acc7bf5f82db475a35b182840e7583cecc4d1d304",
+      "tie_metric_sensitive_queries": 13360,
+      "uniform_tie_expected_ndcg@10": 0.6564032495965819
+    },
+    "lexical_overlap": {
+      "canonical_ndcg@10": 0.6497443706383713,
+      "eligible_ndcg_queries": 14496,
+      "expected_minus_canonical": -0.0031898177069424882,
+      "expected_queries": 14496,
+      "scores_sha256": "47447ba313033d460e20b7ff2d9893eb68931ae1c912a8230cfcea09e2e7d840",
+      "tie_metric_sensitive_queries": 13730,
+      "uniform_tie_expected_ndcg@10": 0.6465545529314288
+    },
+    "random_seed42": {
+      "canonical_ndcg@10": 0.5338274241462146,
+      "eligible_ndcg_queries": 14496,
+      "expected_minus_canonical": 0.0,
+      "expected_queries": 14496,
+      "scores_sha256": "eaace6d7b36b5589b7ed539624297765dfe658076bc835ec072397904b93d239",
+      "tie_metric_sensitive_queries": 0,
+      "uniform_tie_expected_ndcg@10": 0.5338274241462146
+    }
+  },
+  "code_revision": "f69643794a932b14dac46b2e866667f5a7814bc4",
+  "manifest_sha256": "012fa5f58aaa6b75b0d73c1a9f84f811713e87c61df1dc5137867d34c2cba540",
+  "method": "exact_uniform_permutation_within_equal_score_blocks",
+  "schema_version": "ordivo-tie-analysis-v1"
+}

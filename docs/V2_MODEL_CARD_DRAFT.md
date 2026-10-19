@@ -67,6 +67,14 @@ Output: one finite score per eligible candidate keyed by ID, explicit unavailabl
 
 Required comparisons include exact math reference, domain-appropriate classical and heuristic baselines, base d1, frozen v1 transfer, matched behavioral-only training, and MCDM-pretrained continuation with equal downstream conditions. An extra-training control is needed before attributing a gain to MCDM content. A public shared-model generality claim requires at least three real domains covering choice and relevance and actual entire-domain holdout evidence; a two-domain baseline is preliminary. Final comparisons use multiple matched seeds and paired group intervals. Calibration uses an independent held-out calibration set and specifies the event population. ESCI/MSLR results describe source-sampled judged candidate pools, not all possible products or pages. Report violations, unknowns and failed queries with denominators. See the [experiment matrix](EXPERIMENT_MATRIX.md).
 
+The classical ESCI benchmark's canonical-ID tie rule gave LambdaRank/lexical
+NDCG@10 of 0.659554/0.649744 on 14,496 groups. An exact uniform-within-tie
+analysis of the same saved score files gave 0.656403/0.646555, with 13,360
+and 13,730 metric-sensitive queries respectively. This is a tie-convention
+sensitivity check, not a second model run or an uncertainty interval. The
+[sanitized analysis](../reports/runs/v2-esci-ties-20261019/aggregate.json)
+preserves its executed hashes; no superiority claim follows from either gap.
+
 ## Known and anticipated failure modes
 
 The v1 synthetic pilot raised alias/order and calibration concerns; it provides no v2 evidence. For v2, inspect long or variable candidate sets, missing or incomparable units, repeated entities across splits, unavailable options, zero-positive and multi-positive groups, position bias in clicks, domain shift, language imbalance, near-ties, and conflicting/absent preferences. Record actual failures with sanitized examples only after remote evaluation. A lack of suitable evidence should yield `preferences_unknown` or explicit scenarios, not fabricated weights or a false `verified` label.
