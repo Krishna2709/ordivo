@@ -27,7 +27,7 @@ def _policy(paths):
 def test_sushi_preserves_original_sets_without_rank_order_leakage(tmp_path):
     paths = _fixture(tmp_path)
     policy = _policy(paths)
-    episodes = list(sushi.iter_episodes(*paths, policy))
+    episodes = list(sushi.iter_episodes(*paths, policy, verify_official=False))
     assert len(episodes) == 4
     assert {episode["supervision"]["respondent_id"] for episode in episodes} == {"101", "999"}
     assert episodes[0]["supervision"]["ordered_groups"][0] == ["9"]
@@ -36,7 +36,7 @@ def test_sushi_preserves_original_sets_without_rank_order_leakage(tmp_path):
     assert {candidate["id"] for candidate in episodes[1]["alternatives"]} == {"99", "40", "30", "20", "10", "9", "8", "7", "6", "5"}
     assert episodes[0]["alternatives"][0]["features"]["item_name"] == "item0"
     output = tmp_path / "dataset"
-    manifest = write_dataset(sushi.iter_episodes(*paths, policy), output, policy)
+    manifest = write_dataset(sushi.iter_episodes(*paths, policy, verify_official=False), output, policy)
     assert manifest["source_profile"]["raw_rows"] == 4
     assert manifest["source_profile"]["retained_rows"] == 4
     assert manifest["source_profile"]["candidate_rows"] == 40
@@ -58,7 +58,7 @@ def test_sushi_rejects_malformed_original_candidate_set(tmp_path):
     a.write_text(a.read_text().replace("9 8 7 6 5 4 3 2 1 0", "9 9 7 6 5 4 3 2 1 0"))
     policy = _policy(paths)
     try:
-        list(sushi.iter_episodes(*paths, policy))
+        list(sushi.iter_episodes(*paths, policy, verify_official=False))
     except ValueError as exc:
         assert "candidate set" in str(exc)
     else:
