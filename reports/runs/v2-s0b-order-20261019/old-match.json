@@ -1,0 +1,51 @@
+{
+  "schema_version": "ordivo-private-order-id-match-v1",
+  "sources": {
+    "esci": {
+      "intersection": 12,
+      "new_admitted": 20,
+      "new_full": {
+        "mean_l1_probability_change": 0.3002192395739257,
+        "top1_flip_rate": 0.5
+      },
+      "new_matched": {
+        "mean_l1_probability_change": 0.286415865062736,
+        "top1_flip_rate": 0.75
+      },
+      "new_only": 8,
+      "new_per_query_sha256": "4c47f1c932c9b91f299d1186077555d2f649b47967ae3cef581c2935a7fee7b2",
+      "new_selected": 20,
+      "old_admitted": 12,
+      "old_matched": {
+        "mean_l1_probability_change": 0.3188707303100576,
+        "top1_flip_rate": 0.5833333333333334
+      },
+      "old_only": 0,
+      "old_per_query_sha256": "5b44323b56f963e4a8ef9e1d4aa22f58b5ab4e30cfcf841fcb7c988033cdf80d",
+      "old_selected": 20
+    },
+    "swissmetro": {
+      "intersection": 180,
+      "new_admitted": 180,
+      "new_full": {
+        "mean_l1_probability_change": 0.3400996214399735,
+        "top1_flip_rate": 0.3611111111111111
+      },
+      "new_matched": {
+        "mean_l1_probability_change": 0.3400996214399735,
+        "top1_flip_rate": 0.3611111111111111
+      },
+      "new_only": 0,
+      "new_per_query_sha256": "5c653bb74938591cc727950fb49af9c4c89ca7f2277092c4b9693e5b2d8157c8",
+      "new_selected": 180,
+      "old_admitted": 180,
+      "old_matched": {
+        "mean_l1_probability_change": 0.3966283288473884,
+        "top1_flip_rate": 0.28888888888888886
+      },
+      "old_only": 0,
+      "old_per_query_sha256": "4616ceb844335976b679536e0b87e09446ef932f0546bdc3fb30ceee50b6fe21",
+      "old_selected": 180
+    }
+  }
+}

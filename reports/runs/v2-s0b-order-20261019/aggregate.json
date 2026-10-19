@@ -1,0 +1,78 @@
+{
+  "by_source": {
+    "esci": {
+      "admitted_pairs": 20,
+      "excluded": {
+        "fewer_than_two_available": 0,
+        "not_exactly_one_booking": 0,
+        "overflow_both": 0,
+        "overflow_original": 0,
+        "overflow_permuted": 0
+      },
+      "failed_queries": 0,
+      "manifest_sha256": "9fd4065fc0db4586453a412123eb9ef393b1750cd8196bb11cad794d020f07cc",
+      "mean_l1_probability_change": 0.3002192395739257,
+      "schema_version": "ordivo-candidate-order-v1",
+      "selected_episodes": 20,
+      "selected_units": 20,
+      "selected_units_sha256": "85e4fb1b1759a23112657243c231dc313e93655c3070280ea77f33e942b9740c",
+      "source": "amazon_esci",
+      "top1_flip_rate": 0.5
+    },
+    "expedia": {
+      "admitted_pairs": 15,
+      "excluded": {
+        "fewer_than_two_available": 0,
+        "not_exactly_one_booking": 5,
+        "overflow_both": 0,
+        "overflow_original": 0,
+        "overflow_permuted": 0
+      },
+      "failed_queries": 0,
+      "manifest_sha256": "c72552b8fe1acd0cab0480610dd65b5dd6aed575313047d2da2f2786953b4a2b",
+      "mean_l1_probability_change": 0.22335757569720346,
+      "schema_version": "ordivo-candidate-order-v1",
+      "selected_episodes": 20,
+      "selected_units": 20,
+      "selected_units_sha256": "fcedc8dbd1e5ab53b5b8a3df5c8bc09126525da59d9421dcbffbbb8ded03d1a5",
+      "source": "expedia_personalized_sort_2013",
+      "top1_flip_rate": 0.8
+    },
+    "swissmetro": {
+      "admitted_pairs": 180,
+      "excluded": {
+        "fewer_than_two_available": 0,
+        "not_exactly_one_booking": 0,
+        "overflow_both": 0,
+        "overflow_original": 0,
+        "overflow_permuted": 0
+      },
+      "failed_queries": 0,
+      "manifest_sha256": "dd3dc4b0713506f1664149993ca11022614a3ee850c335944ae37b5525af592a",
+      "mean_l1_probability_change": 0.3400996214399735,
+      "schema_version": "ordivo-candidate-order-v1",
+      "selected_episodes": 180,
+      "selected_units": 20,
+      "selected_units_sha256": "92252ab1fc60fa892e6af59b9da25198b21a9f83c857564e20eaa4d73a65d57e",
+      "source": "swissmetro",
+      "top1_flip_rate": 0.3611111111111111
+    }
+  },
+  "claim_scope": "validation_only_diagnostic_no_model_selection",
+  "config_sha256": "0f5c8dcd7dc27e345bc040168f4c7d5df656894025f937f8276d48751a204b82",
+  "elapsed_seconds": 80.4340278301388,
+  "partition": "validation",
+  "pilot_best_step": 90,
+  "pilot_config_sha256": "1ad185a26779248dc0b9bf1635eb4c2a6460304cd34479de77941b898ab6403c",
+  "pilot_source_identity": {
+    "archive_sha256": "d655f68a053264cf4c37665504ceecd25c097bc95813c0804342c9bf006e29c4",
+    "commit": "945fe6e07df4916f202108d7a56a543041808315"
+  },
+  "prompt_version": "behavioral-choice-v1",
+  "schema_version": "ordivo-candidate-order-run-v1",
+  "source_identity": {
+    "archive_sha256": "4be1e9c6587ea460435b8732bdb22a7944aa33a7584e6bbc95bdafcb9b912c41",
+    "commit": "b621461315dc5fe276c563106375ab22ab6b06d7"
+  },
+  "status": "complete"
+}

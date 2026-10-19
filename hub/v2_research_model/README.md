@@ -68,14 +68,16 @@ The S0b Expedia source is the predeclared bounded 20k/2k/2k/5k grouped
 sample (manifest SHA-256
 `c72552b8fe1acd0cab0480610dd65b5dd6aed575313047d2da2f2786953b4a2b`),
 not the full 399,344-search source. A [W&B run](https://wandb.ai/black-order/liquid-mcdm-lab/runs/0sq2jfj9)
-was online at launch. The best adapter is retained privately under
+finished with sanitized cloud readback SHA-256
+`c417a2a5422a60be02de5a1db97ebd1d62d1bfc07a23beb70c718367f347cd5c`.
+The best adapter is retained privately under
 `supervised-s0b/20261019T030009Z/s0b-945fe6e/` at Hub commit
 `df6405c575629dfaf9083f7b068ab8ef34b6eeb3`: eight allowlisted files
 plus manifest passed forced-download SHA readback. Adapter directory SHA-256
 `e9bc879b31a32e5546d238345babd7d9fc5eedad7e015510804e03fde8a77c50`;
 retention-manifest SHA-256
 `1bbd441f8ccb2d276ed4028681cb5d550276fd7b690a47642aa02973d24801e5`.
-Final cloud readback, calibration and cross-domain transfer remain pending.
+Calibration and cross-domain transfer remain pending.
 These are model-selection validation losses only; a separate bounded S0b
 held-out probe follows below.
 
@@ -123,6 +125,28 @@ base d1 was not evaluated for this probe. Sanitized aggregate SHA-256:
 `1caff28407551758975ab5ebcf67abd3708f44fa8f2fa4a29ead7f04beeabad7`.
 The [sanitized order aggregate](https://github.com/Krishna2709/ordivo/blob/b6a353549f478b806b50d979bbfc4a5d5d5907d3/reports/runs/v2-order-20261019/aggregate.json) is metadata-only. Its four private diagnostic output files plus manifest passed forced-download readback under `diagnostics/20261019T030009Z/candidate-order-a19d/` at Hub commit `4434f85c12ab6f7f7bb5894747f3b8f003c075e8` (retention SHA-256 `4a93087601c3ca1b32c7b580d512e2778d4a060cbc92f071066aa03e7a4af54f`). Cloud readback is not asserted here; no public result should
 omit the 8/20 ESCI overflow denominator.
+
+A separate corrected S0b candidate-order diagnostic used model-selection
+validation groups only. Its first attempt failed to admit Expedia searches
+without the exactly-one-booking event; the corrected source
+`b621461315dc5fe276c563106375ab22ab6b06d7` yielded Swissmetro top-choice
+flips in 65/180 pairs (36.11%, mean probability L1 0.34010), ESCI 10/20
+(50%, L1 0.30022), and Expedia 12/15 eligible searches (80%, L1 0.22336;
+five of 20 selected searches target-ineligible). All admitted pairs scored,
+with zero overflow/failures. This positional sensitivity remains material
+after train-only candidate shuffling; it is not an accuracy metric or proof
+that training caused the sensitivity. Sanitized diagnostic SHA-256
+`9be6417337ac574cc6fd38b95fe7f5c0b6e873848601db04eed3993110c344c4`.
+An exact-ID aggregate join shows the same Swissmetro 180 changed from
+52 S0 top-choice flips to 65 S0b, even as mean L1 fell 0.39663→0.34010.
+All 12 old admitted ESCI groups appear in the new 20; on those same 12,
+flips changed 7→9 and mean L1 0.31887→0.28642. Eight new groups change
+the full-20 mean. These small comparisons neither establish robustness
+improvement nor isolate a training cause. Match receipt SHA-256
+`25689eff2d9aecebeed627c0bfdfee04f54e15bafce5cd46828a182369968207`.
+The corrected integrated source suite passed 255 tests, zero skips at
+`b621461315dc5fe276c563106375ab22ab6b06d7`, archive SHA-256
+`4be1e9c6587ea460435b8732bdb22a7944aa33a7584e6bbc95bdafcb9b912c41`.
 
 ## Loading and scoring the frozen S0 label-free research request
 

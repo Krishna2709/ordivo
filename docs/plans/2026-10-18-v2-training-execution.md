@@ -78,8 +78,10 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   `df6405c575629dfaf9083f7b068ab8ef34b6eeb3`; eight files plus manifest
   passed forced-download SHA readback (adapter directory SHA-256
   `e9bc879b31a32e5546d238345babd7d9fc5eedad7e015510804e03fde8a77c50`).
-  This is selection-validation learning only; held-out quality, calibration
-  and transfer remain pending.
+  The S0b W&B training run finished, sanitized cloud readback SHA-256
+  `c417a2a5422a60be02de5a1db97ebd1d62d1bfc07a23beb70c718367f347cd5c`.
+  This training receipt is selection-validation learning; bounded held-out
+  outcomes are recorded below, while calibration and transfer remain pending.
 
 - A separate S0b exploratory paired held-out probe at integrated source
   `10232089368296680c75461da2dffe5254ae7590` measured mixed results.
@@ -99,6 +101,27 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   retention-manifest SHA-256
   `2ab1be61a5709ca8b736d32c9085c8e152a58e65b208e887beb2902b358113c4`.
   This is not a protected test, interval, calibration or transfer result.
+- Corrected S0b candidate-order validation diagnostic at exact source
+  `b621461315dc5fe276c563106375ab22ab6b06d7` (archive SHA-256
+  `4be1e9c6587ea460435b8732bdb22a7944aa33a7584e6bbc95bdafcb9b912c41`)
+  scored Swissmetro 180/180 paired scenarios with 65 top-choice flips and
+  mean probability L1 0.34010; ESCI 20/20 with 10 flips/L1 0.30022;
+  Expedia 15/20 conditional-booking eligible searches with 12 flips/L1
+  0.22336, five target-ineligible. Zero overflow/failures. The initial
+  S0b order diagnostic failed to admit Expedia groups lacking a booking
+  event; the narrow fix was tested before this corrected receipt. Aggregate
+  `reports/runs/v2-s0b-order-20261019/aggregate.json` SHA-256
+  `9be6417337ac574cc6fd38b95fe7f5c0b6e873848601db04eed3993110c344c4`.
+  Exact-ID matched aggregate SHA-256
+  `25689eff2d9aecebeed627c0bfdfee04f54e15bafce5cd46828a182369968207`:
+  same Swissmetro 180 S0 52 flips versus S0b 65; same old ESCI 12 S0 7
+  versus S0b 9, despite lower mean L1. This remains a material ordering
+  robustness issue and does not establish training causation.
+- The subsequent integrated full source suite at `b621461315dc5fe276c563106375ab22ab6b06d7`
+  exited zero with 255 passed, zero skips/failures after verified pinned
+  tokenizer setup (72+72+72+39); archive SHA-256
+  `4be1e9c6587ea460435b8732bdb22a7944aa33a7584e6bbc95bdafcb9b912c41`.
+  This is source verification, not model efficacy.
 - V2 behavioral data reviewer-fix tests at `2f417cbe28e77e7303d3c7fbfdf3d3d80bcf720f`
   passed 19/0 on the remote pod. Release-report source tests at `178d1fd4`
   passed 7/0. These are component tests, not real-data performance evidence.

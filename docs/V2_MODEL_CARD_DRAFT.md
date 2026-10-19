@@ -76,6 +76,23 @@ new 50; on those same 27, base NDCG@10 is 0.778290, S0 0.752276, and S0b
 and 50-group means directly is invalid. Intersection receipt SHA-256
 `494a1a0a6f2795a3c4f9962fc58f6194a7508f3aa5e9a7cc9ad24cde17479672`.
 
+A corrected S0b candidate-order diagnostic on model-selection validation
+pairs found top-choice flips in 65/180 Swissmetro scenarios (36.11%), 10/20
+ESCI groups (50%) and 12/15 Expedia target-eligible searches (80%; five of
+20 selected searches lacked the exactly-one-booking event), with zero
+overflow/failures. Mean probability L1 changes were 0.34010, 0.30022 and
+0.22336 respectively. This remains a material positional sensitivity despite
+train-only shuffling; the diagnostic does not measure accuracy or establish
+causation. Receipt SHA-256
+`9be6417337ac574cc6fd38b95fe7f5c0b6e873848601db04eed3993110c344c4`.
+On the exact same 180 Swissmetro scenarios, S0 flipped 52 versus S0b 65.
+All 12 old eligible ESCI groups are in the new 20; on those same 12, flips
+were S0 7 versus S0b 9. Mean L1 fell in both matched cohorts, so its
+direction alone does not imply fewer decision changes. Match receipt SHA-256
+`25689eff2d9aecebeed627c0bfdfee04f54e15bafce5cd46828a182369968207`.
+The corrected source suite passed 255 tests/zero skips at `b6214613`, archive
+SHA-256 `4be1e9c6587ea460435b8732bdb22a7944aa33a7584e6bbc95bdafcb9b912c41`.
+
 ## Research inference interface
 
 Input: `schema_version=ordivo-behavioral-v1`, `task_type`, allowlisted context, declared criteria/constraints/preferences, and a complete variable-length set of alternatives with typed features and availability. Candidate IDs serve only as output keys and are remapped to aliases in neural prompts. Outcome labels, exposure/position, provenance, source/group identifiers and original row order cannot enter predictor features. Numeric units and missingness must be explicit; weights can be `null`.
