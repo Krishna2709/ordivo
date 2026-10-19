@@ -137,7 +137,7 @@ python -m pip install \
   "peft==0.21.2" \
   "accelerate==1.15.0" \
   "safetensors==0.8.0" \
-  "git+https://github.com/Krishna2709/ordivo-neural-decision-intelligence-model.git@v0.1.0"
+  "git+https://github.com/Krishna2709/ordivo.git@v0.1.0"
 ```
 
 After defining `decision` as above:

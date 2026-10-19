@@ -52,7 +52,7 @@ The manifest SHA-256 used by release run `20261019T005111Z` is
 - Test robustness across criteria counts, alternative counts, directions,
   scales, weighting schemes, near ties, and held-out scenario families.
 - Reproduce solver, prompt, and model experiments from
-  https://github.com/Krishna2709/ordivo-neural-decision-intelligence-model.
+  https://github.com/Krishna2709/ordivo.
 
 ## Limitations
 

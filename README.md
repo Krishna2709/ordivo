@@ -10,7 +10,7 @@ The release run `20261019T005111Z` trained a d1-3B LoRA adapter for 400 steps on
 
 Public release destinations:
 
-- Source and experiment report: https://github.com/Krishna2709/ordivo-neural-decision-intelligence-model
+- Source and experiment report: https://github.com/Krishna2709/ordivo
 - Synthetic dataset: https://huggingface.co/datasets/blackOrder/liquid-mcdm-synthetic
 - Ordivo v1 adapter: https://huggingface.co/blackOrder/Ordivo-v1
 - Release experiment: https://wandb.ai/black-order/liquid-mcdm-lab/runs/4vblgw80
@@ -126,7 +126,7 @@ python -m pip install \
   "peft==0.21.2" \
   "accelerate==1.15.0" \
   "safetensors==0.8.0" \
-  "git+https://github.com/Krishna2709/ordivo-neural-decision-intelligence-model.git@v0.1.0"
+  "git+https://github.com/Krishna2709/ordivo.git@v0.1.0"
 ```
 
 After defining `decision` as above:

@@ -5,7 +5,7 @@ type: software
 authors:
   - family-names: Kankipati
     given-names: Krishna
-repository-code: https://github.com/Krishna2709/ordivo-neural-decision-intelligence-model
+repository-code: https://github.com/Krishna2709/ordivo
 url: https://huggingface.co/blackOrder/Ordivo-v1
 license: Apache-2.0
 version: 0.1.0

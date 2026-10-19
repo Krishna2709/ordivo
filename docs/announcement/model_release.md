@@ -24,7 +24,7 @@ decision quality.
 
 Links:
 
-- Code: https://github.com/Krishna2709/ordivo-neural-decision-intelligence-model
+- Code: https://github.com/Krishna2709/ordivo
 - Dataset: https://huggingface.co/datasets/blackOrder/liquid-mcdm-synthetic
 - Model: https://huggingface.co/blackOrder/Ordivo-v1
 - W&B release run: https://wandb.ai/black-order/liquid-mcdm-lab/runs/4vblgw80
