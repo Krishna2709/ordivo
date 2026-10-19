@@ -1,0 +1,29 @@
+experiment_id: ordivo-v2-expedia-lambdarank-v1
+source: expedia_personalized_sort_2013
+seed: 42
+target_policy:
+  policy_id: expedia-click-booking-v1
+feature_policy:
+  context_features: [srch_length_of_stay, srch_booking_window, srch_adults_count, srch_children_count, srch_room_count]
+  alternative_features: [price_usd, prop_starrating, prop_review_score, prop_location_score1, prop_location_score2]
+  numeric_features:
+    - context.srch_length_of_stay
+    - context.srch_booking_window
+    - context.srch_adults_count
+    - context.srch_children_count
+    - context.srch_room_count
+    - alternative.price_usd
+    - alternative.prop_starrating
+    - alternative.prop_review_score
+    - alternative.prop_location_score1
+    - alternative.prop_location_score2
+  categorical_features: []
+max_trees: 500
+patience: 50
+lightgbm:
+  num_leaves: 31
+  learning_rate: 0.05
+  min_data_in_leaf: 20
+  num_threads: 4
+  deterministic: true
+  force_col_wise: true

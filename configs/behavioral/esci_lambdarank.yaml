@@ -1,0 +1,20 @@
+experiment_id: ordivo-v2-esci-lexical-ranker-v1
+source: amazon_esci
+seed: 42
+target_policy:
+  policy_id: esci-task1-official-gain-v1
+feature_policy:
+  context_features: [query]
+  alternative_features: [product_title, product_description]
+  numeric_features: []
+  categorical_features: []
+  lexical_overlap: true
+max_trees: 500
+patience: 50
+lightgbm:
+  num_leaves: 31
+  learning_rate: 0.05
+  min_data_in_leaf: 20
+  num_threads: 4
+  deterministic: true
+  force_col_wise: true

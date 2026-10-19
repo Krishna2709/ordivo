@@ -1,0 +1,123 @@
+"""Remote-only complete-group specialist benchmark.
+
+Usage: python scripts/benchmark_behavioral.py --config CONFIG --data DATA --output OUTPUT
+DATA contains train.jsonl, validation.jsonl, calibration.jsonl, test.jsonl and
+manifest.json. All per-query material stays under remote /workspace storage.
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import sys
+import time
+from pathlib import Path
+
+import yaml
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from liquid_mcdm.evaluation.ranking import evaluate_ranking
+from liquid_mcdm.models.lambdarank import fit_ranker, predict_ranker
+from liquid_mcdm.models.ranking_baselines import lexical_scores, numerical_heuristic, random_scores
+from liquid_mcdm.runtime import require_remote_gpu
+
+
+def _read_jsonl(path: Path) -> list[dict]:
+    if not path.is_file():
+        raise FileNotFoundError(path)
+    with path.open() as source:
+        return [json.loads(line) for line in source if line.strip()]
+
+
+def _write_json(path: Path, value) -> None:
+    path.write_text(json.dumps(value, indent=2, sort_keys=True, allow_nan=False) + "\n")
+
+
+def _digest(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _aggregate(report: dict) -> dict:
+    return {key: value for key, value in report.items() if key != "per_query"}
+
+
+def benchmark(config_path: Path, data_dir: Path, output_dir: Path) -> dict:
+    runtime = require_remote_gpu()
+    output_dir = output_dir.resolve()
+    if output_dir != Path("/workspace") and Path("/workspace") not in output_dir.parents:
+        raise ValueError("benchmark output must be under remote /workspace storage")
+    if output_dir.exists():
+        raise FileExistsError(output_dir)
+    config = yaml.safe_load(config_path.read_text())
+    manifest_path = data_dir / "manifest.json"
+    if not manifest_path.is_file():
+        raise FileNotFoundError(manifest_path)
+    # Read all split identities before fitting. Calibration is never used here.
+    train = _read_jsonl(data_dir / "train.jsonl")
+    validation = _read_jsonl(data_dir / "validation.jsonl")
+    calibration = _read_jsonl(data_dir / "calibration.jsonl")
+    test = _read_jsonl(data_dir / "test.jsonl")
+    split_ids = {name: {e["episode_id"] for e in episodes} for name, episodes in
+                 (("train", train), ("validation", validation),
+                  ("calibration", calibration), ("test", test))}
+    if any(len(split_ids[name]) != len(episodes) for name, episodes in
+           (("train", train), ("validation", validation),
+            ("calibration", calibration), ("test", test))):
+        raise ValueError("duplicate episode in split")
+    if any(split_ids[a] & split_ids[b] for a in split_ids for b in split_ids if a < b):
+        raise ValueError("episode overlaps splits")
+    if any(e["source"] != config["source"] for group in (train, validation, calibration, test)
+           for e in group):
+        raise ValueError("source differs from config")
+    if not test:
+        raise ValueError("empty test split")
+    output_dir.mkdir(parents=True)
+    started = time.monotonic()
+    candidates = {}
+    candidates["random_seed42"] = {e["episode_id"]: random_scores(e, config["seed"])
+                                   for e in test}
+    if config["source"] == "amazon_esci":
+        candidates["lexical_overlap"] = {e["episode_id"]: lexical_scores(e, config["feature_policy"])
+                                         for e in test}
+    elif config["source"] == "expedia_personalized_sort_2013":
+        candidates["price_ascending"] = {e["episode_id"]: numerical_heuristic(
+            e, config["feature_policy"], {"price_usd": -1.0}) for e in test}
+        candidates["rating_descending"] = {e["episode_id"]: numerical_heuristic(
+            e, config["feature_policy"], {"prop_review_score": 1.0}) for e in test}
+    receipt = fit_ranker(train, validation, config, output_dir / "model")
+    candidates["lambdarank"] = predict_ranker(output_dir / "model", test)
+    aggregate = {}
+    for name, predictions in candidates.items():
+        report = evaluate_ranking(test, predictions, config["target_policy"])
+        _write_json(output_dir / f"{name}_per_query.json", report["per_query"])
+        _write_json(output_dir / f"{name}_scores.json", predictions)
+        aggregate[name] = _aggregate(report)
+    metadata = {"experiment_id": config["experiment_id"], "source": config["source"],
+                "runtime_provider": runtime["provider"], "config_sha256": _digest(config_path),
+                "manifest_sha256": _digest(manifest_path),
+                "split_counts": {"train": len(train), "validation": len(validation),
+                                 "calibration_unused": len(calibration), "test": len(test)},
+                "model_best_iteration": receipt["bundle"]["best_iteration"],
+                "lightgbm_version": receipt["bundle"]["lightgbm_version"],
+                "elapsed_seconds": time.monotonic() - started,
+                "metrics": aggregate}
+    _write_json(output_dir / "aggregate.json", metadata)
+    return metadata
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--config", type=Path, required=True)
+    parser.add_argument("--data", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args()
+    result = benchmark(args.config, args.data, args.output)
+    print(json.dumps({"experiment_id": result["experiment_id"],
+                      "split_counts": result["split_counts"],
+                      "aggregate_path": str(args.output / "aggregate.json")}, sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()
