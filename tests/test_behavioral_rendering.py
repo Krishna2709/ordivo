@@ -356,5 +356,8 @@ def test_bounded_expedia_requires_exact_parent_and_complete_label_free_sample():
             bad_manifest['sampling']['seed'] = 43
         else:
             bad_manifest['target_policy_id'] = 'wrong'
+        bad_content = json.dumps(bad_manifest).encode()
+        if change not in ('parent', 'manifest'):
+            bad_spec['expected_manifest_sha256'] = hashlib.sha256(bad_content).hexdigest()
         with pytest.raises(ValueError, match='source contract'):
-            _validate_manifest_contract(bad_spec, bad_manifest, content, seed=42)
+            _validate_manifest_contract(bad_spec, bad_manifest, bad_content, seed=42)
