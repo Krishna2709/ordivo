@@ -1,0 +1,27 @@
+{
+  "candidate_sum": 9917530,
+  "duplicate_candidate_ids": 0,
+  "duplicate_groups": 0,
+  "manifest_sha256": "3b14e3f30466a2da868ac636c8888bc42366f865737715a57a67f32866a02d92",
+  "source_mismatches": 0,
+  "split_candidate_counts": {
+    "calibration": 497968,
+    "test": 991928,
+    "train": 7935793,
+    "validation": 491841
+  },
+  "split_group_counts": {
+    "calibration": 20040,
+    "test": 39851,
+    "train": 319714,
+    "validation": 19739
+  },
+  "split_sha256": {
+    "calibration": "f601b23c3b3356e93afc781db9c760b9cc549772ad3fe79279494530cab9f9cb",
+    "test": "0cb2bde7ee0c912bf5c70a937b287a38c121fc2e9639ecb95d4f00bf268595b8",
+    "train": "84034a305d0ff5a80226c55e7cd8e9764fc1497576695c1580d00922da994e10",
+    "validation": "60248e91709aa7c3615f654eeb6d8954b09d923e30423d9ab7cc00fa2b6d9877"
+  },
+  "unique_group_count": 399344,
+  "wrong_hash_partitions": 0
+}

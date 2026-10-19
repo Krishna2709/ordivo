@@ -86,6 +86,17 @@ sensitivity check, not a second model run or an uncertainty interval. The
 [sanitized analysis](../reports/runs/v2-esci-ties-20261019/aggregate.json)
 preserves its executed hashes; no superiority claim follows from either gap.
 
+A matched bounded C1 direct-Brier versus R0 stochastic-report continuation
+also ran for 40 updates each from the same pilot adapter and schedule. The
+shared starting selection-validation macro loss was 1.5817367; best
+**post-update** C1/R0 checkpoints at step 10 had 1.6459532/1.6163764,
+respectively. Both degraded relative to the start; R0 degrading less does not
+show a benefit. This is a selection diagnostic, with no continuation held-out
+score. The [sanitized receipt](../reports/runs/v2-continuation-20261019/summary.json)
+(SHA-256 `cc686cf66ee3d7daa777ecc8b3c1ccaedda5d546da96107ad1f18ea0bf055cc5`)
+records the exact source, config, schedule and reload evidence. Cloud/private
+artifact readback remains pending.
+
 ## Known and anticipated failure modes
 
 The v1 synthetic pilot raised alias/order and calibration concerns; it provides no v2 evidence. For v2, inspect long or variable candidate sets, missing or incomparable units, repeated entities across splits, unavailable options, zero-positive and multi-positive groups, position bias in clicks, domain shift, language imbalance, near-ties, and conflicting/absent preferences. Record actual failures with sanitized examples only after remote evaluation. A lack of suitable evidence should yield `preferences_unknown` or explicit scenarios, not fabricated weights or a false `verified` label.
