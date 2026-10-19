@@ -61,8 +61,10 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   integrated source check; neither result measures model efficacy.
 - S0b three-source supervised follow-up is configured for 90 updates,
   6,144-token complete-group cap, learning rate 3e-5, 900-second cap and
-  training-only candidate shuffle. It has no executed result in this ledger
-  yet; validation/test and private retention claims await remote receipts.
+  training-only candidate shuffle. It started remotely at 04:24:40 UTC on
+  19 October 2026 at integrated source `945fe6e`; W&B run `0sq2jfj9` was
+  online at launch. No final validation/test result or artifact-retention
+  receipt is yet available; no efficacy claim follows from launch.
 - V2 behavioral data reviewer-fix tests at `2f417cbe28e77e7303d3c7fbfdf3d3d80bcf720f`
   passed 19/0 on the remote pod. Release-report source tests at `178d1fd4`
   passed 7/0. These are component tests, not real-data performance evidence.

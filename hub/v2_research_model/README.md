@@ -48,9 +48,12 @@ is `cc686cf66ee3d7daa777ecc8b3c1ccaedda5d546da96107ad1f18ea0bf055cc5`
 at source `f69643794a932b14dac46b2e866667f5a7814bc4`; no continuation
 held-out result, cloud readback or private Hub retention is asserted here.
 
-A separate S0b three-source supervised follow-up is configured after token
-coverage review, but no executed S0b result is recorded in this card yet. Its
-setup does not change the frozen pilot results above.
+A separate S0b three-source supervised follow-up started remotely at 04:24:40 UTC
+on 19 October 2026 from integrated source `945fe6e`; its
+[W&B run](https://wandb.ai/black-order/liquid-mcdm-lab/runs/0sq2jfj9) was online
+at launch. No final S0b validation, held-out, artifact-retention or efficacy
+result has been read back. Its setup does not change the frozen pilot results
+above.
 
 A validation-only candidate-order probe of this frozen pilot found
 52/180 Swissmetro top-choice flips (28.89%) across 20 selected respondents,
