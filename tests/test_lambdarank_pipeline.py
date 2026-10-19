@@ -57,6 +57,7 @@ def test_saved_ranker_reload_and_metric_parity(tmp_path):
     actual = reported["per_query"]
     assert [r["metrics"] for r in actual] == [r["metrics"] for r in expected]
     assert receipt["bundle"]["best_iteration"] > 0
+    assert receipt["bundle"]["reload_max_abs_difference"] <= 1e-12
     assert sum(receipt["bundle"]["train_group_sizes"]) == 20
     assert all(set(scores) == {"a", "b"} and np.isfinite(list(scores.values())).all()
                for scores in reloaded.values())

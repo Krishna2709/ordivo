@@ -79,6 +79,16 @@ def test_esci_categories_are_relevance_not_events():
     assert result["per_query"][0]["metrics"]["ndcg@5"] == 1
 
 
+def test_unjudged_candidate_does_not_become_a_negative_or_consume_rank():
+    e = episode("graded_relevance", "amazon_esci", "partial")
+    e["supervision"]["grades_by_id"].pop("b")
+    e["supervision"]["unjudged_ids"] = ["b"]
+    report = evaluate_ranking([e], {e["episode_id"]: {"b": 10, "a": 1}})
+    row = report["per_query"][0]
+    assert row["unjudged_count"] == 1
+    assert row["metrics"]["ndcg@5"] == 1
+
+
 def test_stated_choice_uses_available_candidates_only():
     e = episode("stated_choice", "swissmetro", "r1-1")
     e["alternatives"][1]["available"] = False

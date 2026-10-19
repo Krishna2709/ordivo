@@ -54,6 +54,15 @@ def benchmark(config_path: Path, data_dir: Path, output_dir: Path) -> dict:
     manifest_path = data_dir / "manifest.json"
     if not manifest_path.is_file():
         raise FileNotFoundError(manifest_path)
+    manifest = json.loads(manifest_path.read_text())
+    if manifest.get("target_policy_id") != config["target_policy"]["policy_id"]:
+        raise ValueError("manifest target policy differs from config")
+    if manifest.get("candidate_pool_scope") != "source_exposed_candidates":
+        raise ValueError("unsupported candidate pool scope")
+    for split in ("train", "validation", "calibration", "test"):
+        expected_hash = manifest.get("split_sha256", {}).get(split)
+        if not expected_hash or _digest(data_dir / f"{split}.jsonl") != expected_hash:
+            raise ValueError(f"split hash mismatch or absent: {split}")
     # Read all split identities before fitting. Calibration is never used here.
     train = _read_jsonl(data_dir / "train.jsonl")
     validation = _read_jsonl(data_dir / "validation.jsonl")
@@ -71,6 +80,8 @@ def benchmark(config_path: Path, data_dir: Path, output_dir: Path) -> dict:
     if any(e["source"] != config["source"] for group in (train, validation, calibration, test)
            for e in group):
         raise ValueError("source differs from config")
+    if manifest.get("episode_count") != sum(map(len, (train, validation, calibration, test))):
+        raise ValueError("manifest episode count mismatch")
     if not test:
         raise ValueError("empty test split")
     output_dir.mkdir(parents=True)
