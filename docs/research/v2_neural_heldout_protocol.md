@@ -37,7 +37,7 @@ comparison between them has different feature budgets. A matched-input
 control and a fresh protected release protocol are required before claiming
 neural superiority or general-purpose transfer.
 
-## S0b three-domain exploratory reuse, not yet run
+## S0b three-domain exploratory reuse
 
 `configs/v2_neural_heldout_s0b.yaml` freezes seed 42, a 600-second task cap,
 and at most 50 whole test split units each for Swissmetro, ESCI, and Expedia.
@@ -50,9 +50,9 @@ and multiple-booking searches share the explicit `not_exactly_one_booking`
 exclusion count; prompt overflows have a separate count. Every admitted
 episode and its eligible candidates must have complete scores or the run fails.
 
-Swissmetro and ESCI source manifests, feature policies, and seed are proposed
-to remain the same as the first exploratory probe. Before comparing, check
-that S0b's selected-unit hashes equal the first probe's Swissmetro
+Swissmetro and ESCI source manifests, feature policies, and seed remained
+the same as the first exploratory probe. S0b's selected-unit hashes equal
+the first probe's Swissmetro
 `c546c7af44ce27b4cfb8988d6621222cbd230881fd68f32bfa9b2356843f97dc`
 and ESCI `f4af35cfddaa544cdac993014d4e131e80814b2daeb0e713579fa2132181d15a`.
 The earlier ESCI probe admitted 27 of 50 selected groups because 23 prompts
@@ -70,6 +70,37 @@ per-query files are retained privately under
 This test cohort has already been exposed to exploratory analysis. Neither
 S0b nor its hyperparameters may be selected or retuned using these results.
 The probe is not a protected release test or a claim that S0b's changes caused
-any observed difference. Schedule it before the separate post-S0b validation
-candidate-order diagnostic if remote GPU time permits; do not access the test
-split for that validation-only diagnostic.
+any observed difference. The separate post-S0b candidate-order diagnostic
+uses only the validation split.
+
+The paired probe completed remotely at integrated source
+`10232089368296680c75461da2dffe5254ae7590` with frozen evaluation
+config SHA-256 `b4d889f639cdeaafd46fb24e9b2dccb078e5958178d1553f03acc4a9573594c1`
+and S0b pilot config SHA-256
+`1ad185a26779248dc0b9bf1635eb4c2a6460304cd34479de77941b898ab6403c`.
+The aggregate was read back byte-identically, SHA-256
+`86753c1356cdf8524a3ea28a2f5b4ff31fb4ef20afaf3f96d6db1cb0fd4b086d`,
+at `reports/runs/v2-swarm-20261019T030009Z/s0b-heldout-aggregate.json`
+in the Operations worktree. Base and S0b used the same complete candidate
+prompt within each paired query; there were zero failed queries and zero
+prompt overflows for all three sources.
+
+| Source and observed endpoint | Selected / admitted | Base | S0b adapter | Other accounting |
+|---|---:|---:|---:|---|
+| Swissmetro accuracy@1 | 50 respondents / 450 choices | 0.680000 | 0.662222 | No exclusions; NLL 0.805878 to 0.782651; Brier 0.459254 to 0.463704 |
+| ESCI official-gain NDCG@10 | 50 groups / 50 scored | 0.705590 | 0.714332 | No exclusions or zero-ideal-gain groups |
+| Expedia conditional-booking accuracy@1 | 50 searches / 29 scored | 0.068966 | 0.137931 | 21 searches excluded for not exactly one booking; NLL 2.961689 to 3.016047; Brier 0.967797 to 0.941650 |
+
+ESCI's S0b prompt admitted all 50 selected groups, whereas the first pilot
+admitted 27. Operations joined the two private ESCI per-query files by exact
+episode ID: all old 27 occur in the new 50, with 23 new-only and zero
+old-only. On the **same original 27**, base NDCG@10 was 0.778290 in both
+runs; the first adapter scored 0.752276 (minus base 0.026015), and S0b scored
+0.787842 (plus base 0.009551). The private ID-match aggregate contains no
+IDs, records both consumed file hashes, and was read back at SHA-256
+`494a1a0a6f2795a3c4f9962fc58f6194a7508f3aa5e9a7cc9ad24cde17479672`
+as `reports/runs/v2-swarm-20261019T030009Z/s0b-esci-old27-match.json`
+in the Operations worktree. The 50-group NDCG above is the expanded S0b
+cohort; it must not be compared directly with the earlier 27-group mean.
+Neither probe estimates a confidence interval or protected-release effect,
+and S0b changed several training conditions together.
