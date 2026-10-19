@@ -36,6 +36,8 @@ def test_hand_calculated_perfect_and_reverse():
     assert reverse["per_query"][0]["metrics"]["booking_mrr"] == .5
     assert ndcg_at_k(["b", "a"], {"a": 1, "b": 0}, 1) == 0
     assert ndcg_at_k(["a", "b"], {"a": 1, "b": 0}, 10) == 1
+    expected = (1 / math.log2(3) + 5 / math.log2(4)) / (5 + 1 / math.log2(3))
+    assert ndcg_at_k(["z", "y", "x"], {"x": 5, "y": 1, "z": 0}, 3) == pytest.approx(expected)
 
 
 def test_expedia_gains_and_separate_zero_event_denominators():
