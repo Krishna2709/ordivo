@@ -58,7 +58,9 @@ The standalone pilot receipt records source archive commit/SHA-256, config
 SHA-256, exact effective nonsecret hyperparameters, prompt version, realized
 optimizer steps and updates by source, alongside base/best validation losses.
 Defaults cap selection at 1,000 train and 100 validation split units per source;
-panel respondents remain intact. It records source totals, selected counts and
+absolute episode budgets cap selected rows at 10,000 train and 1,000 validation
+per source. A complete respondent panel is accepted or the pilot fails; it is
+never split to satisfy the cap. It records source totals, selected counts and
 digests, and loss exclusions including zero/no event and prompt overflow. Actual
 selected IDs remain in a remote-only file outside W&B metrics. The wall-clock cap
 covers integrity passes, rendering, model loading, updates and validation.
