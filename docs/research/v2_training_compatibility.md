@@ -39,6 +39,10 @@ validation loss, saves the best adapter, and checks reload. The sample config
 is not an execution authorization. Real source acquisition, rights and baseline
 evidence must be reviewed before starting this pilot; two domains would still
 be preliminary research.
+The identical frozen validation subset is scored before any optimizer update
+and at the selected best adapter. Base/best macro and per-source losses are
+recorded in the remote receipt and W&B; these are optimization diagnostics,
+not an accuracy or transfer claim.
 Model adapters and receipts remain on the remote runtime. The trainer rejects
 `publish_model_artifacts: true`; changing W&B mode can publish aggregate metrics
 but cannot silently upload derived weights. Artifact publication needs a
