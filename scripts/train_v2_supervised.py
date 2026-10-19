@@ -63,10 +63,14 @@ def _validate_source_specs(specs):
         raise ValueError('duplicate source manifest directory')
 
 
-def _load_source(spec, *, seed, max_train_groups, max_validation_groups, deadline):
+def _load_source(spec, *, seed, max_train_groups, max_validation_groups, deadline,
+                 max_train_episodes=10000, max_validation_episodes=1000):
     if (not isinstance(max_train_groups, int) or not 1 <= max_train_groups <= 1000 or
             not isinstance(max_validation_groups, int) or not 1 <= max_validation_groups <= 100):
         raise ValueError('pilot group caps are 1000 train and 100 validation per source')
+    if (not isinstance(max_train_episodes, int) or not 1 <= max_train_episodes <= 10000 or
+            not isinstance(max_validation_episodes, int) or not 1 <= max_validation_episodes <= 1000):
+        raise ValueError('pilot episode caps are 10000 train and 1000 validation per source')
     directory = Path(spec['directory'])
     manifest_bytes = (directory / 'manifest.json').read_bytes()
     manifest = json.loads(manifest_bytes)
@@ -142,8 +146,9 @@ def _load_source(spec, *, seed, max_train_groups, max_validation_groups, deadlin
                         raise ValueError('row source contract differs from pilot spec')
                     if _unit(row) in selected[split]:
                         rows[split].append(row)
-                        if len(rows[split]) > 5 * (max_train_groups if split == 'train' else max_validation_groups):
-                            raise ValueError('selected panel exceeds bounded episode cap; reduce group limit')
+                        budget = max_train_episodes if split == 'train' else max_validation_episodes
+                        if len(rows[split]) > budget:
+                            raise ValueError('selected complete panels exceed absolute episode budget')
     info = {'manifest_sha256': hashlib.sha256(manifest_bytes).hexdigest(),
             'complete_episode_counts': counts,
             'complete_split_unit_counts': unit_counts,
@@ -286,6 +291,8 @@ def run(config_path, output):
         rows, source_info = _load_source(
             spec, seed=config['seed'], max_train_groups=config.get('max_train_groups', 1000),
             max_validation_groups=config.get('max_validation_groups', 100),
+            max_train_episodes=config.get('max_train_episodes', 10000),
+            max_validation_episodes=config.get('max_validation_episodes', 1000),
             deadline=started + config['max_runtime_seconds'])
         if source_info['manifest_sha256'] in seen_manifest_hashes:
             raise ValueError('duplicate source manifest across domains')
@@ -417,7 +424,9 @@ def run(config_path, output):
                        **{key: config[key] for key in ('max_steps', 'max_runtime_seconds',
                            'validation_interval', 'max_length', 'learning_rate', 'seed', 'lora')},
                        'max_train_groups': config.get('max_train_groups', 1000),
-                       'max_validation_groups': config.get('max_validation_groups', 100)},
+                       'max_validation_groups': config.get('max_validation_groups', 100),
+                       'max_train_episodes': config.get('max_train_episodes', 10000),
+                       'max_validation_episodes': config.get('max_validation_episodes', 1000)},
                    'seed': config['seed'], 'best_step': best_step,
                    'realized_optimizer_steps': realized_steps,
                    'optimizer_updates_by_source': updates_by_source,
