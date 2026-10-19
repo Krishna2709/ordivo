@@ -164,13 +164,11 @@ def test_sql_pilot_selection_is_order_invariant_and_panel_atomic(tmp_path):
     from scripts.train_v2_supervised import _load_source
 
     train = [
-        {'episode_id': 'swissmetro:a1', 'source': 'swissmetro', 'group_id': 'a1',
-         'supervision': {'respondent_id': 'panel-a'}},
-        {'episode_id': 'swissmetro:a2', 'source': 'swissmetro', 'group_id': 'a2',
-         'supervision': {'respondent_id': 'panel-a'}},
+        {'episode_id': f'swissmetro:a{i}', 'source': 'swissmetro', 'group_id': f'a{i}',
+         'supervision': {'respondent_id': 'panel-a'}} for i in range(9)
+    ] + [
         {'episode_id': 'swissmetro:b1', 'source': 'swissmetro', 'group_id': 'b1',
-         'supervision': {'respondent_id': 'panel-b'}},
-    ]
+         'supervision': {'respondent_id': 'panel-b'}}]
     other = {split: [{'episode_id': f'swissmetro:{split}', 'source': 'swissmetro',
                       'group_id': split, 'supervision': {'respondent_id': split}}]
              for split in ('validation', 'calibration', 'test')}
@@ -197,7 +195,7 @@ def test_sql_pilot_selection_is_order_invariant_and_panel_atomic(tmp_path):
     assert left_info['selected_split_unit_sha256'] == right_info['selected_split_unit_sha256']
     assert {row['episode_id'] for row in left_rows['train']} == {
         row['episode_id'] for row in right_rows['train']}
-    assert len(left_rows['train']) in (1, 2)  # whole respondent panel selected
+    assert len(left_rows['train']) in (1, 9)  # whole nine-scenario respondent panel
 
     with pytest.raises(ValueError, match='source contract'):
         _load_source({'directory': str(tmp_path), 'name': 's',
