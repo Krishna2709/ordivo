@@ -129,3 +129,12 @@ not call the report-policy result a calibration gain without held-out NLL/Brier,
 ECE and ranking/coverage evidence. A separate G1 structured-action GRPO would
 require a real sequence-action log-probability adapter and its own reward
 variance and verifier audit; this proposal does not supply that interface.
+
+`training/report_policy.py` implements only this single-group tensor objective
+and diagnostics, with no trainer or optimizer execution. It uses PyTorch's
+[Dirichlet sample/log_prob](https://docs.pytorch.org/docs/2.14/distributions.html#dirichlet)
+and registered [Dirichlet KL](https://docs.pytorch.org/docs/2.14/distributions.html#kl-divergence).
+The declared probability floor ensures positive concentration and changes the
+raw option distribution; the exact expected-Brier expression and tests account
+for that transform. The finite-concentration stochastic Brier optimum need not
+equal the deterministic strictly proper Brier optimum.
