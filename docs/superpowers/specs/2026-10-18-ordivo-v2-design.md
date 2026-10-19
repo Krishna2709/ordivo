@@ -1,4 +1,4 @@
-# Ordivo v2 — general-purpose contextual decision learning
+# Ordivo v2 — multi-criteria decision intelligence across domains
 
 Status: research design based on the user's supplied v2 review. Implementation
 and benchmark execution are pending. Engineering defaults below are proposed
@@ -6,21 +6,87 @@ by the implementer and must be frozen in configuration before scored runs.
 
 ## Research objective
 
-The user's follow-up explicitly broadens v2 beyond Expedia: build toward one
-general-purpose model across multiple decision domains. Test whether MCDM
+The user's latest clarification sets the product boundary: Ordivo is an
+MCDM-focused decision intelligence framework with cross-domain applicability.
+It can use general decision models underneath; its differentiation is explicit
+criteria, preferences, constraints, trade-offs, robustness and traceable analysis.
+The request for varied real data remains: Expedia is one domain, not the scope
+of the system. Test whether MCDM
 pretraining improves contextual decisions relative to an identical backbone
 trained only on real-data labels. Preserve Ordivo v1,
 exact solvers, published checkpoint hashes, and historical evidence.
 
 v2 receives observed context and explicit candidate attributes, with optional
-actual constraints or stated preferences. It returns candidate scores and
-ranking. An algorithm name is unnecessary for the learned model. Exact MCDM
-remains a separate, explicitly weighted baseline. Bookings and clicks are
+actual constraints or stated preferences. It returns feasible alternatives,
+rankings, Pareto trade-offs, sensitivity results and explanations tied to the
+analysis. An algorithm name is unnecessary for the learned model. Exact MCDM
+is both a serving analysis component and an explicitly weighted baseline.
+Bookings and clicks are
 observations; neither defines optimal utility or a mathematically correct choice.
 
 Document extraction, retrieval, invented preferences, enterprise procurement,
 and production decision claims are outside this milestone. Generality is a
 testable research objective, not a property established by dataset count.
+Positioning: **Ordivo — Neural Decision Intelligence. Learning to evaluate,
+rank, and decide.** These are v2 capabilities to build, not claims about v1.
+
+## Decision methodology and service contract
+
+The system has three cooperating layers:
+
+1. **Decision specification:** criteria definitions, measurement units and
+   provenance; mandatory constraints; preferences with origin (`declared`,
+   `learned`, `analyst_assumed`, or `unknown`) and applicable context.
+2. **Neural preference/context layer:** estimates task-specific scores,
+   preference relationships or event probabilities. Liquid d1 and the 350M
+   encoder are initial implementations behind a model adapter. Other backbones
+   can be evaluated later without changing mathematical semantics.
+3. **Deterministic decision analysis:** validates constraints, computes the
+   feasible set and Pareto frontier, runs chosen MCDM/utility procedures, and
+   recomputes rankings under declared preference/evidence perturbations.
+
+The analysis report records original candidate identities, feasible/infeasible/
+unknown status with reasons, non-dominated groups, method and learned-score
+rankings separately, weight provenance, sensitivity scenarios, assumptions,
+input/config hashes and source references. It may return multiple defensible
+alternatives or `needs_information`/`no_feasible_alternative`, rather than always
+forcing one winner. An explanation is a deterministic trace of these results;
+optional prose must preserve that trace and cannot invent causal attribution.
+
+Hard constraints are applied as feasibility rules, never merely as a soft
+penalty that a high model score can outweigh. Unknown required measurements
+yield unknown feasibility; an explicit decision policy controls escalation.
+If one candidate is feasible, report that directly; if zero, report no feasible
+choice. Do not pass either case to v1 solvers requiring at least two candidates.
+Use all observed active criteria and explicit directions for Pareto dominance:
+no worse on every criterion and strictly better on at least one. Retain duplicate
+equivalence and record scale-aware tolerances. Missing data cannot establish
+dominance without a declared bound-based analysis. Pareto optimality does not
+select one universally best alternative.
+
+Preference learning is a separate objective from choosing a scoring method.
+Learned weights are not uniquely recoverable from choices without structural
+assumptions. Start with conditional scores or pairwise preferences; introduce
+interpretable utility/weight models only with stated assumptions and validation.
+User-declared weights override learned suggestions when the request says so.
+Unknown weights remain unknown; benchmark weights are explicitly analyst choices.
+
+Sensitivity uses declared weight ranges on the simplex, constraint thresholds,
+and measurement intervals. Return sampled scenarios, ranking changes, feasible
+set changes, and stability summaries; do not claim exact switch boundaries from
+a coarse grid. Winner frequency over chosen scenarios is not calibrated choice
+probability. Keep preference uncertainty, measurement uncertainty and model
+uncertainty distinct. Record candidate-set changes because MCDM rank reversals
+can be mathematically expected, not automatically implementation defects.
+
+Evaluate this layer independently: constraint satisfaction, Pareto correctness,
+faithful explanations, perturbation coverage and preference-recovery diagnostics
+on identifiable synthetic controls. ESCI/MSLR relevance results assess model
+components; they alone do not validate multi-criteria trade-off intelligence.
+Numeric criteria/choice domains and controlled sensitivity tests are essential.
+Do not apply invented retrospective constraints to logged outcomes and call
+the resulting filtered accuracy a fair comparison. Historical benchmarks retain
+their observed available sets; new constraint scenarios are separate analyses.
 
 ## Multi-domain scope and success criteria
 
@@ -43,7 +109,7 @@ An initial multi-domain result needs at least three real domains, including
 observed or stated choices and relevance judgments, through the same inference
 contract. The final domain set is frozen before model comparison.
 
-Compare a single shared model trained on the mixture against per-domain models.
+Compare a single shared neural component trained on the mixture against per-domain models.
 Condition on the requested task and feature semantics, not a dataset ID as a
 prediction shortcut. Use a shared backbone and shared heads by task type, not
 one head per domain. Start with uniform domain sampling, uniform queries within
@@ -72,9 +138,12 @@ larger candidate sets, constraint violations, latency, memory, and cost.
 | Separate behavioral episodes and grouped ranking | Clear provenance, independent metrics, reusable models | New adapter/evaluator boundary | Select |
 | Immediately replace d1 with an encoder ranker | Direct alternative scores, smaller backbone | Changes task and model simultaneously | Later comparison |
 
-The data flow is: remote source data → versioned grouped adapter →
+The research data flow is: remote source data → versioned grouped adapter →
 frozen split/feature manifests → model-specific features → per-query scores →
-shared ranking evaluator → sanitized experiment artifacts.
+shared ranking evaluator → sanitized experiment artifacts. The serving flow
+adds decision specification, deterministic feasibility and Pareto analysis,
+neural preference estimates, exact ranking and sensitivity, and a traceable
+decision report. This report is more than a ranker's ordered output.
 
 New modules live under existing `liquid_mcdm` boundaries; retain current imports
 and commands. `data/behavioral.py` owns records/validation; `data/expedia.py`
@@ -313,6 +382,17 @@ Architecture references: [Deep Sets](https://papers.nips.cc/paper/6931-deep-sets
 [Set Transformer](https://proceedings.mlr.press/v97/lee19d.html), and the pinned
 [Liquid encoder card](https://huggingface.co/LiquidAI/LFM2.5-Encoder-350M/blob/b886781f7c6f10ca9b7096e21b83e30a073c2f39/README.md).
 These motivate experiments, not prevalidated Ordivo implementations.
+
+## RL research options
+
+Include GRPO and calibration-focused RLCD-inspired training as experiments
+after supervised and direct calibration baselines. In this design RLCD means
+TypeSafe's calibrated-decisions terminology, not contrastive distillation.
+Its exact d1 implementation is not established. See the
+[source-grounded RL research note](../../research/v2_rl_and_decision_objectives.md)
+for objectives, constraints, observational-reward limits, and the important
+difference between d1 option readout and token-generation probabilities.
+No RL algorithm is selected merely because it is available in a training library.
 
 ## Artifacts, execution, and completion
 

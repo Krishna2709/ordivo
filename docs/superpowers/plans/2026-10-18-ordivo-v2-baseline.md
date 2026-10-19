@@ -3,8 +3,9 @@
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans
 > to implement this plan task-by-task. Use remote execution for every workload.
 
-**Goal:** Build reproducible real-data decision benchmarks through a common
-multi-source contract, beginning with Expedia and ESCI, before neural fine-tuning.
+**Goal:** Build the decision-analysis core and reproducible real-data benchmarks
+through a common multi-source contract, beginning with Expedia and ESCI, before
+neural fine-tuning or RL.
 
 **Architecture:** Preserve v1 modules and artifacts. Add typed behavioral/relevance
 episodes, source-specific adapters/splits, task-specific target policies, and
@@ -23,7 +24,7 @@ Also read the [audit](../../../reports/V2_RESEARCH_AUDIT.md) and
 
 - All data processing, tests, baselines and neural workloads run remotely.
 - No v1 solver, checkpoint, historical run receipt, or dataset semantics changes.
-- Source data, test labels, and exposure metadata never leak into model features.
+- Targets, test labels, and exposure metadata never become model predictors.
 - Preserve full candidate sets and source-appropriate split groups.
 - No behavioral d1 fine-tuning before the executed data/baseline milestone.
 - No pooled accuracy across observed choices, stated choices, and relevance labels.
@@ -59,6 +60,40 @@ checks exactly the available, eligible candidate set.
   cases. Assert explicit failure or the source policy's explicit unjudged mask.
 - [ ] On remote runtime run `pytest -q tests/test_behavioral_contract.py` to
   establish failure, implement the boundary, rerun to pass, then commit this slice.
+
+## Task 1b: Deterministic decision analysis and explanation trace
+
+**Files:** create `src/liquid_mcdm/decision/specification.py`,
+`decision/constraints.py`, `decision/pareto.py`, `decision/sensitivity.py`,
+`decision/report.py`, and `tests/test_decision_analysis.py`.
+
+**Interfaces:** `validate_decision(spec: dict) -> None` enforces typed criteria,
+unit and preference provenance. `check_constraints(spec: dict) -> dict` returns
+per-candidate feasible/infeasible/unknown states and reasons.
+`pareto_frontier(spec: dict, feasibility: dict) -> dict` returns non-dominated
+IDs, equivalence groups and dominance witnesses for complete eligible data.
+`analyze_sensitivity(spec: dict, scenarios: list[dict], method: str) -> dict`
+recomputes feasibility and exact solver results per explicit scenario.
+`decision_report(spec: dict, analysis: dict, learned_scores: dict | None) -> dict`
+assembles separate mathematical/model outputs and a trace without invented prose.
+
+- [ ] Use the illustrative supplier matrix A=(100,0.90,0.95), B=(80,0.75,0.80),
+  C=(120,0.98,0.99), directions=(min,max,max). Assert all three are Pareto-optimal.
+  Add D=(130,0.70,0.70); assert D is dominated with a valid witness.
+- [ ] Assert cost<=110 and quality>=0.85 admits A alone; cost<=70 admits none;
+  missing quality makes its feasibility unknown, not passed. A high neural
+  score cannot revive an infeasible candidate. One/zero feasible candidates
+  produce explicit reports without calling the >=2-alternative solver.
+- [ ] Test duplicate alternatives, candidate permutation, consistent unit and
+  threshold conversions, criterion-direction reversal, weight provenance and
+  explicit unknown preferences. Missing data cannot silently prove dominance.
+- [ ] Test each sensitivity scenario against a fresh exact-solver call; retain
+  tie groups and method-specific compromise semantics. Every explanation field
+  must resolve to an input/reference or computed trace. A sampled winner share
+  is labeled scenario stability, not choice probability or an exact boundary.
+- [ ] Run `pytest -q tests/test_decision_analysis.py` remotely before/after
+  implementation, then commit. Keep this deterministic core independent of
+  model SDKs, GPU allocation and behavioral supervision.
 
 ## Task 2: Expedia/ESCI adapters and immutable grouped splits
 
@@ -184,11 +219,37 @@ Swissmetro; optional SUSHI adapter; `docs/research/v2_transfer_protocol.md`;
   unseen-domain transfer and encoder/numeric/text comparisons, not just a
   larger Expedia fine-tune.
 
+## Task 7: Specify and test calibration/RL feasibility after baselines
+
+Read [RL research and objective definitions](../../research/v2_rl_and_decision_objectives.md).
+This task produces a later experiment design and compatibility evidence, not
+an automatic large training run.
+
+- [ ] Compare supervised choice/ranking objectives with direct NLL/Brier and
+  validation-only calibration controls before a policy-gradient approach.
+- [ ] Define RLCD as calibrated-decisions inspiration, not proprietary recipe
+  reproduction. Specify sampled objects, probability events and gradients.
+  Reject a design that assigns the same Brier reward to all sampled aliases
+  from an unchanged deterministic distribution and expects group advantages.
+- [ ] For GRPO freeze the action, sampling distribution, reward components,
+  masks, reference policy, loss variant, scaling, seed and compute budget.
+  Verify token likelihood and d1 grouped-option likelihood are not conflated.
+- [ ] Add reward/gradient fixtures: identical rewards yield zero task advantage;
+  unavailable candidates cannot be selected; missing rewards are explicit;
+  observational labels cannot imply counterfactual outcomes. Compare a
+  differentiable readout to the declared inference policy before GPU updates.
+- [ ] Run only a separately configured bounded remote compatibility experiment
+  after Tasks 1–6 have evidence. Check finite gradients, sampling/log-prob parity,
+  save/reload, entropy, KL, calibration, constraint compliance and total cost.
+  Create the later RL implementation plan from those findings.
+
 ## Evidence required before reporting progress as complete
 
 Source code plus fixtures are not dataset integration. A completed integration
 has real source hashes, profile, intact groups, a split manifest and remote
 validation evidence. A completed baseline has a persisted model, reload check,
-scored held-out queries and telemetry receipt. A general-purpose research result
-requires a shared model and held-out-domain evidence; dataset breadth alone
-does not satisfy it. This planning turn completed none of those executions.
+scored held-out queries and telemetry receipt. Cross-domain research requires a
+shared model and held-out-domain evidence; dataset breadth alone does not satisfy
+it. Framework readiness additionally requires verified constraints, Pareto,
+sensitivity and explanation traces. This planning turn completed none of those
+executions.

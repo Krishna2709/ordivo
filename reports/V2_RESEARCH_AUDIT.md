@@ -14,10 +14,13 @@ model's held-out behavioral ranking compared with behavioral supervision alone.
 This was already a research question in [the original brief](../PROJECT_BRIEF.md);
 v2 prioritizes it over further synthetic-only accuracy tuning.
 
-The user subsequently requested general-purpose, multi-domain decision learning
-and explicitly selected Expedia for use. The target therefore expands to one
-shared decision model across travel, retail, web relevance, and transport;
-Expedia alone cannot validate that objective.
+The user subsequently requested broad multi-domain coverage and explicitly
+selected Expedia for use. The latest clarification makes Ordivo an **MCDM-focused
+decision intelligence framework**, using a shared neural component across travel,
+retail, web relevance and transport. Deterministic constraints, Pareto analysis,
+sensitivity and traceable explanations are required differentiation; ranking
+accuracy alone cannot validate that objective. These capabilities and RLCD/GRPO
+training are planned, not present in v1.
 
 The next deliverable is an independently versioned multi-source episode contract,
 Expedia and ESCI adapters, and reproducible remote baselines. None is implemented

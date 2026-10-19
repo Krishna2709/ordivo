@@ -1,8 +1,11 @@
-# Ordivo — Neural Decision Intelligence Model
+# Ordivo — Neural Decision Intelligence
 
-Ordivo is a neural decision intelligence model for exact
-COPRAS/WASPAS/VIKOR/TOPSIS teacher imitation and Liquid d1 winner prediction.
-This first model release is **Ordivo v1**. **All workloads run remotely.** This
+**Learning to evaluate, rank, and decide.** Ordivo's v2 research direction is an
+MCDM-focused framework combining neural preference learning with explicit
+criteria, constraints, trade-offs and robustness analysis across domains.
+The published **Ordivo v1** is a synthetic COPRAS/WASPAS/VIKOR/TOPSIS
+teacher-imitation adapter for Liquid d1; it does not implement the full v2 framework.
+**All workloads run remotely.** This
 local workspace is for source and documentation editing only; do not install
 packages, generate data, run tests or download models locally.
 
@@ -17,13 +20,15 @@ Public release destinations:
 
 ## What is implemented
 
-**V2 research direction:** build a shared contextual decision model across
-travel choices, retail/search relevance, and transport preferences. Expedia is
+**V2 research direction:** build the decision-analysis layer and a shared neural
+preference component across travel choices, retail/search relevance, and transport preferences. Expedia is
 the first dataset, with ESCI, MSLR and Swissmetro in the planned benchmark suite.
 The [v1 audit](reports/V2_RESEARCH_AUDIT.md),
 [dataset register](docs/V2_DATASET_REGISTER.md), and
 [v2 implementation plan](docs/superpowers/plans/2026-10-18-ordivo-v2-baseline.md)
-define the next work. These are research plans; no real-data v2 model or
+define the next work. [GRPO and calibration-focused RLCD research](docs/research/v2_rl_and_decision_objectives.md)
+are additional training experiments, following supervised baselines.
+These are research plans; no real-data v2 model or
 benchmark results have been produced yet. The implemented items below are v1.
 
 - Pure NumPy teachers with explicit domains, normalization, tie groups and VIKOR compromise conditions.

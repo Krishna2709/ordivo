@@ -26,10 +26,15 @@ Metrics require complete valid probability distributions and missing predictions
 
 ## Extension points
 
-The planned v2 boundary is a shared context/candidate input with source-specific
+The planned v2 framework combines deterministic feasibility, Pareto and sensitivity
+analysis with a shared neural preference/context component. Its input is a
+context/candidate decision specification with source-specific
 observed-choice, stated-choice, relevance, and explicit-ranking supervision.
 Adapters own field semantics and split units; evaluators own task-specific
-metrics. Shared-model experiments must test entire held-out domains.
+metrics. The report contains trade-offs, assumptions and an analysis trace as
+well as rankings; mandatory constraints are enforced independently of model
+scores. Shared-model experiments must test entire held-out domains. GRPO and
+calibration-focused training are research options, not implemented trainers.
 See [ADR 0007](docs/decisions/0007-v2-multidomain-decision-learning.md).
 This design is not yet implemented by the v1 modules above.
 

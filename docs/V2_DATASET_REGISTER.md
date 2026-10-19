@@ -1,7 +1,9 @@
 # Ordivo v2 multi-domain dataset research register
 
 Research date: 2026-10-18 local time. This register implements the user's direction
-to use Expedia and a wide variety of data for a general-purpose decision model.
+to use Expedia and varied data for cross-domain decision learning within an
+MCDM-focused framework. Broad relevance benchmarks test the neural component;
+they do not substitute for preference, constraint and trade-off evaluation.
 It records candidate sources and adapter decisions, not completed ingestion or
 measured model results. No raw datasets were downloaded in this review.
 
