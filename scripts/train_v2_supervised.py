@@ -2,11 +2,13 @@
 from __future__ import annotations
 
 import argparse
-from datetime import datetime, timezone
 import hashlib
 import json
 from pathlib import Path
 import random
+import sqlite3
+import subprocess
+import tempfile
 import time
 
 import yaml
@@ -19,33 +21,97 @@ MODEL = 'LiquidAI/d1-3B'
 REVISION = '051bcc464b01b9f92942b364d9586b0ef5912432'
 
 
-def _load_source(spec):
+def _select_unit_ids(units, *, limit, seed, source, split):
+    if not isinstance(limit, int) or limit < 1:
+        raise ValueError('positive group subset limit required')
+    return frozenset(sorted(units, key=lambda unit: (
+        hashlib.sha256(f'{seed}|{source}|{split}|{unit}'.encode()).digest(), unit))[:limit])
+
+
+def _unit(row):
+    return f"{row['source']}:{row['supervision'].get('respondent_id', row['group_id'])}"
+
+
+def _load_source(spec, *, seed, max_train_groups, max_validation_groups, deadline):
+    if (not isinstance(max_train_groups, int) or not 1 <= max_train_groups <= 1000 or
+            not isinstance(max_validation_groups, int) or not 1 <= max_validation_groups <= 100):
+        raise ValueError('pilot group caps are 1000 train and 100 validation per source')
     directory = Path(spec['directory'])
     manifest_bytes = (directory / 'manifest.json').read_bytes()
     manifest = json.loads(manifest_bytes)
     if set(manifest['split_sha256']) != {'train', 'validation', 'calibration', 'test'}:
         raise ValueError('four-way frozen split manifest required')
+    counts = {}
+    with tempfile.TemporaryDirectory() as scratch:
+        connection = sqlite3.connect(str(Path(scratch) / 'lineage.sqlite'))
+        connection.execute('CREATE TABLE episodes (episode_id TEXT PRIMARY KEY)')
+        connection.execute('CREATE TABLE units (unit TEXT PRIMARY KEY, split TEXT, selector BLOB)')
+        try:
+            for split in ('train', 'validation', 'calibration', 'test'):
+                digest = hashlib.sha256()
+                counts[split] = 0
+                with (directory / f'{split}.jsonl').open('rb') as handle:
+                    for line in handle:
+                        if time.monotonic() > deadline:
+                            raise TimeoutError('pilot time cap reached during source integrity pass')
+                        digest.update(line)
+                        if not line.strip():
+                            continue
+                        row = json.loads(line)
+                        unit = _unit(row)
+                        selector = hashlib.sha256(
+                            f"{seed}|{spec['name']}|{split}|{unit}".encode()).digest()
+                        try:
+                            connection.execute('INSERT INTO episodes VALUES (?)', (row['episode_id'],))
+                        except sqlite3.IntegrityError as exc:
+                            raise ValueError('duplicate episode across source splits') from exc
+                        connection.execute('INSERT OR IGNORE INTO units VALUES (?,?,?)',
+                                           (unit, split, selector))
+                        other = connection.execute('SELECT split FROM units WHERE unit=?',
+                                                   (unit,)).fetchone()[0]
+                        if other != split:
+                            raise ValueError(f'group overlap between {other} and {split}')
+                        counts[split] += 1
+                if digest.hexdigest() != manifest['split_sha256'][split]:
+                    raise ValueError(f'{split} hash differs from source manifest')
+                if split in ('train', 'validation') and not counts[split]:
+                    raise ValueError(f'empty {split} split')
+            selected = {}
+            unit_counts = {}
+            for split, limit in (('train', max_train_groups),
+                                 ('validation', max_validation_groups)):
+                if not isinstance(limit, int) or limit < 1:
+                    raise ValueError('positive group subset limit required')
+                selected[split] = frozenset(row[0] for row in connection.execute(
+                    'SELECT unit FROM units WHERE split=? ORDER BY selector, unit LIMIT ?',
+                    (split, limit)))
+            for split in ('train', 'validation', 'calibration', 'test'):
+                unit_counts[split] = connection.execute(
+                    'SELECT COUNT(*) FROM units WHERE split=?', (split,)).fetchone()[0]
+        finally:
+            connection.close()
     rows = {}
-    units = {}
-    for split in ('train', 'validation', 'calibration', 'test'):
-        content = (directory / f'{split}.jsonl').read_bytes()
-        if hashlib.sha256(content).hexdigest() != manifest['split_sha256'][split]:
-            raise ValueError(f'{split} hash differs from source manifest')
-        parsed = [json.loads(line) for line in content.splitlines() if line.strip()]
-        units[split] = {
-            f"{row['source']}:{row['supervision'].get('respondent_id', row['group_id'])}"
-            for row in parsed}
-        if len({row['episode_id'] for row in parsed}) != len(parsed):
-            raise ValueError(f'duplicate episode in {split}')
-        if split in ('train', 'validation'):
-            if not parsed:
-                raise ValueError(f'empty {split} split')
-            rows[split] = parsed
-    for index, left in enumerate(units):
-        for right in list(units)[index + 1:]:
-            if units[left] & units[right]:
-                raise ValueError(f'group overlap between {left} and {right}')
-    return rows, hashlib.sha256(manifest_bytes).hexdigest()
+    for split in ('train', 'validation'):
+        rows[split] = []
+        with (directory / f'{split}.jsonl').open('rb') as handle:
+            for line in handle:
+                if time.monotonic() > deadline:
+                    raise TimeoutError('pilot time cap reached during subset loading')
+                if line.strip():
+                    row = json.loads(line)
+                    if _unit(row) in selected[split]:
+                        rows[split].append(row)
+                        if len(rows[split]) > 5 * (max_train_groups if split == 'train' else max_validation_groups):
+                            raise ValueError('selected panel exceeds bounded episode cap; reduce group limit')
+    info = {'manifest_sha256': hashlib.sha256(manifest_bytes).hexdigest(),
+            'complete_episode_counts': counts,
+            'complete_split_unit_counts': unit_counts,
+            'selected_split_unit_counts': {key: len(value) for key, value in selected.items()},
+            'selected_split_unit_sha256': {
+                key: hashlib.sha256(json.dumps(sorted(value)).encode()).hexdigest()
+                for key, value in selected.items()},
+            'selected_unit_ids': {key: sorted(value) for key, value in selected.items()}}
+    return rows, info
 
 
 def _label(episode, ids, eligible, feature_policy):
@@ -80,10 +146,13 @@ def _label(episode, ids, eligible, feature_policy):
     return 'ranking', values / values.sum(), torch.tensor(judged)
 
 
-def _examples(rows, tokenizer, policy, max_length):
+def _examples(rows, tokenizer, policy, max_length, deadline):
     examples = []
-    excluded = {'no_supervised_event_or_positive_gain': 0, 'fewer_than_two_eligible': 0}
+    excluded = {'no_supervised_event_or_positive_gain': 0,
+                'fewer_than_two_eligible': 0, 'prompt_overflow': 0}
     for episode in rows:
+        if time.monotonic() > deadline:
+            raise TimeoutError('pilot time cap reached during rendering')
         ids = [candidate['id'] for candidate in episode['alternatives']]
         eligible = [candidate.get('available', True) for candidate in episode['alternatives']]
         if sum(eligible) < 2:
@@ -93,7 +162,13 @@ def _examples(rows, tokenizer, policy, max_length):
         if labeled is None:
             excluded['no_supervised_event_or_positive_gain'] += 1
             continue
-        rendered = render_behavioral(episode, tokenizer, policy, max_length=max_length)
+        try:
+            rendered = render_behavioral(episode, tokenizer, policy, max_length=max_length)
+        except ValueError as exc:
+            if 'exceeds max_length' not in str(exc):
+                raise
+            excluded['prompt_overflow'] += 1
+            continue
         if rendered['candidate_ids'] != ids or rendered['eligible'] != eligible:
             raise ValueError('rendered candidate coverage differs from episode')
         examples.append((rendered, labeled))
@@ -120,14 +195,19 @@ def _loss(model, tokenizer, item, device):
     return -(weights * safe_logp).sum()
 
 
-def _validate(model, tokenizer, validation, device):
+def _validate(model, tokenizer, validation, device, deadline):
     import torch
 
     model.eval()
     totals = {}
     with torch.no_grad():
         for source, items in validation.items():
-            totals[source] = sum(float(_loss(model, tokenizer, item, device)) for item in items) / len(items)
+            total = 0.0
+            for item in items:
+                if time.monotonic() > deadline:
+                    raise TimeoutError('pilot time cap reached during validation')
+                total += float(_loss(model, tokenizer, item, device))
+            totals[source] = total / len(items)
     model.train()
     return totals, sum(totals.values()) / len(totals)
 
@@ -141,6 +221,8 @@ def run(config_path, output):
     runtime = require_remote_gpu()
     config_bytes = Path(config_path).read_bytes()
     config = yaml.safe_load(config_bytes)
+    code_revision = subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True,
+                                   text=True, check=True).stdout.strip()
     if config.get('publish_model_artifacts', False):
         raise ValueError('model artifact publication requires separate rights and destination review')
     if config['model_id'] != MODEL or config['revision'] != REVISION:
@@ -160,19 +242,28 @@ def run(config_path, output):
     tokenizer = AutoTokenizer.from_pretrained(MODEL, revision=REVISION)
     training, validation, provenance = {}, {}, {}
     for spec in specs:
-        rows, manifest_hash = _load_source(spec)
+        rows, source_info = _load_source(
+            spec, seed=config['seed'], max_train_groups=config.get('max_train_groups', 1000),
+            max_validation_groups=config.get('max_validation_groups', 100),
+            deadline=started + config['max_runtime_seconds'])
+        (output / f"selected_ids_{spec['name']}.json").write_text(
+            json.dumps(source_info.pop('selected_unit_ids'), indent=2) + '\n')
         if (spec['feature_policy'].get('prediction_event') == 'conditional_booking_choice' and
                 json.loads((Path(spec['directory']) / 'manifest.json').read_text()).get('candidate_pool_scope')
                 != 'source_exposed_candidates'):
             raise ValueError('conditional booking requires exposed candidate pool')
         training[spec['name']], train_excluded = _examples(
-            rows['train'], tokenizer, spec['feature_policy'], config['max_length'])
+            rows['train'], tokenizer, spec['feature_policy'], config['max_length'],
+            started + config['max_runtime_seconds'])
         validation[spec['name']], validation_excluded = _examples(
-            rows['validation'], tokenizer, spec['feature_policy'], config['max_length'])
-        provenance[spec['name']] = {'manifest_sha256': manifest_hash,
+            rows['validation'], tokenizer, spec['feature_policy'], config['max_length'],
+            started + config['max_runtime_seconds'])
+        if time.monotonic() > started + config['max_runtime_seconds']:
+            raise TimeoutError('pilot time cap reached before model load')
+        provenance[spec['name']] = {**source_info,
                                     'feature_policy': spec['feature_policy'],
-                                    'train_groups': len(rows['train']),
-                                    'validation_groups': len(rows['validation']),
+                                    'selected_train_episodes': len(rows['train']),
+                                    'selected_validation_episodes': len(rows['validation']),
                                     'eligible_train_groups': len(training[spec['name']]),
                                     'eligible_validation_groups': len(validation[spec['name']]),
                                     'train_loss_exclusions': train_excluded,
@@ -186,6 +277,8 @@ def run(config_path, output):
                                             task_type='CAUSAL_LM',
                                             target_modules=lora['target_modules'],
                                             exclude_modules='.*vision_tower.*'))
+    if time.monotonic() > started + config['max_runtime_seconds']:
+        raise TimeoutError('pilot time cap reached during model load')
     optimizer = torch.optim.AdamW((p for p in model.parameters() if p.requires_grad),
                                   lr=config['learning_rate'])
     probe_parameter = next(p for p in model.parameters() if p.requires_grad)
@@ -193,6 +286,7 @@ def run(config_path, output):
     run = wandb.init(project=config['wandb_project'], group='ordivo-v2-behavioral',
                      mode=config.get('wandb_mode', 'offline'),
                      config={'model_id': MODEL, 'revision': REVISION,
+                             'code_revision': code_revision,
                              'config_sha256': hashlib.sha256(config_bytes).hexdigest(),
                              'sources': provenance, 'seed': config['seed']})
     cursors = {source: 0 for source in training}
@@ -220,7 +314,8 @@ def run(config_path, output):
             optimizer.step()
             observed_update |= bool(torch.count_nonzero(probe_parameter.detach() - before_update).item())
             if step % config['validation_interval'] == 0 or step == config['max_steps']:
-                by_source, macro = _validate(model, tokenizer, validation, 'cuda')
+                by_source, macro = _validate(model, tokenizer, validation, 'cuda',
+                                             started + config['max_runtime_seconds'])
                 run.log({'train/query_loss': float(loss.detach()),
                          'validation/macro_source_loss': macro,
                          **{f'validation/{key}_query_loss': value for key, value in by_source.items()}},
@@ -242,6 +337,8 @@ def run(config_path, output):
         torch.cuda.empty_cache()
         fresh = AutoModelForImageTextToText.from_pretrained(
             MODEL, revision=REVISION, dtype=dtype, device_map='auto')
+        if time.monotonic() > started + config['max_runtime_seconds']:
+            raise TimeoutError('pilot time cap reached during adapter reload')
         restored = PeftModel.from_pretrained(fresh, output / 'best_adapter')
         restored.eval()
         with torch.no_grad():
@@ -251,6 +348,7 @@ def run(config_path, output):
             raise RuntimeError(f'best adapter reload changed probe loss: {reload_delta}')
         receipt = {'status': 'pilot_completed', 'claim_scope': 'preliminary bounded two-domain pilot',
                    'model_id': MODEL, 'revision': REVISION, 'runtime': runtime,
+                   'code_revision': code_revision,
                    'seed': config['seed'], 'best_step': best_step,
                    'nonzero_lora_update': observed_update,
                    'best_validation_macro_source_loss': best,
