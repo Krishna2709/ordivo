@@ -39,8 +39,13 @@ def _write(path: Path, payload) -> None:
     path.write_text(json.dumps(payload, sort_keys=True, indent=2, allow_nan=False) + "\n")
 
 
+def _require_eligible_metrics(report: dict) -> None:
+    if not any(metric["eligible"] > 0 for metric in report["metrics"].values()):
+        raise ValueError("no eligible paired metric in source")
+
+
 def _source(source_spec: dict, expected_manifest_sha: str, *, seed: int, limit: int,
-            max_episodes: int) -> tuple[list[dict], dict]:
+            max_episodes: int, deadline: float | None = None) -> tuple[list[dict], dict]:
     if type(limit) is not int or not 1 <= limit <= 50:
         raise ValueError("held-out selection limit must be 1..50 whole split units")
     directory = Path(source_spec["directory"])
@@ -59,6 +64,8 @@ def _source(source_spec: dict, expected_manifest_sha: str, *, seed: int, limit: 
         count = 0
         with (directory / f"{split}.jsonl").open("rb") as handle:
             for raw_line in handle:
+                if deadline is not None and time.monotonic() > deadline:
+                    raise TimeoutError("held-out source integrity scan time cap reached")
                 file_digest.update(raw_line)
                 if not raw_line.strip():
                     continue
@@ -86,6 +93,8 @@ def _source(source_spec: dict, expected_manifest_sha: str, *, seed: int, limit: 
     rows = []
     with (directory / "test.jsonl").open("r", encoding="utf-8") as handle:
         for line in handle:
+            if deadline is not None and time.monotonic() > deadline:
+                raise TimeoutError("held-out selected-group load time cap reached")
             if line.strip():
                 episode = json.loads(line)
                 if split_unit(episode) in chosen:
@@ -137,7 +146,8 @@ def run(pilot_config_path: Path, pilot_output: Path, eval_config_path: Path, out
         raise ValueError("new output directory under /workspace required")
     pilot_config_bytes = Path(pilot_config_path).read_bytes()
     pilot_config = yaml.safe_load(pilot_config_bytes)
-    eval_config = yaml.safe_load(Path(eval_config_path).read_text())
+    eval_config_bytes = Path(eval_config_path).read_bytes()
+    eval_config = yaml.safe_load(eval_config_bytes)
     receipt = json.loads((Path(pilot_output) / "pilot_receipt.json").read_text())
     if (receipt.get("status") != "pilot_completed" or receipt.get("best_step", 0) < 1 or
             pilot_config.get("model_id") != MODEL or pilot_config.get("revision") != REVISION or
@@ -165,40 +175,55 @@ def run(pilot_config_path: Path, pilot_output: Path, eval_config_path: Path, out
     import torch
     from peft import PeftModel
 
-    tokenizer = AutoTokenizer.from_pretrained(MODEL, revision=REVISION)
     all_rendered, source_meta, excluded = {}, {}, {}
-    for spec in specs:
-        name = spec["name"]
-        provenance = receipt["source_provenance"][name]
-        if provenance["feature_policy"] != spec["feature_policy"]:
-            raise ValueError("feature policy differs from frozen pilot")
-        limit = eval_config["max_test_units_per_source"][name]
-        rows, meta = _source(spec, provenance["manifest_sha256"], seed=eval_config["seed"],
-                             limit=limit,
-                             max_episodes=eval_config["max_selected_episodes_per_source"])
-        source_meta[name] = meta
-        rendered, overflow = [], set()
-        for episode in rows:
-            if time.monotonic() > deadline:
-                raise TimeoutError("held-out rendering time cap reached")
-            population, reason = eligibility(episode, spec["feature_policy"])
-            if reason:
-                continue
-            try:
-                row = render_behavioral(episode, tokenizer, spec["feature_policy"],
-                                        max_length=pilot_config["max_length"])
-            except ValueError as exc:
-                if "exceeds max_length" not in str(exc):
-                    raise
-                overflow.add(episode["episode_id"])
-                continue
-            if row["candidate_ids"] != [a["id"] for a in episode["alternatives"]]:
-                raise ValueError("rendered candidate coverage differs from source")
-            rendered.append((episode, row))
-        all_rendered[name] = (rows, rendered)
-        excluded[name] = overflow
     output.mkdir()
+    try:
+        tokenizer = AutoTokenizer.from_pretrained(MODEL, revision=REVISION)
+        if time.monotonic() > deadline:
+            raise TimeoutError("held-out tokenizer load time cap reached")
+        for spec in specs:
+            name = spec["name"]
+            provenance = receipt["source_provenance"][name]
+            if provenance["feature_policy"] != spec["feature_policy"]:
+                raise ValueError("feature policy differs from frozen pilot")
+            limit = eval_config["max_test_units_per_source"][name]
+            rows, meta = _source(spec, provenance["manifest_sha256"], seed=eval_config["seed"],
+                                 limit=limit,
+                                 max_episodes=eval_config["max_selected_episodes_per_source"],
+                                 deadline=deadline)
+            source_meta[name] = meta
+            rendered, overflow = [], set()
+            for episode in rows:
+                if time.monotonic() > deadline:
+                    raise TimeoutError("held-out rendering time cap reached")
+                population, reason = eligibility(episode, spec["feature_policy"])
+                if reason:
+                    continue
+                try:
+                    row = render_behavioral(episode, tokenizer, spec["feature_policy"],
+                                            max_length=pilot_config["max_length"])
+                except ValueError as exc:
+                    if "exceeds max_length" not in str(exc):
+                        raise
+                    overflow.add(episode["episode_id"])
+                    continue
+                if row["candidate_ids"] != [a["id"] for a in episode["alternatives"]]:
+                    raise ValueError("rendered candidate coverage differs from source")
+                rendered.append((episode, row))
+            all_rendered[name] = (rows, rendered)
+            excluded[name] = overflow
+        if any(not items[1] for items in all_rendered.values()):
+            raise ValueError("no eligible rendered queries in at least one pilot domain")
+    except Exception as exc:
+        _write(output / "failure.json", {
+            "status": "incomplete", "phase": "preparation", "failure_type": type(exc).__name__,
+            "selected_episodes_by_source": {name: len(items[0]) for name, items in all_rendered.items()},
+            "admitted_rendered_by_source": {name: len(items[1]) for name, items in all_rendered.items()},
+            "aggregate_published": False})
+        raise
     _write(output / "selection_manifest.json", {"sources": source_meta,
+                                                  "evaluation_config_sha256": hashlib.sha256(eval_config_bytes).hexdigest(),
+                                                  "pilot_config_sha256": receipt["config_sha256"],
                                                   "pilot_best_step": receipt["best_step"],
                                                   "pilot_source_identity": receipt["source_identity"],
                                                   "evaluation_source_identity": identity})
@@ -207,6 +232,8 @@ def run(pilot_config_path: Path, pilot_output: Path, eval_config_path: Path, out
     try:
         base = AutoModelForImageTextToText.from_pretrained(MODEL, revision=REVISION,
                                                           dtype=dtype, device_map="auto")
+        if time.monotonic() > deadline:
+            raise TimeoutError("held-out base model load time cap reached")
         base_predictions = {name: _score_model(base, tokenizer, items[1], deadline,
                                                base_progress, name)
                             for name, items in all_rendered.items()}
@@ -215,6 +242,8 @@ def run(pilot_config_path: Path, pilot_output: Path, eval_config_path: Path, out
         fresh = AutoModelForImageTextToText.from_pretrained(MODEL, revision=REVISION,
                                                            dtype=dtype, device_map="auto")
         adapted = PeftModel.from_pretrained(fresh, Path(pilot_output) / "best_adapter")
+        if time.monotonic() > deadline:
+            raise TimeoutError("held-out adapter load time cap reached")
         adapted_predictions = {name: _score_model(adapted, tokenizer, items[1], deadline,
                                                   adapted_progress, name)
                                for name, items in all_rendered.items()}
@@ -227,6 +256,7 @@ def run(pilot_config_path: Path, pilot_output: Path, eval_config_path: Path, out
             report = evaluate_neural_pair(rows, base_predictions[name], adapted_predictions[name],
                                           next(s["feature_policy"] for s in specs if s["name"] == name),
                                           excluded[name])
+            _require_eligible_metrics(report)
             _write(output / f"{name}_per_query.json", report.pop("per_query"))
             aggregates[name] = {**report, "source": source_meta[name]["source"],
                                 "manifest_sha256": source_meta[name]["manifest_sha256"],
@@ -243,6 +273,8 @@ def run(pilot_config_path: Path, pilot_output: Path, eval_config_path: Path, out
     aggregate = {"schema_version": "ordivo-neural-heldout-run-v1", "status": "complete",
                  "claim_scope": "exploratory_bounded_probe_not_protected_release_test",
                  "source_identity": identity, "pilot_best_step": receipt["best_step"],
+                 "evaluation_config_sha256": hashlib.sha256(eval_config_bytes).hexdigest(),
+                 "pilot_config_sha256": receipt["config_sha256"],
                  "base_model": MODEL, "revision": REVISION, "seed": eval_config["seed"],
                  "elapsed_seconds": time.monotonic() - started,
                  "by_source": aggregates, "paired_interpretation": "small_bounded_heldout_probe_no_calibration"}

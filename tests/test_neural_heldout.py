@@ -10,7 +10,7 @@ import pytest
 from liquid_mcdm.evaluation.neural_heldout import (
     eligibility, evaluate_neural_pair, select_whole_test_units,
 )
-from scripts.evaluate_v2_neural_heldout import _source
+from scripts.evaluate_v2_neural_heldout import _require_eligible_metrics, _source
 
 
 def swiss(respondent, row, selected="train"):
@@ -78,6 +78,8 @@ def test_conditional_booking_exclusion_and_overflow_are_explicit():
     report = evaluate_neural_pair([row], {}, {}, policy)
     assert report["selected_episodes"] == 1 and report["admitted_queries"] == 0
     assert report["excluded"]["not_exactly_one_booking"] == 1
+    with pytest.raises(ValueError, match="no eligible paired metric"):
+        _require_eligible_metrics(report)
     row["supervision"]["outcomes_by_id"]["train"]["booking_bool"] = 1
     report = evaluate_neural_pair([row], {}, {}, policy, {row["episode_id"]})
     assert report["excluded"]["prompt_overflow"] == 1
@@ -107,6 +109,9 @@ def test_frozen_manifest_hashes_and_respondent_units_guard_heldout(tmp_path):
     selected, info = _source({"directory": str(tmp_path)}, digest, seed=42,
                              limit=1, max_episodes=5)
     assert len(selected) == 2 and info["selected_units"] == 1
+    with pytest.raises(TimeoutError, match="integrity scan time cap"):
+        _source({"directory": str(tmp_path)}, digest, seed=42,
+                limit=1, max_episodes=5, deadline=0)
     rows["test"][0]["supervision"]["respondent_id"] = "r1"
     (tmp_path / "test.jsonl").write_text("".join(json.dumps(e) + "\n" for e in rows["test"]))
     with pytest.raises(ValueError, match="test file hash"):

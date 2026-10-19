@@ -4,7 +4,9 @@ import math
 
 import pytest
 
-from liquid_mcdm.evaluation.ranking import evaluate_ranking, ndcg_at_k, ranked_ids
+from liquid_mcdm.evaluation.ranking import (
+    evaluate_ranking, ndcg_at_k, ranked_ids, tie_expected_ndcg_at_k,
+)
 from liquid_mcdm.evaluation.target_policy import targets
 
 
@@ -68,6 +70,14 @@ def test_canonical_ties_and_complete_coverage():
         evaluate_ranking([e, e], {e["episode_id"]: {"a": 1, "b": 0}})
     with pytest.raises(ValueError):
         evaluate_ranking([e], {e["episode_id"]: {"a": math.inf, "b": 0}})
+
+
+def test_uniform_tie_expectation_only_flags_metric_relevant_ties():
+    expected, sensitive = tie_expected_ndcg_at_k({"a": 1, "b": 1}, {"a": 1, "b": 0}, 1)
+    assert expected == pytest.approx(.5) and sensitive
+    expected, sensitive = tie_expected_ndcg_at_k({"a": 2, "b": 1, "c": 1},
+                                                 {"a": 1, "b": 1, "c": 0}, 1)
+    assert expected == 1 and not sensitive
 
 
 def test_esci_categories_are_relevance_not_events():
