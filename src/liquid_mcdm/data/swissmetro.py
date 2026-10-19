@@ -72,6 +72,9 @@ def iter_episodes(path: Path, policy: dict) -> Iterator[DecisionEpisode]:
             }
             validate_episode(episode)
             yield episode
+        profile["raw_groups"] = profile["raw_rows"]
+        profile["selected_groups"] = profile["selected_rows"]
+        profile["omitted_groups_by_reason"] = {"no_choice": profile["omitted_by_reason"]["no_choice"]}
 
 
 def _integer(value: str, name: str) -> int:

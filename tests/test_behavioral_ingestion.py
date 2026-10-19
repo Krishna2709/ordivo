@@ -28,7 +28,7 @@ def test_expedia_complete_groups_shuffle_and_split(tmp_path):
     first, second = tmp_path / "one.csv", tmp_path / "two.csv"
     write_csv(first, rows)
     write_csv(second, list(reversed(rows)))
-    policy = {"temp_dir": tmp_path, "split_policy_id": "expedia-2013-split-v2-calibration", "source_files": {"train": first}, "target_policy_id": "expedia-click-booking-v1"}
+    policy = {"source": "expedia_personalized_sort_2013", "temp_dir": tmp_path, "split_policy_id": "expedia-2013-split-v2-calibration", "source_files": {"train": first}, "target_policy_id": "expedia-click-booking-v1"}
     episodes1 = list(expedia.iter_episodes(first, policy))
     episodes2 = list(expedia.iter_episodes(second, policy))
     for episode in episodes1 + episodes2:
@@ -38,7 +38,7 @@ def test_expedia_complete_groups_shuffle_and_split(tmp_path):
     output = tmp_path / "dataset"
     manifest = write_dataset(expedia.iter_episodes(first, policy), output, policy)
     assert manifest["episode_count"] == 2
-    assert manifest["source_profile"] == {"raw_rows": 4, "selected_rows": 4, "omitted_by_reason": {}, "retained_rows": 4, "retained_groups": 2, "candidate_rows": 4}
+    assert manifest["source_profile"] == {"raw_rows": 4, "selected_rows": 4, "omitted_by_reason": {}, "raw_groups": 2, "selected_groups": 2, "omitted_groups_by_reason": {}, "retained_rows": 4, "retained_groups": 2, "candidate_rows": 4}
     assert set(manifest["episode_counts"]) == {"train", "validation", "calibration", "test"}
     assert sum(manifest["episode_counts"].values()) == 2
     assert manifest["source_sha256"]["train"] == hashlib.sha256(first.read_bytes()).hexdigest()
@@ -64,7 +64,7 @@ def test_failed_materialization_leaves_no_dataset(tmp_path):
     rows = [expedia_row("1", "a"), expedia_row("1", "b")]
     rows[1]["srch_length_of_stay"] = "4"
     write_csv(path, rows)
-    policy = {"temp_dir": tmp_path, "split_policy_id": "expedia-2013-split-v2-calibration", "source_files": {"training": path}}
+    policy = {"source": "expedia_personalized_sort_2013", "temp_dir": tmp_path, "split_policy_id": "expedia-2013-split-v2-calibration", "source_files": {"training": path}}
     output = tmp_path / "processed"
     with pytest.raises(ValueError, match="conflicting"):
         write_dataset(expedia.iter_episodes(path, policy), output, policy)
@@ -84,7 +84,7 @@ def test_esci_locale_join_and_official_test(tmp_path):
     rows.append({"example_id": "3", "query": "shoe", "query_id": "q2", "product_id": "same", "product_locale": "us",
                  "esci_label": "I", "small_version": "0", "split": "train"})
     write_csv(examples, rows)
-    policy = {"temp_dir": tmp_path, "split_policy_id": "esci-official-train-test-v2-calibration", "source_files": {"examples": examples, "products": products}, "target_policy_id": "esci-task1-official-gain-v1"}
+    policy = {"source": "amazon_esci", "temp_dir": tmp_path, "split_policy_id": "esci-official-train-test-v2-calibration", "source_files": {"examples": examples, "products": products}, "target_policy_id": "esci-task1-official-gain-v1"}
     episodes = list(esci.iter_episodes(examples, products, policy))
     assert len(episodes) == 2
     assert {e["alternatives"][0]["features"]["product_title"] for e in episodes} == {"shoe", "zapato"}
@@ -94,6 +94,9 @@ def test_esci_locale_join_and_official_test(tmp_path):
     assert manifest["source_profile"]["raw_rows"] == 3
     assert manifest["source_profile"]["retained_rows"] == 2
     assert manifest["source_profile"]["omitted_by_reason"] == {"outside_task1_reduced": 1}
+    assert manifest["source_profile"]["raw_groups"] == 3
+    assert manifest["source_profile"]["selected_groups"] == 2
+    assert manifest["source_profile"]["omitted_groups_by_reason"] == {"outside_task1_reduced": 1}
     rows[0]["product_id"] = "missing"
     write_csv(examples, rows)
     with pytest.raises(ValueError, match="missing ESCI product"):

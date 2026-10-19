@@ -126,18 +126,18 @@ def main() -> None:
         if kind == "esci":
             root = args.input
             examples, products = (root / file for file in ESCI_FILES)
-            policy = {"split_policy_id": "esci-official-train-test-v2-calibration", "target_policy_id": "esci-task1-official-gain-v1",
+            policy = {"source": "amazon_esci", "split_policy_id": "esci-official-train-test-v2-calibration", "target_policy_id": "esci-task1-official-gain-v1",
                       "candidate_pool_scope": "source_task1_reduced_candidate_list", "judgment_policy": "explicit_judged_and_unjudged_partition",
                       "source_terms": "https://github.com/amazon-science/esci-data/blob/main/LICENSE",
                       "source_files": {"examples": examples, "products": products}}
             episodes = esci.iter_episodes(examples, products, policy)
         elif kind == "swissmetro":
-            policy = {"split_policy_id": "swissmetro-respondent-v2-calibration", "target_policy_id": "swissmetro-choice-v1",
+            policy = {"source": "swissmetro", "split_policy_id": "swissmetro-respondent-v2-calibration", "target_policy_id": "swissmetro-choice-v1",
                       "candidate_pool_scope": "three_survey_modes", "judgment_policy": "one_stated_available_choice_per_survey_scenario",
                       "source_terms": "https://biogeme.epfl.ch/", "source_files": {"survey": args.input}}
             episodes = swissmetro.iter_episodes(args.input, policy)
         else:
-            policy = {"split_policy_id": "expedia-2013-split-v2-calibration", "target_policy_id": "expedia-click-booking-v1",
+            policy = {"source": "expedia_personalized_sort_2013", "split_policy_id": "expedia-2013-split-v2-calibration", "target_policy_id": "expedia-click-booking-v1",
                       "candidate_pool_scope": "source_exposed_candidates", "judgment_policy": "complete_observed_click_booking_per_exposed_candidate",
                       "source_terms": "https://www.kaggle.com/c/expedia-personalized-sort/rules", "source_files": {"training": args.input}}
             episodes = expedia.iter_episodes(args.input, policy)

@@ -94,8 +94,8 @@ def write_dataset(episodes: Iterable[DecisionEpisode], output: Path, policy: dic
     output = Path(output)
     if output.exists():
         raise FileExistsError(output)
-    if not isinstance(policy.get("source_files"), dict) or not policy.get("split_policy_id"):
-        raise ValueError("source_files and split_policy_id required for dataset manifest")
+    if not isinstance(policy.get("source_files"), dict) or not policy.get("split_policy_id") or not policy.get("source"):
+        raise ValueError("source, source_files and split_policy_id required for dataset manifest")
     source_hashes = {name: file_sha256(Path(path)) for name, path in sorted(policy["source_files"].items())}
     output.parent.mkdir(parents=True, exist_ok=True)
     stage = Path(tempfile.mkdtemp(prefix=f".{output.name}.incomplete-", dir=output.parent))
@@ -111,6 +111,8 @@ def write_dataset(episodes: Iterable[DecisionEpisode], output: Path, policy: dic
         try:
             for episode in episodes:
                 validate_episode(episode)
+                if episode["source"] != policy["source"]:
+                    raise ValueError("episode source conflicts with dataset policy source")
                 if episode["episode_id"] in seen:
                     raise ValueError(f"duplicate episode {episode['episode_id']}")
                 seen.add(episode["episode_id"])
@@ -146,9 +148,14 @@ def write_dataset(episodes: Iterable[DecisionEpisode], output: Path, policy: dic
             raise ValueError("source raw rows do not reconcile to selected plus omitted")
         if profile["selected_rows"] != retained_rows:
             raise ValueError("selected source rows do not reconcile to retained candidate rows")
+        if profile.get("raw_groups") != profile.get("selected_groups") + sum(profile.get("omitted_groups_by_reason", {}).values()):
+            raise ValueError("source groups do not reconcile to selected plus omitted groups")
+        if profile["selected_groups"] != len(seen):
+            raise ValueError("selected source groups do not reconcile to retained episodes")
         profile = {**profile, "retained_rows": retained_rows, "retained_groups": len(seen), "candidate_rows": candidate_rows}
         manifest = {
             "manifest_version": "ordivo-grouped-v1",
+            "source": policy["source"],
             "split_policy_id": policy["split_policy_id"],
             "source_sha256": source_hashes,
             "source_terms": policy.get("source_terms"),
