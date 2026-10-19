@@ -57,3 +57,9 @@ def test_launch_uses_no_volume_and_arms_reaper(control, monkeypatch):
     assert bodies[0]['gpuCount'] == 1
     receipt = next(control.RUNS.glob('v2-swarm-*/pod.json'))
     assert 'reaper_pid' in receipt.read_text()
+
+
+def test_task_rejects_path_escape_before_remote_or_archive_access(control, monkeypatch):
+    monkeypatch.setattr(control, 'live_pod', lambda: pytest.fail('remote accessed'))
+    with pytest.raises(ValueError, match='relative'):
+        control.run_task('x', Path('/unused'), 'a' * 40, 'true', outputs=['../private'])

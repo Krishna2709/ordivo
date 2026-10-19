@@ -219,11 +219,19 @@ def setup():
     return {'setup': 'complete', 'freeze_sha256': state['setup_freeze_sha256']}
 
 
-def run_task(task, repo, commit, command, secret_names=()):
+def run_task(task, repo, commit, command, secret_names=(), outputs=()):
     if not re.fullmatch(r'[A-Za-z0-9_-]+', task):
         raise ValueError('Invalid task identifier')
     if not re.fullmatch(r'[0-9a-f]{40}', commit):
         raise ValueError('Full 40-character commit required')
+    allowed = {'wandb': ('WANDB_API_KEY', 'WEIGHTS_AND_BIASES_API_KEY'),
+               'hf': ('HF_TOKEN', 'HUGGINGFACE_API_KEY')}
+    if any(name not in allowed for name in secret_names):
+        raise ValueError('Unknown secret alias')
+    for output in outputs:
+        value = Path(output)
+        if value.is_absolute() or '..' in value.parts or not value.parts:
+            raise ValueError('Outputs must be relative to the task source checkout')
     path, state, pod = live_pod()
     if 'setup_utc' not in state:
         raise RuntimeError('Run --setup before tasks')
@@ -242,10 +250,6 @@ def run_task(task, repo, commit, command, secret_names=()):
     base, scp, target = ssh_args(pod)
     subprocess.run([*base, f'mkdir -p {shlex.quote(remote)}/src'], check=True)
     subprocess.run([*scp, str(archive), f'{target}:{remote}/source.tar'], check=True)
-    allowed = {'wandb': ('WANDB_API_KEY', 'WEIGHTS_AND_BIASES_API_KEY'),
-               'hf': ('HF_TOKEN', 'HUGGINGFACE_API_KEY')}
-    if any(name not in allowed for name in secret_names):
-        raise ValueError('Unknown secret alias')
     if secret_names:
         env_text = ''.join(f'export {allowed[name][0]}={shlex.quote(load_secret(allowed[name][1]))}\n'
                            for name in secret_names)
@@ -266,7 +270,7 @@ def run_task(task, repo, commit, command, secret_names=()):
     receipt = {'task': task, 'commit': commit, 'command': command,
                'source_sha256': source_sha, 'started_utc': utcnow().isoformat(),
                'remote_dir': remote, 'pod_id': state['pod_id'],
-               'secret_aliases': list(secret_names)}
+               'secret_aliases': list(secret_names), 'outputs': list(outputs)}
     write_once(task_dir / 'receipt.json', receipt)
     result = subprocess.run([*base, 'bash -lc ' + shlex.quote(wrapped)],
                             capture_output=True, text=True, timeout=3600)
@@ -275,6 +279,23 @@ def run_task(task, repo, commit, command, secret_names=()):
     write_state(task_dir / 'receipt.json', receipt)
     (task_dir / 'ssh.log').write_text(result.stdout[-10000:] + result.stderr[-10000:])
     fetch_task(task)
+    if outputs:
+        output_root = task_dir / 'outputs'
+        output_root.mkdir()
+        hashes = {}
+        for output in outputs:
+            local = output_root / output
+            local.parent.mkdir(parents=True, exist_ok=True)
+            subprocess.run([*scp, '-r', f'{target}:{remote}/src/{output}', str(local)],
+                           check=True, capture_output=True)
+            if local.is_file():
+                hashes[output] = hashlib.sha256(local.read_bytes()).hexdigest()
+            else:
+                hashes[output] = {str(p.relative_to(output_root)):
+                                  hashlib.sha256(p.read_bytes()).hexdigest()
+                                  for p in local.rglob('*') if p.is_file()}
+        receipt['output_sha256'] = hashes
+        write_state(task_dir / 'receipt.json', receipt)
     return {key: receipt[key] for key in ('task', 'commit', 'returncode', 'source_sha256')}
 
 
@@ -336,6 +357,7 @@ def main():
     parser.add_argument('--commit')
     parser.add_argument('--command')
     parser.add_argument('--with-secret', action='append', choices=('wandb', 'hf'), default=[])
+    parser.add_argument('--output', action='append', default=[])
     args = parser.parse_args()
     if args.reap:
         reap(Path(args.reap))
@@ -343,7 +365,8 @@ def main():
     if args.run:
         if not all((args.repo, args.commit, args.command)):
             parser.error('--run requires --repo, --commit and --command')
-        result = run_task(args.run, args.repo, args.commit, args.command, args.with_secret)
+        result = run_task(args.run, args.repo, args.commit, args.command,
+                          args.with_secret, args.output)
     elif args.fetch:
         result = fetch_task(args.fetch)
     elif args.launch:
