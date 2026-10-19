@@ -1,0 +1,8 @@
+source: swissmetro
+split_policy_id: swissmetro-respondent-v2-calibration
+target_policy_id: swissmetro-choice-v1
+candidate_pool_scope: three_survey_modes
+judgment_policy: one_stated_available_choice_per_survey_scenario
+context_features: [purpose, ga, who, luggage]
+alternative_features: [travel_time_minutes, cost_chf, headway_minutes]
+source_terms: https://biogeme.epfl.ch/

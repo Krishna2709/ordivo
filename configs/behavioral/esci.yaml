@@ -1,0 +1,9 @@
+source: amazon_esci
+split_policy_id: esci-official-train-test-v2-calibration
+target_policy_id: esci-task1-official-gain-v1
+candidate_pool_scope: source_task1_reduced_candidate_list
+judgment_policy: explicit_judged_and_unjudged_partition
+context_features: [query, locale]
+alternative_features: [product_title, product_description, product_bullet_point, product_brand, product_color]
+source_terms: https://github.com/amazon-science/esci-data/blob/main/LICENSE
+gains: {E: 1.0, C: 0.1, S: 0.01, I: 0.0}
