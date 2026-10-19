@@ -1,17 +1,20 @@
 # Ordivo v2 experiment matrix
 
-Planning date: 2026-10-18. Preserve `blackOrder/Ordivo-v1` and its historical
-results. No row below implies a completed new neural experiment.
+Planning date: 2026-10-18; execution status updated from the
+[v2 evidence report](../reports/ordivo-v2-experiment.html) and
+[execution ledger](plans/2026-10-18-v2-training-execution.md). Preserve
+`blackOrder/Ordivo-v1` and its historical results. A completed bounded
+experiment does not mean a release criterion passed.
 
 | ID | Experiment | Data / target | Main comparison | Status |
 |---|---|---|---|---|
 | V0 | Weight policy + numerical verifier | Hand fixtures, adversarial inputs, independent formula references | Mathematical invariants | Implemented; see remote validation report |
 | B0 | Exact MCDM | Synthetic and explicit-preference numeric specifications | Formula reference; not behavioral oracle | v1 available; new wrapper implemented |
-| B1 | LightGBM / choice baselines | Source-specific real groups | Domain-specific choice/ranking performance | Planned |
-| S0 | d1 supervised choice/ranking | Shared mixed-domain model, task-typed labels | B1, v1 transfer, zero-shot backbone | Planned |
+| B1 | LightGBM / choice baselines | Source-specific real groups | Domain-specific choice/ranking performance | Swissmetro 1,044-group and ESCI 14,496-group classical held-out runs measured; [aggregate receipts](../reports/ordivo-v2-experiment.html). Expedia grouped baseline pending. |
+| S0 | d1 supervised choice/ranking | Shared mixed-domain model, task-typed labels | B1, v1 transfer, zero-shot backbone | Preliminary two-domain 40-step pilot and [bounded paired held-out probe](../reports/runs/v2-neural-heldout-20261019/aggregate.json) completed at `854de087`: adapted accuracy/NDCG below base on admitted groups; 23/50 selected ESCI groups overflowed. Full controls, seeds and transfer pending. |
 | C0 | S0 + held-out temperature fit | Event probabilities | S0 raw probability quality | Planned |
-| C1 | Direct NLL/Brier fine-tuning | Same S0 checkpoint and splits | C0 and matched-budget SFT | Planned |
-| R0 | RLCD-inspired report policy | Perturbed probability reports | C1; score/exploration ablations | Not compatibility-validated |
+| C1 | Direct NLL/Brier fine-tuning | Same S0 checkpoint and splits | C0 and matched-budget SFT | Bounded 40-step remote task started at `f696437`; no result receipt yet. |
+| R0 | RLCD-inspired report policy | Perturbed probability reports | C1; score/exploration ablations | Bounded remote task started at `f696437` under shared 1,800-second cap with C1; no result receipt yet. |
 | G0 | Structured-action SFT | Verifiable action examples | Action-interface control for G1 | Planned |
 | G1 | Verifier-guided GRPO | Same action interface and SFT start as G0 | G0, R0 on applicable metrics | Not compatibility-validated |
 | P0 | DPO | Genuine expert/observed preference pairs with provenance | Pairwise supervised control | Pending suitable pairs |
@@ -21,7 +24,9 @@ results. No row below implies a completed new neural experiment.
 
 - Expedia: search-group split, booking/click semantics separate; analyze randomized
   presentation subset and position bias. Exactly-one-booking conditional choice
-  is distinct from purchase probability. Kaggle authentication remains needed.
+  is distinct from purchase probability. Official archive and `train.csv` were
+  [acquired and hashed](../reports/runs/v2-expedia-20261019/acquisition.json)
+  after user-confirmed rules; grouped ingestion and any Expedia metric pending.
 - Swissmetro: stated mode choice, respondent-disjoint splits and availability.
 - Amazon ESCI: graded relevance; preserve official test and query/locale groups.
 - MSLR: fixed official fold and query groups; source agreement recorded.
