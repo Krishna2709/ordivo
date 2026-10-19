@@ -19,6 +19,11 @@ def _hash(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _read_jsonl(path: Path) -> list[dict]:
+    # JSON strings may contain Unicode line separators; only physical LF ends a record.
+    return [json.loads(line) for line in path.read_bytes().split(b"\n") if line.strip()]
+
+
 def analyze(data: Path, baseline_dir: Path, output: Path) -> dict:
     require_remote_gpu()
     commit = os.environ.get("ORDIVO_SOURCE_COMMIT", "")
@@ -37,7 +42,7 @@ def analyze(data: Path, baseline_dir: Path, output: Path) -> dict:
             _hash(test_path) != manifest["split_sha256"]["test"] or
             aggregate["source"] != "amazon_esci"):
         raise ValueError("baseline source or frozen test manifest mismatch")
-    episodes = [json.loads(line) for line in test_path.read_text().splitlines() if line.strip()]
+    episodes = _read_jsonl(test_path)
     expected = {e["episode_id"] for e in episodes}
     if len(expected) != len(episodes):
         raise ValueError("duplicate test episode")
