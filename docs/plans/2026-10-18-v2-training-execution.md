@@ -11,11 +11,11 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
 | Constraints, Pareto and numerical claim verification | Implemented | `decision/verification.py`, exact solver reference tests |
 | Explicit weight scenarios | Implemented | Recomputed scores and stability, not confidence |
 | Independent review | Complete, important issue fixed | Unknown feasibility regression reproduced then corrected |
-| Real multi-domain data adapters/grouped baselines | Source implementation in progress; no real held-out benchmark | Data contract/reviewer-fix remote tests passed 19/0 at `2f417cb`; official Swissmetro acquisition/build receipt exists. Expedia official file list succeeded, download returned HTTP 403. ESCI and Swissmetro baseline results pending. |
-| Differentiable d1 readout and training compatibility | Bounded remote check passed | Exact integrated commit `22707ed3`; one fixed A40 BF16 forward/backward, finite loss/gradients and reload parity. No optimizer step, v2 adapter, or behavioral training result. |
-| V2 SFT and direct calibration baselines | Pending | Experiment S0/C0/C1 |
+| Real multi-domain data adapters/grouped baselines | Two official grouped sources and classical held-out benchmarks complete; Expedia grouped build pending | Swissmetro and ESCI source-bound four-role manifests audited; source-specific classical metrics and denominators below. Expedia official archive and `train.csv` acquired after user-confirmed rules. |
+| Differentiable d1 readout and training compatibility | Bounded remote check passed | Exact integrated commit `22707ed3`; one fixed A40 BF16 forward/backward, finite loss/gradients and reload parity. No optimizer step in this compatibility check. |
+| V2 SFT and direct calibration baselines | Preliminary two-domain SFT pilot completed; calibration and matched controls pending | Pilot source `854de087`, 40 steps, private best adapter and selected-validation receipt below; S0/C0/C1 held-out conclusions pending. |
 | RLCD/GRPO experiments and DPO pairs | Pending | Experiment R0/G0/G1/P0 |
-| Final model, held-out evaluation and release | Pending | No v2 weights published |
+| Final model, held-out evaluation and release | Pending | Preliminary weights retained privately with SHA readback; no public v2 model or held-out neural claim |
 
 ## Verification chronology
 
@@ -92,7 +92,7 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   on A40 BF16: one fixed prompt, finite loss 0.57594, 166 trainable tensors
   with nonzero gradients, option-readout parity maximum delta 2.98e-8,
   unavailable-option probability 0, reload delta 0. No optimization or pilot
-  training occurred. Remote/local metadata SHA-256 matches
+  training occurred **in this compatibility task**. Remote/local metadata SHA-256 matches
   `2a9500911f60cf50635c31277b8994c8cebef92ab455174d12b9dea6f6317406`.
   Receipt: `v2-swarm-20261019T030009Z/gpu_compat_22707`.
 - [W&B cloud run 2f8r8pwf](https://wandb.ai/black-order/liquid-mcdm-lab/runs/2f8r8pwf)
@@ -101,8 +101,24 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   has SHA-256 `b5074afd5532054c7a1b06f080f2042cf7654c6389fb5b490876344aec244d7f`.
   It is not a trained-model artifact. A private Hugging Face v2 research repo
   contains 22 readback-verified allowlisted classical artifacts at private repo
-  commit `1a64f477f66413b25adad68b297c2cdcd4f5ba7e`; no public v2 model
-  or trained neural adapter has been created.
+  commit `1a64f477f66413b25adad68b297c2cdcd4f5ba7e`.
+- A subsequent bounded Swissmetro/ESCI supervised pilot at executed source
+  `854de0877c8e7e380b7353a578e95ba9865d4e25`, config SHA-256
+  `c152e64d839082531d4ece9e66d330fa35ffddfbc442685742b9fd171de5462b`,
+  completed 40 optimizer steps and selected checkpoint step 40. It recorded
+  nonzero LoRA updates, 20 updates per source and zero reload-probe loss delta.
+  Swissmetro selected-validation loss changed 1.1358→0.8577; ESCI
+  3.1603→2.6311. ESCI prompt overflow excluded 325 of 1,000 selected train
+  and 29 of 100 selected validation groups. These are selection diagnostics,
+  not held-out model performance. Sanitized remote/local receipt SHA-256 is
+  `5f58e02b3259601d9663892f50e32460a57be2d424724ec283d87ecb8678f7c1`.
+  The best adapter was retained in **private** `blackOrder/Ordivo-v2-research`
+  at commit `bf1d425b4e6ffc392121d8fb0776e41b1af48c4a`, folder
+  `supervised-pilot/20261019T030009Z/pilot-854de/`; nine allowlisted files
+  plus manifest passed forced SHA readback. W&B pilot
+  [run bnsgv73p](https://wandb.ai/black-order/liquid-mcdm-lab/runs/bnsgv73p)
+  finished at step 40. Paired held-out neural evaluation, calibration, public
+  weight rights and release remain pending.
 
 No local workload was executed. The integrated suite proves source behavior,
 not real-data neural efficacy or release readiness. Initial GitHub CPU runs were superseded by the
