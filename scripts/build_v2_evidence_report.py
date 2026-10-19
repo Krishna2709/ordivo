@@ -77,7 +77,10 @@ def render_rows(payload: object) -> str:
         # traversal, fragments or per-row prediction artifacts are accepted.
         if not re.fullmatch(r"reports/runs/[A-Za-z0-9_/-]+/(aggregate|summary)\.json", receipt) or ".." in receipt:
             raise ValueError("receipt must be an aggregate/summary JSON under reports/runs")
-        if not (ROOT / receipt).is_file():
+        receipt_file = ROOT / receipt
+        if any(path.is_symlink() for path in (receipt_file, *receipt_file.parents) if path != ROOT and ROOT in path.parents):
+            raise ValueError("receipt path cannot contain a symlink")
+        if not receipt_file.is_file():
             raise ValueError(f"receipt does not exist: {receipt}")
         cells = [f"{source} · {task}", comparison, metric, f"{value:.4f}", f"{groups} · {population}"]
         safe_cells = "".join(f"<td>{html.escape(cell)}</td>" for cell in cells)
