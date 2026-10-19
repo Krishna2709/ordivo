@@ -12,7 +12,7 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
 | Explicit weight scenarios | Implemented | Recomputed scores and stability, not confidence |
 | Independent review | Complete, important issue fixed | Unknown feasibility regression reproduced then corrected |
 | Real multi-domain data adapters/grouped baselines | Source implementation in progress; no real held-out benchmark | Data contract/reviewer-fix remote tests passed 19/0 at `2f417cb`; official Swissmetro acquisition/build receipt exists. Expedia official file list succeeded, download returned HTTP 403. ESCI and Swissmetro baseline results pending. |
-| Differentiable d1 readout and training compatibility | Source implementation in progress; remote compatibility receipt pending | Training worker prepared bounded fixed-prompt backward check. No optimizer step or behavioral training result. |
+| Differentiable d1 readout and training compatibility | Bounded remote check passed | Exact integrated commit `22707ed3`; one fixed A40 BF16 forward/backward, finite loss/gradients and reload parity. No optimizer step, v2 adapter, or behavioral training result. |
 | V2 SFT and direct calibration baselines | Pending | Experiment S0/C0/C1 |
 | RLCD/GRPO experiments and DPO pairs | Pending | Experiment R0/G0/G1/P0 |
 | Final model, held-out evaluation and release | Pending | No v2 weights published |
@@ -58,8 +58,27 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   1,118,011 candidate rows across 48,300 groups. Four partitions contain
   30,372 train, 1,688 selection, 1,744 calibration, and 14,496 official-test
   groups. This is a source-defined judged candidate pool, not retrieval recall.
-  Explicit split-overlap/official-test audit and held-out baseline are pending.
+  Explicit split-overlap/official-test audit was pending at this build.
   Receipt: `v2-swarm-20261019T030009Z/esci_source`.
+- ESCI classical benchmark at exact evaluator `22707ed3` scored all 14,496
+  expected official-test query groups, zero failures and zero zero-ideal
+  exclusions, under frozen old manifest SHA
+  `012fa5f58aaa6b75b0d73c1a9f84f811713e87c61df1dc5137867d34c2cba540`.
+  Macro NDCG@10: LambdaRank 0.6596, lexical overlap 0.6497, seeded random
+  0.5338. Any-tie groups: 14,495, 14,496 and 0 respectively; the tie rule is
+  ascending canonical candidate ID. Any-tie counts do not establish whether
+  top-ten scores change under tie averaging; no superiority or uncertainty
+  claim follows. Sanitized [aggregate](../../reports/runs/v2-esci-20261019/aggregate.json)
+  and [readback](../../reports/runs/v2-esci-20261019/readback.json) retain
+  source/hash evidence. A later source-bound manifest must be split-hash
+  reconciled before comparing its runs to this one.
+- D1 option-readout/training compatibility at integrated `22707ed3` exited 0
+  on A40 BF16: one fixed prompt, finite loss 0.57594, 166 trainable tensors
+  with nonzero gradients, option-readout parity maximum delta 2.98e-8,
+  unavailable-option probability 0, reload delta 0. No optimization or pilot
+  training occurred. Remote/local metadata SHA-256 matches
+  `2a9500911f60cf50635c31277b8994c8cebef92ab455174d12b9dea6f6317406`.
+  Receipt: `v2-swarm-20261019T030009Z/gpu_compat_22707`.
 
 No local workload was executed. The v2 worker branches have not yet passed a
 single integrated remote suite. Initial GitHub CPU runs were superseded by the
