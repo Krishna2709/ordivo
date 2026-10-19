@@ -20,6 +20,10 @@ readbacks. There is no public v2 model release or demonstrated cross-domain
 generality.
 See the [current v2 experiment report](reports/ordivo-v2-experiment.html) and
 [release criteria](docs/V2_RELEASE_CRITERIA.md) for exact denominators and pending work.
+The [next v2 research milestone](docs/decisions/0010-v2-permutation-consistent-ranking.md)
+and [implementation plan](docs/superpowers/plans/2026-10-19-v2-permutation-consistent-ranking.md)
+prioritize a frozen alias-versus-row-order audit, then matched numerical shared-scorer
+controls; implementation and new measurements are pending.
 
 The release run `20261019T005111Z` trained a d1-3B LoRA adapter for 400 steps on a remote A40 after a 130-test CPU acceptance suite. Across all 87 eligible held-out episodes, accuracy improved from 28.74% to 58.62%; on the original 16-episode comparison slice it improved from 37.5% to 75.0%. The published adapter, dataset, source, complete evaluation evidence, and W&B telemetry are linked below. [de01.ipynb](de01.ipynb) remains the Colab alternative, and the [Hugging Face Jobs runbook](docs/huggingface_jobs.md) remains available.
 

@@ -6,6 +6,14 @@ Planning date: 2026-10-18; execution status updated from the
 `blackOrder/Ordivo-v1` and its historical results. A completed bounded
 experiment does not mean a release criterion passed.
 
+**Next priority (2026-10-19):** Run the frozen validation-only alias-versus-row
+factorial, then compare matched independent numerical and masked set-context
+scorers. The [decision](decisions/0010-v2-permutation-consistent-ranking.md)
+and [implementation plan](superpowers/plans/2026-10-19-v2-permutation-consistent-ranking.md)
+define the gates. Further R0/RL continuation and unexecuted G0/G1 GRPO work
+are deferred until architecture, reward and evaluation boundaries are validated.
+The completed R0 row below remains historical evidence, not a pending run.
+
 | ID | Experiment | Data / target | Main comparison | Status |
 |---|---|---|---|---|
 | V0 | Weight policy + numerical verifier | Hand fixtures, adversarial inputs, independent formula references | Mathematical invariants | Implemented; see remote validation report |

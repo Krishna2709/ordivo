@@ -39,6 +39,15 @@ calibration-focused training are research options, not implemented trainers.
 See [ADR 0007](docs/decisions/0007-v2-multidomain-decision-learning.md).
 The deterministic foundation is now implemented in `decision/`; behavioral adapters, preference learning and RL trainers remain planned. See [ADR 0008](docs/decisions/0008-v2-verifier-and-research-order.md) and [verification contract](docs/DECISION_VERIFICATION.md).
 
+The next **planned** v2 research milestone first separates alias assignment from
+content-row order in a frozen validation diagnostic, then compares independent
+numerical candidate scoring with a masked set-context scorer. Shared text
+encoding and set attention are conditional later experiments. Candidate scores
+remain separate from feasibility, weight provenance and exact verification; no
+new ranker or preference learner is implemented by this decision. See
+[ADR 0010](docs/decisions/0010-v2-permutation-consistent-ranking.md) and its
+[implementation plan](docs/superpowers/plans/2026-10-19-v2-permutation-consistent-ranking.md).
+
 Add a method by declaring its formula/domain/order/compromise contract and independent fixtures, then extend the generator/schema. Add behavioral datasets through a separate grouped loader; do not impersonate `synthetic_solver`. Add a model through the decision-input/probability boundary. Encoder set-ranking and full-ranking metrics are later distinct tasks, not implied by winner classification.
 
 The user requires remote resources only and selected Hugging Face Jobs after Colab allocation failures; see ADR0005. Pure functions remain reusable, but CLI/notebook entry points reject local workload execution. Source preparation stays local; generated datasets, caches, environments, runs and checkpoints stay remote. Colab is ephemeral: persistent artifacts and resumable checkpoints require an explicit remote destination.
