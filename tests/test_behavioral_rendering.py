@@ -188,6 +188,33 @@ def test_train_permutation_is_label_independent_and_preserves_id_mapped_targets(
     assert len({tuple(a['id'] for a in _permute_train_episode(base, seed=trial)['alternatives'])
                 for trial in range(20)}) > 1
 
+    observed = json.loads(json.dumps(base))
+    observed['task_type'] = 'observed_choice'
+    observed['supervision'] = {'outcomes_by_id': {
+        'private-id-1': {'click_bool': 0, 'booking_bool': 0},
+        'private-id-2': {'click_bool': 0, 'booking_bool': 0},
+        'private-id-3': {'click_bool': 1, 'booking_bool': 1}}}
+    moved = _permute_train_episode(observed, seed=42)
+    ids = [a['id'] for a in moved['alternatives']]
+    available = [a['available'] for a in moved['alternatives']]
+    kind, target, mask = _label(moved, ids, available,
+                                {'prediction_event': 'conditional_booking_choice'})
+    assert kind == 'choice' and ids[int(target)] == 'private-id-3'
+    assert mask.tolist() == available
+
+    relevance = json.loads(json.dumps(base))
+    relevance['task_type'] = 'graded_relevance'
+    relevance['supervision'] = {'grades_by_id': {'private-id-1': 'E',
+                                                'private-id-2': 'I'},
+                                'unjudged_ids': ['private-id-3']}
+    moved = _permute_train_episode(relevance, seed=42)
+    ids = [a['id'] for a in moved['alternatives']]
+    available = [a['available'] for a in moved['alternatives']]
+    kind, weights, judged = _label(moved, ids, available, {})
+    assert kind == 'ranking'
+    assert ids[int(weights.argmax())] == 'private-id-1'
+    assert judged.tolist() == [id_ != 'private-id-3' for id_ in ids]
+
 
 def test_supervised_exclusion_precedes_conditional_projection(monkeypatch):
     from scripts import train_v2_supervised as trainer
