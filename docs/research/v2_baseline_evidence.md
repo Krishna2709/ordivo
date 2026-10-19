@@ -1,7 +1,7 @@
 # Ordivo v2 behavioral baseline evidence
 
 This file records the evaluator and specialist baseline contract and the
-Swissmetro receipt below; Expedia and ESCI results remain pending. Each live run
+Swissmetro and ESCI receipts below; Expedia remains pending. Each live run
 receipt must name an exact code commit, source hashes, terms, split manifest,
 dependency versions, candidate coverage, test outcome, and remote artifact paths.
 
@@ -22,7 +22,7 @@ namespaced episode and every available candidate, rejects extras and non-finite
 scores, and never silently shrinks the denominator. It groups aggregates by
 source, task type, and policy; it publishes no pooled probability metric.
 
-The ESCI gain conversion follows [Amazon's official Task 1 ranking preparation](https://github.com/amazon-science/esci-data/blob/main/ranking/prepare_trec_eval_files.py).
+The ESCI gain conversion follows [Amazon's official Task 1 ranking preparation](https://github.com/amazon-science/esci-data/blob/7916cdf6ab75a462e77f20ab40428a10923998d5/ranking/prepare_trec_eval_files.py).
 It is a declared source task mapping, not a human utility scale. The Expedia
 0/1/5 gains are a research policy, not a competition reproduction.
 
@@ -63,10 +63,10 @@ Its time, cost and headway inputs are source fields, not invented weights.
 
 | Gate | Status |
 |---|---|
-| Source code and hand-authored tests | Present on the evaluation branch; remote execution pending. |
+| Source code and hand-authored tests | Included in the remote integrated suite below; newer neural-probe fixtures remain pending. |
 | Integrated remote suite | 214 tests, exit 0, no skips at integrated commit `9c532d98050e40ab3c9056e0bec1eeace123ccef`; controller archive SHA `4dd4793819f8d4507312894dbdbac9e510fc67d01afc6da7a6c292276f491838`. This includes evaluator fixtures and LightGBM save/reload parity fixture. |
-| Remote LightGBM save/reload parity | Fixture check included in the 214-test suite; real ESCI/Expedia model bundle pending. |
-| Real ESCI lexical and ranker results | Pending source acquisition, manifested dataset, remote run. |
+| Remote LightGBM save/reload parity | Fixture check included in the 214-test suite; real ESCI bundle persisted and scored. |
+| Real ESCI lexical and ranker results | Complete for frozen old manifest at commit `22707ed34fd125e96aade9123f9baaf34cd64a18`; new manifest equivalence pending. |
 | Real Expedia baseline | Pending authenticated source access and terms record. |
 | Swissmetro stated-choice baseline | Real 1,044-episode test run complete with full score coverage and model reload parity; figures and limits below. |
 
@@ -96,3 +96,35 @@ on this split. No uncertainty interval or causal interpretation has been
 computed. The source terms field points to Biogeme's site but redistribution
 rights have not been established; keep model/per-query artifacts private and
 do not promote a public efficacy claim from this receipt.
+
+## ESCI old-manifest relevance receipt
+
+The official Amazon repository was acquired at commit
+`7916cdf6ab75a462e77f20ab40428a10923998d5`. The source Task 1 gain script
+at that revision defines the E/C/S/I conversion used above. The remote run
+used integrated code commit `22707ed34fd125e96aade9123f9baaf34cd64a18`
+and frozen manifest SHA-256
+`012fa5f58aaa6b75b0d73c1a9f84f811713e87c61df1dc5137867d34c2cba540`.
+Raw examples/products SHA-256 values are
+`4a735b693b4a424a6fc67f5be6e4c811495c488bbf66d02a602d308b2744263a`
+and `25124442d064d64b26f74082d6fa09438d679efc0c183cf28d19064a2b65a265`.
+The sanitized aggregate readback matched remote SHA-256
+`d4e953a11ba9102b09fb5dd515b059731db856f6b26d4e8bb97fe66643be2673`.
+Split counts were train 30,372, validation 1,688, unused calibration 1,744,
+and official test 14,496. All 14,496 test groups were scored, with zero failed
+queries, zero unjudged candidates, and zero zero-ideal-gain NDCG exclusions.
+The fitted LightGBM 4.7.0 bundle selected iteration 138 on validation.
+
+| Baseline | Test macro NDCG@10 | Eligible |
+|---|---:|---:|
+| ESCI lexical-feature LambdaRank | 0.659554 | 14,496 |
+| Lexical overlap control | 0.649744 | 14,496 |
+| Seeded random score | 0.533827 | 14,496 |
+
+The ranker had at least one tied score in 14,495 test queries, and the lexical
+control in all 14,496. That count alone does not tell us whether ties affect
+NDCG@10; exact tie sensitivity remains unmeasured. This result is valid for
+the frozen old manifest. A subsequent data-code fix added source-bound
+manifest fields and group accounting; matched neural comparisons require
+equality of all four split-file SHA-256 values after rebuilding, or a fresh
+baseline run on changed split bytes. Per-query files remain in remote storage.
