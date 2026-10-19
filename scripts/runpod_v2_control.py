@@ -276,11 +276,12 @@ def run_task(task, repo, commit, command, secret_names=(), outputs=()):
             name = Path(member.name)
             lowered = [part.lower() for part in name.parts]
             if (name.is_absolute() or '..' in name.parts or member.issym() or member.islnk()
+                    or (lowered and lowered[0] in {'reports', 'dist', 'checkpoints',
+                                                    'models'})
                     or any(part.startswith('.env') or
                            any(term in part for term in ('credential', 'secret', 'private_key',
                                                           'kaggle.json', 'token.json')) or
-                           part in {'.kaggle', '.wandb',
-                                    'reports', 'dist', 'checkpoints', 'models'}
+                           part in {'.kaggle', '.wandb'}
                            for part in lowered)
                     or name.suffix.lower() in {'.safetensors', '.pt', '.pth', '.ckpt',
                                                '.parquet', '.arrow'}):
