@@ -60,10 +60,13 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
 - After the user confirmed applicable rules, an official Expedia archive was
   acquired: 434,573,097 bytes, SHA-256
   `f16b9622a73c015e2693284a5939a82817417f23f284bfd69081f1f35cdd0602`.
-  Python `zipfile` cannot extract its Deflate64 CSV members. A versioned
-  streaming extraction fix is in progress; no grouped Expedia manifest or
-  benchmark exists yet. [Archive inventory](../../reports/runs/v2-expedia-20261019/inventory.json)
-  is path-redacted metadata only.
+  Python `zipfile` could not extract its Deflate64 CSV members. A versioned
+  7-Zip 23.01 extraction succeeded: official `train.csv` is 2,358,114,793
+  bytes, SHA-256 `84a53139ea92df1e9400f84852facbd78f3136f366a08440f4ab4518e71a49a9`.
+  No grouped Expedia manifest or benchmark exists yet.
+  [Archive inventory](../../reports/runs/v2-expedia-20261019/inventory.json)
+  and [source receipt](../../reports/runs/v2-expedia-20261019/acquisition.json)
+  contain metadata only.
 - Official Amazon ESCI Task 1 acquisition/build at `b352c14` exited 0: 2,621,288
   example rows, 1,503,277 outside the reduced ranking pool omitted,
   1,118,011 candidate rows across 48,300 groups. Four partitions contain

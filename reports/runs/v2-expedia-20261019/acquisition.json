@@ -1,0 +1,14 @@
+{
+  "acquisition_method": "verified_preexisting_archive",
+  "download_archive_sha256": "f16b9622a73c015e2693284a5939a82817417f23f284bfd69081f1f35cdd0602",
+  "files": {
+    "train.csv": {
+      "bytes": 2358114793,
+      "sha256": "84a53139ea92df1e9400f84852facbd78f3136f366a08440f4ab4518e71a49a9"
+    }
+  },
+  "revision": "kaggle-competition-data.zip",
+  "rights_reference": "https://www.kaggle.com/c/expedia-personalized-sort/rules (competition terms; no redistribution assumed)",
+  "source": "expedia_personalized_sort_2013",
+  "source_url": "https://www.kaggle.com/c/expedia-personalized-sort/data"
+}
