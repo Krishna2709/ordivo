@@ -47,6 +47,12 @@ def fit_ranker(train: list[Mapping], validation: list[Mapping], config: Mapping,
 
     if not train or not validation:
         raise ValueError("train and validation must both contain complete groups")
+    train_ids = [e["episode_id"] for e in train]
+    validation_ids = [e["episode_id"] for e in validation]
+    if (len(set(train_ids)) != len(train_ids) or
+            len(set(validation_ids)) != len(validation_ids) or
+            set(train_ids) & set(validation_ids)):
+        raise ValueError("duplicate or overlapping train/validation episode")
     output = Path(output)
     if output.exists():
         raise FileExistsError(output)
@@ -55,8 +61,8 @@ def fit_ranker(train: list[Mapping], validation: list[Mapping], config: Mapping,
     if any(e["supervision"]["policy_id"] != policy_id for e in train + validation):
         raise ValueError("target policy mismatch")
     feature_state = FeatureState(config["feature_policy"]).fit(train)
-    x_train, train_groups, train_ids = feature_state.transform(train)
-    x_validation, validation_groups, validation_ids = feature_state.transform(validation)
+    x_train, train_groups, train_candidate_ids = feature_state.transform(train)
+    x_validation, validation_groups, validation_candidate_ids = feature_state.transform(validation)
     labels_train, labels_validation = _labels(train, policy), _labels(validation, policy)
     if sum(train_groups) != len(labels_train) or sum(validation_groups) != len(labels_validation):
         raise ValueError("contiguous group sizes do not cover labels")
@@ -76,7 +82,7 @@ def fit_ranker(train: list[Mapping], validation: list[Mapping], config: Mapping,
                               group=validation_groups, reference=training, free_raw_data=False)
 
     def validation_ndcg5(values, _dataset):
-        predictions = _predictions(validation, validation_ids, validation_groups, values)
+        predictions = _predictions(validation, validation_candidate_ids, validation_groups, values)
         report = evaluate_ranking(validation, predictions, policy)
         segment = next(iter(report["by_source_task_policy"].values()))
         metric = segment["macro"]["ndcg@5"]
@@ -92,7 +98,7 @@ def fit_ranker(train: list[Mapping], validation: list[Mapping], config: Mapping,
                                                       first_metric_only=True, verbose=False)])
     best_iteration = booster.best_iteration
     validation_values = booster.predict(x_validation, num_iteration=best_iteration)
-    validation_predictions = _predictions(validation, validation_ids, validation_groups, validation_values)
+    validation_predictions = _predictions(validation, validation_candidate_ids, validation_groups, validation_values)
     validation_report = evaluate_ranking(validation, validation_predictions, policy)
     output.mkdir(parents=True)
     booster.save_model(str(output / "model.txt"), num_iteration=best_iteration)
