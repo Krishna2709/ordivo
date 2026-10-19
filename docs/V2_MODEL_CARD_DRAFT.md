@@ -2,6 +2,14 @@
 
 **Research status:** no v2 checkpoint, adapter, or multi-domain performance claim is established here. This is the intended public card template; replace each pending field with an immutable receipt before publication. [Release criteria](V2_RELEASE_CRITERIA.md) control promotion. `blackOrder/Ordivo-v1` and its [synthetic-only results](../reports/V2_RESEARCH_AUDIT.md) are a separate historical model.
 
+A bounded remote compatibility check at integrated source commit
+`22707ed34fd125e96aade9123f9baaf34cd64a18` completed one A40 BF16
+forward/backward pass on a fixed prompt: finite loss, 166 trainable tensors with
+nonzero gradients, unavailable-option probability zero, and zero reload delta
+on that check. It took **no optimizer step** and produced no v2 trained adapter
+or behavioral performance evidence. The remote/local metadata SHA-256 is
+`2a9500911f60cf50635c31277b8994c8cebef92ab455174d12b9dea6f6317406`.
+
 ## Intended system
 
 Ordivo v2 investigates a shared neural component for grouped candidate scoring across observed choice, stated choice, graded relevance, and explicit ranking. A deterministic layer handles declared MCDM formulas, hard constraints, feasible alternatives, Pareto checks and weight scenarios. The neural output proposes scores or choices; the verifier alone establishes arithmetic validity. No authoritative criterion weights can be inferred from a decision matrix without a user, policy, or preference evidence source.

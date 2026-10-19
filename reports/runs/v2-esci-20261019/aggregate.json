@@ -1,0 +1,116 @@
+{
+  "candidate_pool_scope": "source_task1_reduced_candidate_list",
+  "code_revision": "22707ed34fd125e96aade9123f9baaf34cd64a18",
+  "code_revision_basis": "controller_verified_archive_env",
+  "config_sha256": "39da849ff4b5677d1fec0bfc421a52fbbcb146c36c01a6175955e633fac770b6",
+  "elapsed_seconds": 85.97515297308564,
+  "experiment_id": "ordivo-v2-esci-lexical-ranker-v1",
+  "manifest_sha256": "012fa5f58aaa6b75b0d73c1a9f84f811713e87c61df1dc5137867d34c2cba540",
+  "metrics": {
+    "lambdarank": {
+      "by_source_task_policy": {
+        "amazon_esci|graded_relevance|esci-task1-official-gain-v1": {
+          "macro": {
+            "ndcg@10": {
+              "eligible": 14496,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.6595536707876613
+            },
+            "ndcg@5": {
+              "eligible": 14496,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.6190922733246061
+            }
+          },
+          "query_count": 14496,
+          "tied_score_queries": 14495,
+          "unjudged_candidates": 0
+        }
+      },
+      "estimand": "ranking_within_judged_task1_reduced_candidates",
+      "expected_queries": 14496,
+      "failed_queries": 0,
+      "missing_predictions": [],
+      "prediction_tie_break": "canonical_candidate_id_ascending",
+      "schema_version": "ordivo-ranking-eval-v1",
+      "scored_queries": 14496
+    },
+    "lexical_overlap": {
+      "by_source_task_policy": {
+        "amazon_esci|graded_relevance|esci-task1-official-gain-v1": {
+          "macro": {
+            "ndcg@10": {
+              "eligible": 14496,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.6497443706383713
+            },
+            "ndcg@5": {
+              "eligible": 14496,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.6061167904262527
+            }
+          },
+          "query_count": 14496,
+          "tied_score_queries": 14496,
+          "unjudged_candidates": 0
+        }
+      },
+      "estimand": "ranking_within_judged_task1_reduced_candidates",
+      "expected_queries": 14496,
+      "failed_queries": 0,
+      "missing_predictions": [],
+      "prediction_tie_break": "canonical_candidate_id_ascending",
+      "schema_version": "ordivo-ranking-eval-v1",
+      "scored_queries": 14496
+    },
+    "random_seed42": {
+      "by_source_task_policy": {
+        "amazon_esci|graded_relevance|esci-task1-official-gain-v1": {
+          "macro": {
+            "ndcg@10": {
+              "eligible": 14496,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.5338274241462146
+            },
+            "ndcg@5": {
+              "eligible": 14496,
+              "excluded_zero_ideal_gain": 0,
+              "value": 0.47182838259722465
+            }
+          },
+          "query_count": 14496,
+          "tied_score_queries": 0,
+          "unjudged_candidates": 0
+        }
+      },
+      "estimand": "ranking_within_judged_task1_reduced_candidates",
+      "expected_queries": 14496,
+      "failed_queries": 0,
+      "missing_predictions": [],
+      "prediction_tie_break": "canonical_candidate_id_ascending",
+      "schema_version": "ordivo-ranking-eval-v1",
+      "scored_queries": 14496
+    }
+  },
+  "model": {
+    "lightgbm_version": "4.7.0",
+    "model_best_iteration": 138,
+    "model_kind": "lambdarank"
+  },
+  "prediction_event": null,
+  "ranking_objective": "source_graded_relevance_gain_lambdarank",
+  "runtime_provider": "runpod",
+  "source": "amazon_esci",
+  "source_sha256": {
+    "examples": "4a735b693b4a424a6fc67f5be6e4c811495c488bbf66d02a602d308b2744263a",
+    "products": "25124442d064d64b26f74082d6fa09438d679efc0c183cf28d19064a2b65a265"
+  },
+  "source_terms": "https://github.com/amazon-science/esci-data/blob/main/LICENSE",
+  "split_counts": {
+    "calibration_unused": 1744,
+    "test": 14496,
+    "train": 30372,
+    "validation": 1688
+  },
+  "split_policy_id": "esci-official-train-test-v2-calibration"
+}
