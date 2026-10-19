@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import os
@@ -45,6 +46,26 @@ def _select_unit_ids(units, *, limit, seed, source, split):
         raise ValueError('positive group subset limit required')
     return frozenset(sorted(units, key=lambda unit: (
         hashlib.sha256(f'{seed}|{source}|{split}|{unit}'.encode()).digest(), unit))[:limit])
+
+
+def _permute_train_episode(episode, *, seed):
+    """Order every candidate deterministically without reading any target field.
+
+    Candidate records retain their IDs, features and availability. Supervision
+    remains ID-keyed and is mapped to new indices later by `_label`. This opt-in
+    is applied only to selected train rows, never validation/calibration/test.
+    """
+    if not isinstance(seed, int) or not episode.get('source') or not episode.get('episode_id'):
+        raise ValueError('seed and source-bound episode identity required')
+    copied = copy.deepcopy(episode)
+    candidates = copied['alternatives']
+    ids = [candidate['id'] for candidate in candidates]
+    if len(ids) != len(set(ids)) or any(not isinstance(id_, str) or not id_ for id_ in ids):
+        raise ValueError('candidate IDs must be unique nonempty strings')
+    copied['alternatives'] = sorted(candidates, key=lambda candidate: (
+        hashlib.sha256(f"{seed}|{episode['source']}|{episode['episode_id']}|{candidate['id']}".encode()).digest(),
+        candidate['id']))
+    return copied
 
 
 def _unit(row):
@@ -271,6 +292,8 @@ def run(config_path, output):
     source_identity = _source_identity()
     if config.get('publish_model_artifacts', False):
         raise ValueError('model artifact publication requires separate rights and destination review')
+    if type(config.get('train_candidate_permutation', False)) is not bool:
+        raise ValueError('train_candidate_permutation must be boolean')
     if config['model_id'] != MODEL or config['revision'] != REVISION:
         raise ValueError('unexpected base model identity')
     if not (1 <= config['max_steps'] <= 100 and 60 <= config['max_runtime_seconds'] <= 7200):
@@ -284,6 +307,7 @@ def run(config_path, output):
         'max_validation_groups': config.get('max_validation_groups', 100),
         'max_train_episodes': config.get('max_train_episodes', 10000),
         'max_validation_episodes': config.get('max_validation_episodes', 1000)}
+    effective_hyperparameters['train_candidate_permutation'] = config.get('train_candidate_permutation', False)
     specs = config['sources']
     _validate_source_specs(specs)
     output = Path(output)
@@ -310,6 +334,8 @@ def run(config_path, output):
                 json.loads((Path(spec['directory']) / 'manifest.json').read_text()).get('candidate_pool_scope')
                 != 'source_exposed_candidates'):
             raise ValueError('conditional booking requires exposed candidate pool')
+        if config.get('train_candidate_permutation', False):
+            rows['train'] = [_permute_train_episode(row, seed=config['seed']) for row in rows['train']]
         training[spec['name']], train_excluded = _examples(
             rows['train'], tokenizer, spec['feature_policy'], config['max_length'],
             started + config['max_runtime_seconds'])
@@ -321,6 +347,7 @@ def run(config_path, output):
         provenance[spec['name']] = {**source_info,
                                     'canonical_source': spec['expected_source'],
                                     'feature_policy': spec['feature_policy'],
+                                    'train_candidate_permutation': config.get('train_candidate_permutation', False),
                                     'selected_train_episodes': len(rows['train']),
                                     'selected_validation_episodes': len(rows['validation']),
                                     'eligible_train_groups': len(training[spec['name']]),
