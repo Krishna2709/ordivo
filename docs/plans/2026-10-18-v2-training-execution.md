@@ -11,7 +11,7 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
 | Constraints, Pareto and numerical claim verification | Implemented | `decision/verification.py`, exact solver reference tests |
 | Explicit weight scenarios | Implemented | Recomputed scores and stability, not confidence |
 | Independent review | Complete, important issue fixed | Unknown feasibility regression reproduced then corrected |
-| Real multi-domain data adapters/grouped baselines | Three official sources grouped; Swissmetro/ESCI classical held-out benchmarks complete; Expedia benchmark pending | Swissmetro and ESCI source-bound four-role manifests audited; Expedia source-bound 399,344-search build passed. Source-specific classical metrics and denominators below. |
+| Real multi-domain data adapters/grouped baselines | Three official sources grouped; Swissmetro/ESCI full source-defined and Expedia bounded sampled classical benchmarks complete | Swissmetro and ESCI source-bound four-role manifests audited; Expedia source-bound 399,344-search build and 5,000-search sampled classical benchmark passed. Exact cohort/denominators below. |
 | Differentiable d1 readout and training compatibility | Bounded remote check passed | Exact integrated commit `22707ed3`; one fixed A40 BF16 forward/backward, finite loss/gradients and reload parity. No optimizer step in this compatibility check. |
 | V2 SFT and direct calibration baselines | Preliminary two-domain SFT pilot completed; direct Brier C1 completed with worse selected-validation loss | Pilot source `854de087`, 40 steps, private best adapter and selected-validation/paired-probe receipts below; C1 40-step continuation at `f696437`, best post-update loss 1.645953 versus start 1.581737; no held-out claim. |
 | RLCD/GRPO experiments and DPO pairs | Stochastic report R0 completed with worse selected-validation loss | R0 40-step continuation at `f696437`, best post-update loss 1.616376 versus start 1.581737; G0/G1/P0 not executed. |
@@ -75,7 +75,7 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   Python `zipfile` could not extract its Deflate64 CSV members. A versioned
   7-Zip 23.01 extraction succeeded: official `train.csv` is 2,358,114,793
   bytes, SHA-256 `84a53139ea92df1e9400f84852facbd78f3136f366a08440f4ab4518e71a49a9`.
-  A grouped Expedia manifest was built later; no benchmark exists yet.
+  A grouped Expedia manifest and bounded sampled benchmark were built later.
   [Archive inventory](../../reports/runs/v2-expedia-20261019/inventory.json)
   and [source receipt](../../reports/runs/v2-expedia-20261019/acquisition.json)
   contain metadata only.
@@ -90,9 +90,27 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   has SHA-256 `3b14e3f30466a2da868ac636c8888bc42366f865737715a57a67f32866a02d92`
   and records exact split hashes, candidate pool, judgment policy and 122,751
   zero-booking groups. Focused data tests passed 20/0 remotely at the same
-  commit. No Expedia benchmark or neural training result has been measured;
+  commit. A bounded classical benchmark followed, but no Expedia neural
+  training result has been measured;
   source rows and grouped JSONLs stay private, and derivative-weight rights
   remain source-specific.
+- Bounded Expedia classical ranking benchmark at exact evaluator commit
+  `79da4ffa885888d141bc396a617c48c4c8fa0531` used a predeclared,
+  label-independent complete-search hash sample from the full source manifest.
+  Derived [sample manifest](../../reports/runs/v2-expedia-bounded-20261019/manifest.json)
+  SHA-256 `c72552b8fe1acd0cab0480610dd65b5dd6aed575313047d2da2f2786953b4a2b`
+  selected 20,000 train, 2,000 validation, 2,000 unused calibration and 5,000
+  test groups. The 5,000 test groups contained 123,456 candidates; 34,851
+  original source test groups were outside the bounded sample. All selected
+  test groups scored, zero failures/unjudged. Declared click/booking 0/1/5-gain
+  NDCG@10 was LambdaRank 0.413110, price 0.268414, rating 0.240019, seeded
+  random 0.232711. Booking-only NDCG@10 0.436156 used 3,389 booking-positive
+  groups, excluding 1,611 zero-booking groups; click-only NDCG@10 was 0.416388
+  on 5,000 groups. The [sanitized aggregate](../../reports/runs/v2-expedia-bounded-20261019/aggregate.json)
+  SHA-256 `95d9251e7efa1d9b6ab745f25cd8649fb9bbf5d532bdcaa76dab6d39db1182b0`
+  is a one-run, sampled exposed-candidate ranking result, not booking
+  probability, full-source performance, causal preference, or neural v2
+  performance. No paired interval or actual billed cost recorded.
 - Official Amazon ESCI Task 1 acquisition/build at `b352c14` exited 0: 2,621,288
   example rows, 1,503,277 outside the reduced ranking pool omitted,
   1,118,011 candidate rows across 48,300 groups. Four partitions contain

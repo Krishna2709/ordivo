@@ -10,8 +10,8 @@ local workspace is for source and documentation editing only; do not install
 packages, generate data, run tests or download models locally.
 
 **V2 research status (2026-10-19):** official Swissmetro, Amazon ESCI and
-Expedia sources have grouped four-way remote builds. Swissmetro and ESCI have
-classical benchmarks; a private two-domain neural pilot has a bounded paired
+Expedia sources have grouped four-way remote builds. Swissmetro and ESCI have full source-defined classical benchmarks; Expedia has
+a bounded 5,000-search classical ranking benchmark; a private two-domain neural pilot has a bounded paired
 probe with mixed/negative held-out results and material ESCI prompt overflow.
 There is no public v2 model release or demonstrated cross-domain generality.
 See the [current v2 experiment report](reports/ordivo-v2-experiment.html) and
@@ -301,8 +301,8 @@ The release run verified the pinned checkpoint, actual completion mask, frozen v
 
 Persist checkpoints, config, source snapshot, data manifest and environment freeze to a user-selected Google Drive folder or approved artifact store. A Colab disconnect can delete VM disk. Mounting Drive alone does not copy outputs; explicitly save/copy checkpoints there. Resume requires optimizer/scheduler/trainer state as well as adapter weights and the pinned base snapshot; verify reload predictions before scaling.
 
-Expedia and MSLR are optional pending their access/use agreements. UCI Car is a classification sanity task. Numerical neural/LightGBM controls and behavioral ranking remain future milestones.
+At the v1 release, Expedia and MSLR were proposed future sources; the dated v2 status above records the later Expedia research acquisition and grouped build. UCI Car remains a classification sanity task. The published v1 adapter and its evidence are unchanged by the v2 research runs.
 
 ## V2 training plan and implemented foundation
 
-The accepted [research design](docs/RL_RESEARCH_DESIGN.md) preserves d1-3B and the v1 baseline, then compares supervised learning, calibrated probability objectives and verifier-guided RL. The first implemented slice provides [weight provenance](docs/WEIGHT_INFERENCE_POLICY.md), constraints, Pareto analysis, exact score verification and weight sensitivity. See [the executable input/output example](docs/DECISION_VERIFICATION.md), [reward design](docs/REWARD_DESIGN.md), [experiment matrix](docs/EXPERIMENT_MATRIX.md), and [remote test evidence](reports/V2_VERIFIER_VALIDATION.md). No v2 trained checkpoint is claimed. All workloads run on RunPod; the laptop is used for source editing and control only.
+The accepted [research design](docs/RL_RESEARCH_DESIGN.md) preserves d1-3B and the v1 baseline, then compares supervised learning, calibrated probability objectives and verifier-guided RL. The first implemented slice provides [weight provenance](docs/WEIGHT_INFERENCE_POLICY.md), constraints, Pareto analysis, exact score verification and weight sensitivity. See [the executable input/output example](docs/DECISION_VERIFICATION.md), [reward design](docs/REWARD_DESIGN.md), [experiment matrix](docs/EXPERIMENT_MATRIX.md), and [remote test evidence](reports/V2_VERIFIER_VALIDATION.md). A preliminary v2 adapter exists in a private research repository; its bounded probe and limits are in the current v2 report above. No public v2 checkpoint is released. All workloads run on RunPod; the laptop is used for source editing and control only.
