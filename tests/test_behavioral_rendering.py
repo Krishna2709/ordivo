@@ -1,5 +1,6 @@
 import importlib
 import sys
+import time
 import types
 
 import pytest
@@ -121,6 +122,23 @@ def test_supervised_exclusion_precedes_conditional_projection(monkeypatch):
                'a': {'booking_bool': 1, 'click_bool': 1},
                'b': {'booking_bool': 0, 'click_bool': 0}}}}
     rows, excluded = trainer._examples([zero, one], None,
-                                        {'prediction_event': 'conditional_booking_choice'}, 100)
+                                        {'prediction_event': 'conditional_booking_choice'},
+                                        100, time.monotonic() + 10)
     assert len(rows) == 1 and called == ['one']
     assert excluded['no_supervised_event_or_positive_gain'] == 1
+
+
+def test_pilot_group_subset_is_order_invariant_and_panel_atomic():
+    from scripts.train_v2_supervised import _select_unit_ids
+
+    units = ['source:respondent-a', 'source:respondent-b', 'source:respondent-c']
+    left = _select_unit_ids(units, limit=2, seed=42, source='source', split='train')
+    right = _select_unit_ids(list(reversed(units)), limit=2, seed=42,
+                             source='source', split='train')
+    assert left == right and len(left) == 2
+    # The selector operates on respondent split units, not individual rows.
+    panel_rows = ['source:respondent-a'] * 3 + ['source:respondent-b'] * 2
+    selected = _select_unit_ids(set(panel_rows), limit=1, seed=42,
+                                source='source', split='train')
+    kept = [unit for unit in panel_rows if unit in selected]
+    assert len(kept) in (2, 3)
