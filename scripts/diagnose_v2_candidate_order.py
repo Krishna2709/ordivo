@@ -15,9 +15,16 @@ from liquid_mcdm.evaluation.neural_heldout import _validate_probabilities
 from liquid_mcdm.evaluation.ranking import ranked_ids
 from liquid_mcdm.runtime import require_remote_gpu
 from liquid_mcdm.training.behavioral_rendering import PROMPT_VERSION, render_behavioral
-from scripts.evaluate_v2_neural_heldout import (
-    MODEL, REVISION, _controller_identity, _score_model, _source, _write,
-)
+try:
+    from scripts.evaluate_v2_neural_heldout import (
+        MODEL, REVISION, _controller_identity, _score_model, _source, _write,
+    )
+except ModuleNotFoundError as exc:
+    if exc.name != "scripts":
+        raise
+    from evaluate_v2_neural_heldout import (  # type: ignore[no-redef]
+        MODEL, REVISION, _controller_identity, _score_model, _source, _write,
+    )
 
 
 def permute_candidates(episode: dict, seed: int) -> dict:

@@ -1,6 +1,10 @@
 """Invented groups prove order changes preserve candidate identity and paired coverage."""
 
 import copy
+import os
+import subprocess
+import sys
+from pathlib import Path
 
 import pytest
 
@@ -80,3 +84,14 @@ def test_validation_source_selection_is_separate_from_test(tmp_path):
     with pytest.raises(ValueError, match="partition"):
         _source({"directory": str(tmp_path)}, digest, seed=42, limit=1,
                 max_episodes=5, partition="calibration")
+
+
+def test_direct_script_launch_resolves_shared_evaluator_import():
+    root = Path(__file__).resolve().parents[1]
+    env = {**os.environ, "PYTHONPATH": str(root / "src")}
+    completed = subprocess.run(
+        [sys.executable, "scripts/diagnose_v2_candidate_order.py", "--help"],
+        cwd=root, env=env, text=True, capture_output=True, check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert "--pilot-output" in completed.stdout
