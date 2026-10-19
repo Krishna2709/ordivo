@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+title: Liquid MCDM Lab
+message: If you use this software, dataset, or adapter, please cite this repository.
+type: software
+authors:
+  - family-names: Kankipati
+    given-names: Krishna
+repository-code: https://github.com/Krishna2709/liquid-mcdm-lab
+url: https://huggingface.co/blackOrder/d1-3b-mcdm-lora
+license: Apache-2.0
+version: 0.1.0
+date-released: 2026-10-18
+keywords:
+  - multi-criteria decision making
+  - decision models
+  - LiquidAI
+  - LoRA
