@@ -82,6 +82,44 @@ def test_observed_event_is_visible_and_target_is_not(renderer):
     assert 'click' in click['prompt']
 
 
+def test_predictor_only_request_preserves_frozen_prompt_bytes(renderer):
+    from liquid_mcdm.training.behavioral_rendering import render_predictor_input
+
+    policy = {'context_features': ['purpose'], 'alternative_features': ['cost']}
+    projected = {key: episode()[key] for key in (
+        'task_type', 'context', 'criteria', 'constraints', 'preferences', 'alternatives')}
+    request = {'schema_version': 'ordivo-behavioral-v1', **projected}
+    supervised = renderer(episode(), CharacterTokenizer(), policy)
+    predicted = render_predictor_input(request, CharacterTokenizer(), policy)
+    assert predicted == supervised
+    assert 'private-id' not in predicted['prompt']
+
+
+def test_predictor_only_rejects_labels_extra_features_and_event_drift(renderer):
+    from liquid_mcdm.training.behavioral_rendering import render_predictor_input
+
+    policy = {'context_features': ['purpose'], 'alternative_features': ['cost']}
+    base = {'schema_version': 'ordivo-behavioral-v1', **{
+        key: episode()[key] for key in (
+            'task_type', 'context', 'criteria', 'constraints', 'preferences', 'alternatives')}}
+    import copy
+    for change in ('supervision', 'extra_feature', 'nested_label', 'schema', 'event'):
+        request = copy.deepcopy(base)
+        if change == 'supervision':
+            request['supervision'] = {'selected_id': 'private-id-1'}
+        elif change == 'extra_feature':
+            request['alternatives'][0]['features']['post_choice'] = 1
+        elif change == 'nested_label':
+            request['preferences']['selected_id'] = 'private-id-1'
+        elif change == 'schema':
+            request['schema_version'] = 'other'
+        else:
+            request['task_type'] = 'observed_choice'
+            request['prediction_event'] = 'conditional_booking_choice'
+        with pytest.raises(ValueError):
+            render_predictor_input(request, CharacterTokenizer(), policy)
+
+
 def test_supervised_labels_respect_event_population_and_unjudged_mask():
     from scripts.train_v2_supervised import _label
 
