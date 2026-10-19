@@ -114,7 +114,7 @@ entire-domain transfer were measured. This is not a protected release test or
 a general improvement claim. Expedia is conditional booking within its bounded
 exposed-search sample, not general booking probability.
 
-A validation-only candidate-order probe of this frozen pilot found
+A validation-only candidate-order probe of the original frozen two-source S0 pilot found
 52/180 Swissmetro top-choice flips (28.89%) across 20 selected respondents,
 and 7/12 admitted ESCI flips (58.33%) from 20 selected queries; eight ESCI
 query groups overflowed in both orders. Mean probability L1 change was
