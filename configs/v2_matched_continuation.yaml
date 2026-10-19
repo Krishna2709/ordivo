@@ -1,0 +1,48 @@
+# Frozen proposed C1/R0 comparison. Source-only until independent review.
+# Both arms replay exactly the same 40 complete groups from the pilot-selected cohort.
+model_id: LiquidAI/d1-3B
+revision: 051bcc464b01b9f92942b364d9586b0ef5912432
+prompt_version: behavioral-choice-v1
+event: stated_choice
+candidate_population: eligible_stated_choice_group
+pilot_receipt: /workspace/ordivo-v2-data/pilots/pilot-854de/pilot_receipt.json
+pilot_receipt_sha256: 5f58e02b3259601d9663892f50e32460a57be2d424724ec283d87ecb8678f7c1
+pilot_source_commit: 854de0877c8e7e380b7353a578e95ba9865d4e25
+pilot_source_archive_sha256: 38454c8d667183d57c9c48ed0bcc3d3b32f214e2485c6bdb6bf99f6af0204faa
+pilot_config_sha256: c152e64d839082531d4ece9e66d330fa35ffddfbc442685742b9fd171de5462b
+starting_adapter: /workspace/ordivo-v2-data/pilots/pilot-854de/best_adapter
+starting_adapter_sha256: 831fb319d8a2144ef26ed86a7c985ed3ca4b9662180ced32e28b6f4c469c612c
+seed: 42
+max_steps: 40
+max_runtime_seconds: 3600
+validation_interval: 10
+max_length: 2048
+learning_rate: 0.0001
+gradient_clip_norm: 1.0
+concentration: 20.0
+report_count: 8
+kl_weight: 0.01
+wandb_project: liquid-mcdm-lab
+wandb_mode: offline
+publish_model_artifacts: false
+sources:
+  - name: swissmetro
+    expected_source: swissmetro
+    directory: /workspace/ordivo-v2-data/processed/swissmetro-source-bound-v2
+    manifest_sha256: dd3dc4b0713506f1664149993ca11022614a3ee850c335944ae37b5525af592a
+    selected_split_unit_sha256:
+      train: 816c770c16250029f20cfef849254f3c270fa6442430606016260eadb86b5ff9
+      validation: 2a122590d592580f116e414c83e6c52d487c60c3fcc66f3421d823a6bd285045
+    feature_policy:
+      context_features: [purpose, ga, who, luggage]
+      alternative_features: [travel_time_minutes, cost_chf, headway_minutes]
+  - name: esci
+    expected_source: amazon_esci
+    directory: /workspace/ordivo-v2-data/processed/esci-source-bound-v2
+    manifest_sha256: 9fd4065fc0db4586453a412123eb9ef393b1750cd8196bb11cad794d020f07cc
+    selected_split_unit_sha256:
+      train: 58e75505bb0eebd5cec1584b846487dd4be20e2b419728fab8184030b418400b
+      validation: ec7e56f78e30dc00e9d3be07e4347e55cef72100eed4b8ec28198ed605b50bc1
+    feature_policy:
+      context_features: [query, locale]
+      alternative_features: [product_title, product_brand, product_color]

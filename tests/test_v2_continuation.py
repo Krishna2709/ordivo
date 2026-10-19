@@ -1,8 +1,5 @@
 """Contract checks for the matched C1/R0 continuation, without model loads."""
 import copy
-import hashlib
-import json
-
 import pytest
 import torch
 
@@ -41,6 +38,8 @@ def _receipt():
 def _config():
     receipt = _receipt()
     return {
+        'event': 'stated_choice',
+        'candidate_population': 'eligible_stated_choice_group',
         'pilot_receipt_sha256': '4' * 64,
         'starting_adapter_sha256': '5' * 64,
         'pilot_source_commit': receipt['source_identity']['commit'],
