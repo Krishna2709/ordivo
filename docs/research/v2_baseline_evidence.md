@@ -1,7 +1,7 @@
 # Ordivo v2 behavioral baseline evidence
 
-This file records the evaluator and specialist baseline contract. It is not a
-claim that real Expedia, ESCI, or Swissmetro benchmarks have run. The live run
+This file records the evaluator and specialist baseline contract and the
+Swissmetro receipt below; Expedia and ESCI results remain pending. Each live run
 receipt must name an exact code commit, source hashes, terms, split manifest,
 dependency versions, candidate coverage, test outcome, and remote artifact paths.
 

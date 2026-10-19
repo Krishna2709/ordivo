@@ -1,0 +1,8 @@
+# Remote-only paired probe. Paths come from the frozen pilot config and receipt.
+seed: 42
+max_runtime_seconds: 3600
+max_selected_episodes_per_source: 500
+max_test_units_per_source:
+  expedia: 50
+  esci: 50
+  swissmetro: 50
