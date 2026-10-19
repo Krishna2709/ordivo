@@ -80,33 +80,55 @@ def acquire_swissmetro(output: Path) -> dict:
                    "https://biogeme.epfl.ch/ (research/education data); verify dataset-specific redistribution terms")
 
 
-def acquire_expedia(output: Path) -> dict:
-    """Use the official Kaggle CLI with a scoped bearer token; never accept terms."""
-    if not os.environ.get("KAGGLE_API_TOKEN"):
-        raise RuntimeError("KAGGLE_API_TOKEN is required for official Expedia retrieval")
-    if shutil.which("kaggle") is None:
-        raise RuntimeError("official Kaggle CLI is unavailable")
-    output.mkdir(parents=True, exist_ok=False)
+def acquire_expedia(output: Path, existing_archive: Path | None = None, expected_archive_sha256: str | None = None) -> dict:
+    """Stream the labeled member of the official Deflate64 competition archive."""
+    if existing_archive is None:
+        if not os.environ.get("KAGGLE_API_TOKEN"):
+            raise RuntimeError("KAGGLE_API_TOKEN is required for official Expedia retrieval")
+        if shutil.which("kaggle") is None:
+            raise RuntimeError("official Kaggle CLI is unavailable")
+        output.mkdir(parents=True, exist_ok=False)
+    else:
+        existing_archive = Path(existing_archive)
+        if not existing_archive.is_file() or existing_archive.parent.resolve() != output.resolve():
+            raise ValueError("existing archive must be data.zip inside output directory")
+        if (output / "acquisition.json").exists():
+            raise FileExistsError("Expedia acquisition already completed")
     # The competition lists data.zip containing train.csv and unlabeled test.csv.
     # The CLI enforces existing account access/rules; this command never joins
     # the competition or accepts new terms.
-    _run("kaggle", "competitions", "download", "expedia-personalized-sort", "-f", "data.zip", "-p", str(output))
-    archive = output / "data.zip"
+    if existing_archive is None:
+        _run("kaggle", "competitions", "download", "expedia-personalized-sort", "-f", "data.zip", "-p", str(output))
+    archive = existing_archive or output / "data.zip"
     if not archive.exists():
         raise RuntimeError("official Kaggle download did not produce data.zip")
     archive_sha256 = _sha256(archive)
+    if expected_archive_sha256 and archive_sha256 != expected_archive_sha256:
+        raise ValueError("existing Expedia archive SHA-256 mismatch")
     with zipfile.ZipFile(archive) as zipped:
         matches = [name for name in zipped.namelist() if Path(name).name == "train.csv"]
         if len(matches) != 1:
             raise RuntimeError("official Expedia archive lacks a unique train.csv")
+        expected_bytes = zipped.getinfo(matches[0]).file_size
+        if zipped.getinfo(matches[0]).compress_type != 9:
+            raise RuntimeError("unexpected Expedia compression method; inspect archive before extraction")
+        if shutil.which("7z") is None:
+            raise RuntimeError("7z with Deflate64 support is required on the remote runtime")
         train = output / "train.csv"
-        with zipped.open(matches[0]) as source, train.open("wb") as destination:
-            shutil.copyfileobj(source, destination, length=1024 * 1024)
-    archive.unlink()
+        with train.open("wb") as destination:
+            result = subprocess.run(("7z", "x", "-so", str(archive), matches[0]), stdout=destination,
+                                    stderr=subprocess.PIPE, check=False)
+        if result.returncode:
+            train.unlink(missing_ok=True)
+            raise RuntimeError(f"7z failed to extract Expedia train.csv (exit {result.returncode})")
+        if train.stat().st_size != expected_bytes:
+            train.unlink(missing_ok=True)
+            raise RuntimeError("extracted Expedia train.csv size mismatch")
     receipt = _record(output, "expedia_personalized_sort_2013", "kaggle-competition-data.zip", [train],
                       "https://www.kaggle.com/c/expedia-personalized-sort/data",
                       "https://www.kaggle.com/c/expedia-personalized-sort/rules (competition terms; no redistribution assumed)")
     receipt["download_archive_sha256"] = archive_sha256
+    receipt["acquisition_method"] = "official_kaggle_cli" if existing_archive is None else "verified_preexisting_archive"
     (output / "acquisition.json").write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n")
     return receipt
 
@@ -116,6 +138,8 @@ def main() -> None:
     parser.add_argument("source", choices=("esci", "swissmetro", "expedia", "build-esci", "build-swissmetro", "build-expedia"))
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--input", type=Path, help="remote raw source file, or ESCI acquisition repo directory")
+    parser.add_argument("--existing-archive", type=Path, help="already downloaded data.zip in --output; no download")
+    parser.add_argument("--expected-archive-sha256", help="required hash comparison for a preexisting archive")
     args = parser.parse_args()
     if args.source.startswith("build-"):
         if args.input is None:
@@ -143,7 +167,9 @@ def main() -> None:
             episodes = expedia.iter_episodes(args.input, policy)
         print(json.dumps(write_dataset(episodes, args.output, policy), sort_keys=True))
         return
-    manifest = acquire_esci(args.output) if args.source == "esci" else acquire_swissmetro(args.output) if args.source == "swissmetro" else acquire_expedia(args.output)
+    if args.source == "expedia" and args.existing_archive and not args.expected_archive_sha256:
+        parser.error("--expected-archive-sha256 required with --existing-archive")
+    manifest = acquire_esci(args.output) if args.source == "esci" else acquire_swissmetro(args.output) if args.source == "swissmetro" else acquire_expedia(args.output, args.existing_archive, args.expected_archive_sha256)
     print(json.dumps(manifest, sort_keys=True))
 
 

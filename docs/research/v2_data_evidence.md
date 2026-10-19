@@ -102,8 +102,9 @@ official Git revision, streams only requested files, and writes
 <dataset-dir>`. For Expedia, the official Kaggle CLI accepts a scoped
 `KAGGLE_API_TOKEN` as documented in its [current authentication guide](https://github.com/Kaggle/kaggle-cli/blob/main/docs/README.md).
 `scripts/acquire_v2_sources.py expedia --output <remote-dir>` requests only the
-competition's `data.zip`, streams its `train.csv` member to disk, hashes both
-archive and training file, then deletes the archive to limit retained copies.
+competition's `data.zip`, uses remote `7z` to stream its Deflate64 `train.csv`
+member to disk, and hashes both archive and training file. The source archive
+remains in the private raw scope for later readback.
 It does not accept competition rules on behalf of the account holder. Then
 `build-expedia --input <remote-dir>/train.csv --output <dataset-dir>` creates
 the four-way materialization. Authentication or a rules-denied response must
@@ -111,6 +112,41 @@ be reported as a blocker; there is no mirror fallback. Raw source data and JSONL
 records remain in the approved remote storage scope.
 
 ## Remaining evidence gates
+
+### Executed source receipts (RunPod, 2026-10-19 UTC)
+
+The official ESCI acquisition pinned Amazon revision
+`7916cdf6ab75a462e77f20ab40428a10923998d5`; examples Parquet SHA-256
+`4a735b693b4a424a6fc67f5be6e4c811495c488bbf66d02a602d308b2744263a`
+(51,286,808 bytes) and products Parquet SHA-256
+`25124442d064d64b26f74082d6fa09438d679efc0c183cf28d19064a2b65a265`
+(1,108,857,465 bytes). The source-bound manifest at versioned remote path
+`/workspace/ordivo-v2-data/processed/esci-source-bound-v2` reports 2,621,288
+raw rows across 130,652 locale/query groups; 1,503,277 rows and 82,352
+groups outside the Task 1 reduced list; 1,118,011 retained candidate rows in
+48,300 groups. Train/validation/calibration/test contain
+30,372/1,688/1,744/14,496 groups. A remote audit found zero locale/query
+overlap within or between partitions; every official test query remains test.
+
+The official Swissmetro acquisition pinned Biogeme revision
+`8d1063b5c371f09f5dd44f430b3be66455f2b785`; source SHA-256
+`27432693cf052985d79a950b4b888be3efca798fc89b0d3ffefe40608ede00f2`
+(767,932 bytes). The source-bound manifest at
+`/workspace/ordivo-v2-data/processed/swissmetro-source-bound-v2` reports
+10,728 survey rows, 9 no-choice omissions and 10,719 retained episodes
+(32,157 mode candidates). The four split counts are
+8,532/549/594/1,044. Missing car headway accounts for 10,719 null feature
+values, one per scenario.
+
+The [source-bound audit](../../../ordivo-v2-operations/reports/runs/v2-swarm-20261019T030009Z/source-bound-audit-edc884.json)
+has SHA-256 `a25ae5af87093bb25e2c94416d71f2f4b49ab92a33a1a4ea5d5246a80beaf7b0`.
+It verifies that all four split-file hashes in each new source-bound manifest
+are byte-identical to the frozen baseline manifest. New manifest SHA-256s are
+`9fd4065fc0db4586453a412123eb9ef393b1750cd8196bb11cad794d020f07cc`
+for ESCI and
+`dd3dc4b0713506f1664149993ca11022614a3ee850c335944ae37b5525af592a`
+for Swissmetro. These are data-ingestion receipts, not scored-model results or
+permission to publish data/derivatives.
 
 The remote receipts must include the exact executed code commit, acquisition
 revision, file hashes/sizes, source terms, raw and retained rows/groups,
