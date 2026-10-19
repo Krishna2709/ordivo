@@ -68,6 +68,7 @@ def fit_ranker(train: list[Mapping], validation: list[Mapping], config: Mapping,
               "seed": seed, "verbosity": -1}
     params.update(config.get("lightgbm", {}))
     # Frozen gains cannot be overridden by an experiment config.
+    params["objective"] = "lambdarank"
     params["label_gain"] = gains
     params["metric"] = "None"
     training = lgb.Dataset(x_train, label=labels_train, group=train_groups, free_raw_data=False)
@@ -95,11 +96,17 @@ def fit_ranker(train: list[Mapping], validation: list[Mapping], config: Mapping,
     validation_report = evaluate_ranking(validation, validation_predictions, policy)
     output.mkdir(parents=True)
     booster.save_model(str(output / "model.txt"), num_iteration=best_iteration)
+    reloaded = lgb.Booster(model_file=str(output / "model.txt"))
+    reload_values = reloaded.predict(x_validation, num_iteration=best_iteration)
+    reload_max_abs_difference = float(np.max(np.abs(validation_values - reload_values)))
+    if not np.allclose(validation_values, reload_values, rtol=0, atol=1e-12):
+        raise ValueError("saved LightGBM model changed validation scores on reload")
     bundle = {"schema_version": "ordivo-ranker-bundle-v1", "target_policy": policy,
               "feature_state": feature_state.to_dict(), "seed": seed,
               "best_iteration": best_iteration, "lightgbm_version": lgb.__version__,
               "train_queries": len(train), "validation_queries": len(validation),
-              "train_group_sizes": train_groups, "validation_group_sizes": validation_groups}
+              "train_group_sizes": train_groups, "validation_group_sizes": validation_groups,
+              "reload_max_abs_difference": reload_max_abs_difference}
     (output / "bundle.json").write_text(json.dumps(bundle, indent=2, sort_keys=True))
     receipt = {"bundle": bundle, "validation": validation_report,
                "model_dir": str(output)}
