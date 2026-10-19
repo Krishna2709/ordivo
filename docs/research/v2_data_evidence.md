@@ -40,8 +40,8 @@ that could have been retrieved or considered.
 | Source | Primary reference | Labels and fields | Terms evidence | Status |
 |---|---|---|---|---|
 | Expedia Personalized Sort | [official Kaggle data dictionary](https://www.kaggle.com/c/expedia-personalized-sort/data) | `srch_id` search, `prop_id` hotel, click and booking flags; position and `random_bool` are exposure | [competition rules](https://www.kaggle.com/c/expedia-personalized-sort/rules) require account review | Official archive acquired after user accepted rules; four-way group build pending |
-| Amazon ESCI | [official Amazon Science repository](https://github.com/amazon-science/esci-data) | Task 1 uses `small_version=1`, E/S/C/I judgments, `split`, product join on `(product_locale, product_id)` | [Apache-2.0](https://github.com/amazon-science/esci-data/blob/main/LICENSE) and [NOTICE](https://github.com/amazon-science/esci-data/blob/main/NOTICE) | Remote acquisition and full ingestion pending |
-| Swissmetro | [official Biogeme source data](https://github.com/michelbierlaire/biogeme/blob/master/src/biogeme/data/data/swissmetro.dat) and [example loader](https://biogeme.epfl.ch/sphinx/_modules/biogeme/data/swissmetro.html) | Stated `CHOICE`, respondent `ID`, `TRAIN_AV`/`SM_AV`/`CAR_AV`, times/costs/headways; `CHOICE=0` excluded as in the example | [Biogeme data page](https://biogeme.epfl.ch/) makes data available for research and education; source-specific redistribution terms still require confirmation | Adapter implemented; remote acquisition and full ingestion pending |
+| Amazon ESCI | [official Amazon Science repository](https://github.com/amazon-science/esci-data) | Task 1 uses `small_version=1`, E/S/C/I judgments, `split`, product join on `(product_locale, product_id)` | [Apache-2.0](https://github.com/amazon-science/esci-data/blob/main/LICENSE) and [NOTICE](https://github.com/amazon-science/esci-data/blob/main/NOTICE) | Official acquisition and source-bound four-way materialization completed; see receipt below |
+| Swissmetro | [official Biogeme source data](https://github.com/michelbierlaire/biogeme/blob/master/src/biogeme/data/data/swissmetro.dat) and [example loader](https://biogeme.epfl.ch/sphinx/_modules/biogeme/data/swissmetro.html) | Stated `CHOICE`, respondent `ID`, `TRAIN_AV`/`SM_AV`/`CAR_AV`, times/costs/headways; `CHOICE=0` excluded as in the example | [Biogeme data page](https://biogeme.epfl.ch/) makes data available for research and education; source-specific redistribution terms still require confirmation | Official acquisition and source-bound four-way materialization completed; see receipt below |
 
 ESCI ranking's [official TREC preparation](https://github.com/amazon-science/esci-data/blob/main/ranking/prepare_trec_eval_files.py)
 maps E/C/S/I to grades 4/3/2/1 and uses TREC gains 1/0.1/0.01/0. The
@@ -59,8 +59,8 @@ zero or multiple clicks/bookings. Test rows without labels are outside the
 labeled benchmark.
 
 The Swissmetro adapter preserves all three modes and availability masks.
-`CHOICE=0` rows are omitted from supervised episodes, and the remote profile
-must report their number. A selected unavailable mode is an error. The
+`CHOICE=0` rows are omitted from supervised episodes; the remote profile
+reports nine such rows. A selected unavailable mode is an error. The
 respondent ID is retained only in supervision for respondent-disjoint splitting.
 These are stated survey choices, not observed transport purchases.
 
