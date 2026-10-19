@@ -31,6 +31,8 @@ def tie_expected_ndcg_at_k(scores: Mapping[str, float], gains: Mapping[str, floa
     The boolean says a permutation can change DCG@k; a tie anywhere in a query
     does not imply metric sensitivity.
     """
+    if k < 1:
+        raise ValueError("k must be positive")
     if set(scores) != set(gains):
         raise ValueError("tie analysis requires the exact judged candidate pool")
     ideal = sorted(gains.values(), reverse=True)[:k]
