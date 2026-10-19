@@ -83,7 +83,14 @@ base d1 was not evaluated for this probe. Sanitized aggregate SHA-256:
 The [sanitized order aggregate](https://github.com/Krishna2709/ordivo/blob/b6a353549f478b806b50d979bbfc4a5d5d5907d3/reports/runs/v2-order-20261019/aggregate.json) is metadata-only. Per-query retention and cloud readback remain pending; no public result should
 omit the 8/20 ESCI overflow denominator.
 
-## Loading and scoring a label-free research request
+## Loading and scoring the frozen S0 label-free research request
+
+The executable fixture below loads only the earlier, two-source S0 adapter at
+Hub commit `bf1d425b4e6ffc392121d8fb0776e41b1af48c4a`. It does not load
+or validate the separate S0b checkpoint. S0b requires its own verified Hub
+folder/revision and the run-specific feature policy, including Expedia
+`conditional_booking_choice`; those parameters remain pending private adapter
+readback and are not silently substituted into this example.
 
 Use integrated project source `bd24814429211ad4dad4e9a58ba0137daa0bc76b` or a reviewed descendant with its dependency lock. The label-free `render_predictor_input` uses the same prompt/readout core as the executed pilot; the remote scoped 16-test and integrated 244-test suites passed at this source commit (archive SHA-256 `778a3689f90c44afa572fc4ecd968a8853e53f5c5bb81e3356338485dd57c2a0`). The private adapter files were force-downloaded and matched upload SHA-256 at Hub commit `bf1d425b4e6ffc392121d8fb0776e41b1af48c4a`; inspect its private artifact manifest when reproducing. The **illustrative** Swissmetro-style input below has no target, supervision, exposure, provenance, respondent, group or source identifier. Its numbers are examples, not a dataset row or expected model prediction. Apply the exact feature allowlist from the frozen pilot config to real authorized inputs.
 
@@ -178,4 +185,4 @@ prompt but receives probability zero.
 
 ## Use and distribution
 
-The d1 base is under [LFM Open License v1.0](https://huggingface.co/LiquidAI/d1-3B/blob/051bcc464b01b9f92942b364d9586b0ef5912432/LICENSE). Source-specific dataset terms and notices must travel with any private artifacts as applicable. The ESCI source repository declares [Apache-2.0](https://github.com/amazon-science/esci-data/blob/main/LICENSE); Swissmetro source and derived-weight distribution terms need a source-specific record. Expedia competition data is subject to competition rules and is absent from this pilot. Private research storage does not establish permission for public adapter redistribution. No license is assigned to this adapter by this draft README.
+The d1 base is under [LFM Open License v1.0](https://huggingface.co/LiquidAI/d1-3B/blob/051bcc464b01b9f92942b364d9586b0ef5912432/LICENSE). Source-specific dataset terms and notices must travel with any private artifacts as applicable. The ESCI source repository declares [Apache-2.0](https://github.com/amazon-science/esci-data/blob/main/LICENSE); Swissmetro source and derived-weight distribution terms need a source-specific record. Expedia competition data is subject to competition rules. It is absent from the frozen S0 adapter used in the tested example, but a bounded, sampled Expedia conditional-booking source was included in separate S0b training. Private research storage does not establish permission for public adapter redistribution. No license is assigned to this adapter by this draft README.
