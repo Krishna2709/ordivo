@@ -74,8 +74,12 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   bounded 20k/2k/2k/5k complete-search sample. Receipt:
   `reports/runs/v2-s0b-20261019/pilot-receipt.json`, SHA-256
   `85426d547c1fbc88cc52cf9c4fc9c9bfac99fb3bfbd7b256b177c3f069e24565`.
-  This is selection-validation learning only; held-out quality, private
-  adapter retention, calibration and transfer remain pending.
+  The best adapter is retained privately at Hub commit
+  `df6405c575629dfaf9083f7b068ab8ef34b6eeb3`; eight files plus manifest
+  passed forced-download SHA readback (adapter directory SHA-256
+  `e9bc879b31a32e5546d238345babd7d9fc5eedad7e015510804e03fde8a77c50`).
+  This is selection-validation learning only; held-out quality, calibration
+  and transfer remain pending.
 
 - V2 behavioral data reviewer-fix tests at `2f417cbe28e77e7303d3c7fbfdf3d3d80bcf720f`
   passed 19/0 on the remote pod. Release-report source tests at `178d1fd4`

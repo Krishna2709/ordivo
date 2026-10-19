@@ -1,6 +1,6 @@
 # Ordivo v2 model card — draft, unreleased
 
-**Research status:** a preliminary two-domain v2 adapter exists in a **private** research repository; its bounded held-out neural probe measured negative/mixed results. A separate three-source S0b training run has completed with better selected-validation loss, but no S0b held-out or retained-adapter evidence yet. No public release claim is established here. This is the intended public card template; replace remaining pending fields with immutable receipts before publication. [Release criteria](V2_RELEASE_CRITERIA.md) control promotion. `blackOrder/Ordivo-v1` and its [synthetic-only results](../reports/V2_RESEARCH_AUDIT.md) are a separate historical model.
+**Research status:** a preliminary two-domain v2 adapter exists in a **private** research repository; its bounded held-out neural probe measured negative/mixed results. A separate three-source S0b training run has completed with better selected-validation loss, but no S0b held-out result yet; the private S0b adapter passed file-level readback. No public release claim is established here. This is the intended public card template; replace remaining pending fields with immutable receipts before publication. [Release criteria](V2_RELEASE_CRITERIA.md) control promotion. `blackOrder/Ordivo-v1` and its [synthetic-only results](../reports/V2_RESEARCH_AUDIT.md) are a separate historical model.
 
 A bounded remote compatibility check at integrated source commit
 `22707ed34fd125e96aade9123f9baaf34cd64a18` completed one A40 BF16
@@ -57,7 +57,7 @@ ESCI training overflow excluded 4/1,000 selected groups; Expedia target
 exclusions were 315/1,000 selected training groups. Expedia used only the
 predeclared 20k/2k/2k/5k complete-search sample, not the full source. This is
 selection-validation evidence, not held-out accuracy, booking probability,
-calibration or cross-domain generality. Private S0b adapter readback pending.
+calibration or cross-domain generality. Private S0b adapter readback passed at `blackOrder/Ordivo-v2-research` commit `df6405c575629dfaf9083f7b068ab8ef34b6eeb3`, directory SHA-256 `e9bc879b31a32e5546d238345babd7d9fc5eedad7e015510804e03fde8a77c50`; no S0b held-out inference is established by storage.
 
 ## Research inference interface
 
@@ -127,8 +127,8 @@ groups after eight both-order prompt overflows; 7/12 admitted pairs flipped
 admission. This exposes positional sensitivity in the pilot; it does not
 measure accuracy loss or show that fine-tuning caused the effect, because base
 d1 was not evaluated in this diagnostic. The
-+[sanitized receipt](../reports/runs/v2-order-20261019/aggregate.json) has
-+SHA-256 `1caff28407551758975ab5ebcf67abd3708f44fa8f2fa4a29ead7f04beeabad7`.
+[sanitized receipt](../reports/runs/v2-order-20261019/aggregate.json) has
+SHA-256 `1caff28407551758975ab5ebcf67abd3708f44fa8f2fa4a29ead7f04beeabad7`.
 
 ## Reproduction and rights
 

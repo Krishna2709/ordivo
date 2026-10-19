@@ -1,6 +1,6 @@
 # Ordivo v2 research adapter (private)
 
-**Status:** preliminary, access-controlled pilot, **not a release candidate**. This repository is not a public v2 release or a claim of held-out neural improvement. It is separate from the published Ordivo v1 synthetic adapter. The retained bounded pilot trained one shared adapter on Swissmetro stated choice and Amazon ESCI graded relevance. A separate three-source S0b pilot has now completed training with sampled Expedia conditional-booking choice, but has no held-out result or verified private adapter retention yet. Neither establishes three-domain generality or a public release dossier. The model repository is `blackOrder/Ordivo-v2-research` and should remain private.
+**Status:** preliminary, access-controlled pilot, **not a release candidate**. This repository is not a public v2 release or a claim of held-out neural improvement. It is separate from the published Ordivo v1 synthetic adapter. The retained bounded pilot trained one shared adapter on Swissmetro stated choice and Amazon ESCI graded relevance. A separate three-source S0b pilot has now completed training with sampled Expedia conditional-booking choice, but has no held-out result yet; its private best adapter passed file-level readback. Neither establishes three-domain generality or a public release dossier. The model repository is `blackOrder/Ordivo-v2-research` and should remain private.
 
 ## Exact model and task boundary
 
@@ -46,7 +46,7 @@ shared start: start 1.5817367, C1 1.6459532, R0 1.6163764. R0 degrading less
 than C1 is not evidence of improvement. The [sanitized remote receipt](https://github.com/Krishna2709/ordivo/blob/b6a353549f478b806b50d979bbfc4a5d5d5907d3/reports/runs/v2-continuation-20261019/summary.json) SHA-256
 is `cc686cf66ee3d7daa777ecc8b3c1ccaedda5d546da96107ad1f18ea0bf055cc5`
 at source `f69643794a932b14dac46b2e866667f5a7814bc4`; no continuation
-held-out result, cloud readback or private Hub retention is asserted here.
+held-out result is asserted here. Private C1/R0 adapter retention passed forced-download SHA readback under `continuations/20261019T030009Z/matched-f696/` at Hub commit `4b43ec8767d2bb99ec835020c04d412c89cd26a4` (retention-manifest SHA-256 `4c5dc14a52a25e74acfa9a013d4ecc3ba14dcd96d9c21c44f0b61c857bfb367d`). Both [C1](https://wandb.ai/black-order/liquid-mcdm-lab/runs/6ohymgld) and [R0](https://wandb.ai/black-order/liquid-mcdm-lab/runs/57fzcrlp) cloud runs finished; sanitized cloud-readback SHA-256 `f9b02842db5e1d6d0747913a3f3e0a760cdcb95a147d17f45603f7b52c3d4580`.
 
 A separate S0b three-source supervised follow-up completed 90/90 nonzero
 optimizer steps at exact integrated source
@@ -68,8 +68,15 @@ The S0b Expedia source is the predeclared bounded 20k/2k/2k/5k grouped
 sample (manifest SHA-256
 `c72552b8fe1acd0cab0480610dd65b5dd6aed575313047d2da2f2786953b4a2b`),
 not the full 399,344-search source. A [W&B run](https://wandb.ai/black-order/liquid-mcdm-lab/runs/0sq2jfj9)
-was online at launch; final cloud readback, private adapter retention,
-held-out efficacy, calibration and cross-domain transfer remain pending. These
+was online at launch. The best adapter is retained privately under
+`supervised-s0b/20261019T030009Z/s0b-945fe6e/` at Hub commit
+`df6405c575629dfaf9083f7b068ab8ef34b6eeb3`: eight allowlisted files
+plus manifest passed forced-download SHA readback. Adapter directory SHA-256
+`e9bc879b31a32e5546d238345babd7d9fc5eedad7e015510804e03fde8a77c50`;
+retention-manifest SHA-256
+`1bbd441f8ccb2d276ed4028681cb5d550276fd7b690a47642aa02973d24801e5`.
+Final cloud readback, held-out efficacy, calibration and cross-domain transfer
+remain pending. These
 are model-selection validation losses only; they do not overturn the earlier
 negative/mixed held-out probe of the frozen two-source pilot.
 
@@ -80,17 +87,19 @@ query groups overflowed in both orders. Mean probability L1 change was
 0.39663/0.31887. This is positional sensitivity, not an accuracy comparison;
 base d1 was not evaluated for this probe. Sanitized aggregate SHA-256:
 `1caff28407551758975ab5ebcf67abd3708f44fa8f2fa4a29ead7f04beeabad7`.
-The [sanitized order aggregate](https://github.com/Krishna2709/ordivo/blob/b6a353549f478b806b50d979bbfc4a5d5d5907d3/reports/runs/v2-order-20261019/aggregate.json) is metadata-only. Per-query retention and cloud readback remain pending; no public result should
+The [sanitized order aggregate](https://github.com/Krishna2709/ordivo/blob/b6a353549f478b806b50d979bbfc4a5d5d5907d3/reports/runs/v2-order-20261019/aggregate.json) is metadata-only. Its four private diagnostic output files plus manifest passed forced-download readback under `diagnostics/20261019T030009Z/candidate-order-a19d/` at Hub commit `4434f85c12ab6f7f7bb5894747f3b8f003c075e8` (retention SHA-256 `4a93087601c3ca1b32c7b580d512e2778d4a060cbc92f071066aa03e7a4af54f`). Cloud readback is not asserted here; no public result should
 omit the 8/20 ESCI overflow denominator.
 
 ## Loading and scoring the frozen S0 label-free research request
 
 The executable fixture below loads only the earlier, two-source S0 adapter at
 Hub commit `bf1d425b4e6ffc392121d8fb0776e41b1af48c4a`. It does not load
-or validate the separate S0b checkpoint. S0b requires its own verified Hub
-folder/revision and the run-specific feature policy, including Expedia
-`conditional_booking_choice`; those parameters remain pending private adapter
-readback and are not silently substituted into this example.
+or validate the separate S0b checkpoint. S0b requires its own Hub folder/revision (`supervised-s0b/20261019T030009Z/s0b-945fe6e/`
+at `df6405c575629dfaf9083f7b068ab8ef34b6eeb3`) and run-specific feature
+policy, including Expedia `conditional_booking_choice`. Its private retention
+is verified, but that checkpoint has not been exercised through this tested
+fixture or a held-out result; its parameters are not silently substituted
+into this S0 example.
 
 Use integrated project source `bd24814429211ad4dad4e9a58ba0137daa0bc76b` or a reviewed descendant with its dependency lock. The label-free `render_predictor_input` uses the same prompt/readout core as the executed pilot; the remote scoped 16-test and integrated 244-test suites passed at this source commit (archive SHA-256 `778a3689f90c44afa572fc4ecd968a8853e53f5c5bb81e3356338485dd57c2a0`). The private adapter files were force-downloaded and matched upload SHA-256 at Hub commit `bf1d425b4e6ffc392121d8fb0776e41b1af48c4a`; inspect its private artifact manifest when reproducing. The **illustrative** Swissmetro-style input below has no target, supervision, exposure, provenance, respondent, group or source identifier. Its numbers are examples, not a dataset row or expected model prediction. Apply the exact feature allowlist from the frozen pilot config to real authorized inputs.
 
