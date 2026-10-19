@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -41,6 +42,12 @@ def _digest(path: Path) -> str:
 
 def _aggregate(report: dict) -> dict:
     return {key: value for key, value in report.items() if key != "per_query"}
+
+
+def _revision() -> str:
+    result = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True,
+                            cwd=Path(__file__).resolve().parents[1], check=True)
+    return result.stdout.strip()
 
 
 def benchmark(config_path: Path, data_dir: Path, output_dir: Path) -> dict:
@@ -106,8 +113,13 @@ def benchmark(config_path: Path, data_dir: Path, output_dir: Path) -> dict:
         _write_json(output_dir / f"{name}_scores.json", predictions)
         aggregate[name] = _aggregate(report)
     metadata = {"experiment_id": config["experiment_id"], "source": config["source"],
+                "code_revision": _revision(),
                 "runtime_provider": runtime["provider"], "config_sha256": _digest(config_path),
                 "manifest_sha256": _digest(manifest_path),
+                "source_sha256": manifest.get("source_sha256", {}),
+                "source_terms": manifest.get("source_terms"),
+                "split_policy_id": manifest.get("split_policy_id"),
+                "candidate_pool_scope": manifest.get("candidate_pool_scope"),
                 "split_counts": {"train": len(train), "validation": len(validation),
                                  "calibration_unused": len(calibration), "test": len(test)},
                 "model_best_iteration": receipt["bundle"]["best_iteration"],
