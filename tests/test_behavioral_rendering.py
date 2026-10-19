@@ -29,6 +29,10 @@ def renderer(monkeypatch):
         return projection
 
     behavioral.inference_input = inference_input
+    behavioral.FORBIDDEN_FEATURES = {
+        'source', 'group_id', 'episode_id', 'supervision', 'exposure', 'provenance',
+        'position', 'selected_id', 'click_bool', 'booking_bool', 'id',
+    }
     monkeypatch.setitem(sys.modules, behavioral.__name__, behavioral)
     module = importlib.import_module('liquid_mcdm.training.behavioral_rendering')
     monkeypatch.setattr(module, 'inference_input', inference_input)
@@ -118,6 +122,23 @@ def test_predictor_only_rejects_labels_extra_features_and_event_drift(renderer):
             request['prediction_event'] = 'conditional_booking_choice'
         with pytest.raises(ValueError):
             render_predictor_input(request, CharacterTokenizer(), policy)
+
+
+def test_predictor_observed_event_uses_same_pilot_prompt_and_rejects_overflow(renderer):
+    from liquid_mcdm.training.behavioral_rendering import render_predictor_input
+
+    labeled = episode()
+    labeled['task_type'] = 'observed_choice'
+    policy = {'context_features': ['purpose'], 'alternative_features': ['cost'],
+              'prediction_event': 'conditional_booking_choice'}
+    request = {'schema_version': 'ordivo-behavioral-v1', **{
+        key: labeled[key] for key in (
+            'task_type', 'context', 'criteria', 'constraints', 'preferences', 'alternatives')},
+        'prediction_event': 'conditional_booking_choice'}
+    assert render_predictor_input(request, CharacterTokenizer(), policy) == renderer(
+        labeled, CharacterTokenizer(), policy)
+    with pytest.raises(ValueError, match='truncation forbidden'):
+        render_predictor_input(request, CharacterTokenizer(), policy, max_length=4)
 
 
 def test_supervised_labels_respect_event_population_and_unjudged_mask():
