@@ -152,8 +152,12 @@ The JSONL files total 2,475,946,949 bytes in private remote storage.
 Remote GREEN at code `919c67e494174f34d2436fa507e427b75fe866c2`
 passed 20 focused tests with no skips; the build at the same code exited zero.
 The manifest records 25,969 groups with multiple clicks and 122,751 with zero
-bookings. Group-integrity readback is pending; manifest conservation and split
-hashes alone are not scored held-out evaluation.
+bookings. A [full streaming four-way audit](../../../ordivo-v2-operations/reports/runs/v2-swarm-20261019T030009Z/expedia-fourway-audit.json)
+(SHA-256 `d48db0af0be72b48c7244ca41e78dda5789c496bf6a29fc7a8bcb5211558c387`)
+read every private split record and found 399,344 unique groups and 9,917,530
+candidates, with zero duplicate groups/candidate IDs, wrong hash partitions,
+or source mismatches. All four split-file byte hashes match the manifest.
+This is source/split integrity evidence, not scored held-out evaluation.
 
 The official ESCI acquisition pinned Amazon revision
 `7916cdf6ab75a462e77f20ab40428a10923998d5`; examples Parquet SHA-256
