@@ -62,6 +62,26 @@ omit the 8/20 ESCI overflow denominator.
 
 Use integrated project source `bd24814429211ad4dad4e9a58ba0137daa0bc76b` or a reviewed descendant with its dependency lock. The label-free `render_predictor_input` uses the same prompt/readout core as the executed pilot; the remote scoped 16-test and integrated 244-test suites passed at this source commit (archive SHA-256 `778a3689f90c44afa572fc4ecd968a8853e53f5c5bb81e3356338485dd57c2a0`). The private adapter files were force-downloaded and matched upload SHA-256 at Hub commit `bf1d425b4e6ffc392121d8fb0776e41b1af48c4a`; inspect its private artifact manifest when reproducing. The **illustrative** Swissmetro-style input below has no target, supervision, exposure, provenance, respondent, group or source identifier. Its numbers are examples, not a dataset row or expected model prediction. Apply the exact feature allowlist from the frozen pilot config to real authorized inputs.
 
+Run from an authenticated, access-controlled **CUDA GPU** environment with
+compatible PyTorch, Transformers, PEFT and Hugging Face Hub packages; the private folder contains the [retained environment inventory](https://huggingface.co/blackOrder/Ordivo-v2-research/blob/bf1d425b4e6ffc392121d8fb0776e41b1af48c4a/supervised-pilot/20261019T030009Z/pilot-854de/environment.json) and [effective pilot config](https://huggingface.co/blackOrder/Ordivo-v2-research/blob/bf1d425b4e6ffc392121d8fb0776e41b1af48c4a/supervised-pilot/20261019T030009Z/pilot-854de/effective_config.yaml) at the pinned Hub commit. Authenticate to the private Hub repository through your
+normal secret-backed environment or `hf auth login`; do not paste or print a
+token in a notebook or command log. The code below imports the versioned
+project package, so run it from a checkout of the pinned project source with
+`PYTHONPATH=src` (or install that exact checkout as a package):
+
+```bash
+git clone https://github.com/Krishna2709/ordivo.git
+cd ordivo
+git checkout bd24814429211ad4dad4e9a58ba0137daa0bc76b
+# In the approved GPU environment with the pinned dependency set and Hub auth:
+PYTHONPATH=src python private_v2_probe.py
+```
+
+Save the Python block below as `private_v2_probe.py` in that checkout. The
+remote source test suite used the same `PYTHONPATH=src` import boundary. The
+exact illustrative inference playthrough and its environment inventory are
+being verified; no example output is claimed yet.
+
 ```python
 from pathlib import Path
 import torch
