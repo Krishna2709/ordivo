@@ -1,0 +1,18 @@
+experiment_id: ordivo-v2-swissmetro-conditional-logit-v1
+source: swissmetro
+candidate_pool_scope: three_survey_modes
+seed: 42
+target_policy:
+  policy_id: swissmetro-choice-v1
+feature_policy:
+  context_features: [purpose, ga, who, luggage]
+  alternative_features: [travel_time_minutes, cost_chf, headway_minutes]
+  numeric_features:
+    - alternative.travel_time_minutes
+    - alternative.cost_chf
+    - alternative.headway_minutes
+  categorical_features: []
+conditional_logit:
+  iterations: 500
+  learning_rate: 0.05
+  l2: 0.01

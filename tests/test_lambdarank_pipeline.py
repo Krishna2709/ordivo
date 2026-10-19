@@ -1,12 +1,18 @@
 """Small invented groups test feature boundaries and saved ranker parity."""
 
+import json
 import numpy as np
 import pytest
 
 from liquid_mcdm.evaluation.ranking import evaluate_ranking
 from liquid_mcdm.models.lambdarank import fit_ranker, predict_ranker
-from liquid_mcdm.models.ranking_baselines import FeatureState, lexical_scores, random_scores
-from scripts.benchmark_behavioral import _revision, validate_candidate_pool_scope
+from liquid_mcdm.models.ranking_baselines import (
+    FeatureState, fit_conditional_logit, lexical_scores, numerical_heuristic,
+    predict_conditional_logit, random_scores,
+)
+from scripts.benchmark_behavioral import (
+    _revision, validate_candidate_pool_scope, validate_respondent_splits,
+)
 
 
 POLICY = {"prediction_event": "combined_click_booking_relevance", "context_features": [],
@@ -43,6 +49,12 @@ def test_random_control_ignores_candidate_order():
     before = random_scores(e)
     e["alternatives"].reverse()
     assert random_scores(e) == before
+
+
+def test_missing_numerical_heuristic_field_ranks_below_known_value():
+    e = example(3, price_a=None)
+    scores = numerical_heuristic(e, POLICY, {"price_usd": -1})
+    assert scores["a"] < scores["b"]
 
 
 def test_saved_ranker_reload_and_metric_parity(tmp_path):
@@ -93,6 +105,7 @@ def test_runner_accepts_only_source_specific_candidate_pool_scopes():
                                   "source_task1_reduced_candidate_list")
     validate_candidate_pool_scope("expedia_personalized_sort_2013", "source_exposed_candidates",
                                   "source_exposed_candidates")
+    validate_candidate_pool_scope("swissmetro", "three_survey_modes", "three_survey_modes")
     with pytest.raises(ValueError, match="candidate pool scope"):
         validate_candidate_pool_scope("amazon_esci", "source_exposed_candidates",
                                       "source_task1_reduced_candidate_list")
@@ -105,3 +118,37 @@ def test_runner_archive_revision_requires_controller_env(monkeypatch):
     commit = "a" * 40
     monkeypatch.setenv("ORDIVO_SOURCE_COMMIT", commit)
     assert _revision() == commit
+
+
+def swissmetro(number, respondent, selected="train"):
+    return {"schema_version": "ordivo-behavioral-v1",
+            "episode_id": f"swissmetro:{respondent}:{number}", "source": "swissmetro",
+            "task_type": "stated_choice", "group_id": f"{respondent}:{number}",
+            "context": {}, "criteria": [], "constraints": [], "preferences": {},
+            "alternatives": [
+                {"id": "train", "features": {"travel_time_minutes": 10, "cost_chf": 20}},
+                {"id": "car", "features": {"travel_time_minutes": 25, "cost_chf": 40}},
+                {"id": "swissmetro", "available": False,
+                 "features": {"travel_time_minutes": 5, "cost_chf": 10}}],
+            "supervision": {"kind": "stated_choice", "policy_id": "swissmetro-choice-v1",
+                            "selected_id": selected, "respondent_id": respondent},
+            "exposure": {}, "provenance": {}}
+
+
+def test_swissmetro_respondent_disjointness_beyond_episode_ids():
+    splits = {"train": [swissmetro(1, "person-a")],
+              "validation": [swissmetro(2, "person-a")], "calibration": [], "test": []}
+    with pytest.raises(ValueError, match="respondent overlaps"):
+        validate_respondent_splits(splits)
+
+
+def test_conditional_logit_only_scores_available_modes():
+    policy = {"context_features": [], "alternative_features": ["travel_time_minutes", "cost_chf"],
+              "numeric_features": ["alternative.travel_time_minutes", "alternative.cost_chf"]}
+    train = [swissmetro(1, "person-a"), swissmetro(2, "person-b", selected="car")]
+    bundle = fit_conditional_logit(train, policy, iterations=5)
+    scores = predict_conditional_logit(bundle, [swissmetro(3, "person-c")])
+    reloaded = json.loads(json.dumps(bundle))
+    assert predict_conditional_logit(reloaded, [swissmetro(3, "person-c")]) == scores
+    assert set(scores["swissmetro:person-c:3"]) == {"train", "car"}
+    assert np.isfinite(list(scores["swissmetro:person-c:3"].values())).all()
