@@ -1,0 +1,64 @@
+{
+  "adapter_files": [
+    {
+      "bytes": 1182,
+      "path": "adapter_config.json",
+      "sha256": "c6a039d0fa2c06c868169bd5ac0b7b56ea438d0cba8e814e8c166cfa2b445c70"
+    },
+    {
+      "bytes": 97894520,
+      "path": "adapter_model.safetensors",
+      "sha256": "691b01dac4b7a2dd13c5636c9187d446d378aa27eac699e925b9d773fa0c789c"
+    },
+    {
+      "bytes": 5436,
+      "path": "chat_template.jinja",
+      "sha256": "86f4770449a4797c9b4212d110b0cc70fb993c1ce960095bcfb12eea22f61cca"
+    },
+    {
+      "bytes": 17905589,
+      "path": "tokenizer.json",
+      "sha256": "c4687c0046da6579aba6f9aa713e9bed61e5fd210b0e012028ae57751d028689"
+    },
+    {
+      "bytes": 508,
+      "path": "tokenizer_config.json",
+      "sha256": "95243b671215ec52551df257d55121de55f15eb8bc40eab459a91dc09f3a130d"
+    },
+    {
+      "bytes": 5777,
+      "path": "training_args.bin",
+      "sha256": "1438b0160ce3a0c1b303273f1c5436107692cb99fad37b98ec8427a2ca1bb11c"
+    }
+  ],
+  "authenticated_user": "blackOrder",
+  "dataset_files": [
+    {
+      "bytes": 831,
+      "path": "manifest.json",
+      "sha256": "1235dd1439935f217ab7fca62746fa7ddf28806ace867810b349abc147e4e1b2"
+    },
+    {
+      "bytes": 220563,
+      "path": "test.jsonl",
+      "sha256": "d76b496e6b3111dc05435242ed95bc61ed96750164467b5f86df62c9318c7d83"
+    },
+    {
+      "bytes": 1835309,
+      "path": "train.jsonl",
+      "sha256": "33fb635de3400842d74d66b2bf3c7c2a4bc03817a0b94a1db47522c78abc5bdf"
+    },
+    {
+      "bytes": 228770,
+      "path": "val.jsonl",
+      "sha256": "1f433900102a69387366ee37b23314e48d6aeef8fbcdb91ba7e3bbdd4962afc1"
+    }
+  ],
+  "dataset_readback_verified": true,
+  "dataset_repo": "blackOrder/liquid-mcdm-synthetic",
+  "dataset_url": "https://huggingface.co/datasets/blackOrder/liquid-mcdm-synthetic",
+  "model_file_presence_verified": true,
+  "model_file_sizes_verified": true,
+  "model_repo": "blackOrder/d1-3b-mcdm-lora",
+  "model_url": "https://huggingface.co/blackOrder/d1-3b-mcdm-lora"
+}

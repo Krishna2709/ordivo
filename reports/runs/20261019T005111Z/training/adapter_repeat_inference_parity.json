@@ -1,0 +1,6 @@
+{
+  "argmax_agreement": 1.0,
+  "episodes": 16,
+  "max_absolute_probability_delta": 0.0,
+  "mean_absolute_probability_delta": 0.0
+}

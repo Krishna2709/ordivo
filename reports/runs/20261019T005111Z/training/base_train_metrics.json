@@ -1,0 +1,111 @@
+{
+  "accuracy": 0.32421875,
+  "brier_multiclass": 0.7618296419863908,
+  "by_method": {
+    "COPRAS": {
+      "accuracy": 0.4,
+      "eligible": 145
+    },
+    "TOPSIS": {
+      "accuracy": 0.2152777777777778,
+      "eligible": 144
+    },
+    "VIKOR": {
+      "accuracy": 0.21518987341772153,
+      "eligible": 79
+    },
+    "WASPAS": {
+      "accuracy": 0.4166666666666667,
+      "eligible": 144
+    }
+  },
+  "ece_10_bins": 0.038180507005971955,
+  "eligible": 512,
+  "excluded_nonunique": 0,
+  "prediction_tie_break": "first_option",
+  "slices": {
+    "alternatives_count": {
+      "3": {
+        "accuracy": 0.43209876543209874,
+        "eligible": 81
+      },
+      "4": {
+        "accuracy": 0.35789473684210527,
+        "eligible": 95
+      },
+      "5": {
+        "accuracy": 0.336734693877551,
+        "eligible": 98
+      },
+      "6": {
+        "accuracy": 0.2916666666666667,
+        "eligible": 72
+      },
+      "7": {
+        "accuracy": 0.24691358024691357,
+        "eligible": 81
+      },
+      "8": {
+        "accuracy": 0.27058823529411763,
+        "eligible": 85
+      }
+    },
+    "criteria_count": {
+      "2": {
+        "accuracy": 0.36046511627906974,
+        "eligible": 86
+      },
+      "3": {
+        "accuracy": 0.3508771929824561,
+        "eligible": 114
+      },
+      "4": {
+        "accuracy": 0.32727272727272727,
+        "eligible": 110
+      },
+      "5": {
+        "accuracy": 0.2376237623762376,
+        "eligible": 101
+      },
+      "6": {
+        "accuracy": 0.3465346534653465,
+        "eligible": 101
+      }
+    },
+    "near_tie": {
+      "False": {
+        "accuracy": 0.32421875,
+        "eligible": 512
+      }
+    },
+    "scenario_family": {
+      "correlated_quality": {
+        "accuracy": 0.3395061728395062,
+        "eligible": 162
+      },
+      "iid_uniform": {
+        "accuracy": 0.3522727272727273,
+        "eligible": 176
+      },
+      "lognormal_tradeoff": {
+        "accuracy": 0.28160919540229884,
+        "eligible": 174
+      }
+    },
+    "weighting_scheme": {
+      "dirichlet": {
+        "accuracy": 0.3333333333333333,
+        "eligible": 171
+      },
+      "equal": {
+        "accuracy": 0.3216374269005848,
+        "eligible": 171
+      },
+      "sparse": {
+        "accuracy": 0.3176470588235294,
+        "eligible": 170
+      }
+    }
+  },
+  "winner_nll": 1.5772522951074475
+}

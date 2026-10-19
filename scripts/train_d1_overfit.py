@@ -9,7 +9,6 @@ import importlib
 import inspect
 import json
 import math
-import os
 from pathlib import Path
 import platform
 import subprocess
@@ -426,7 +425,10 @@ def run(config_path, data_dir, output):
             'winner_nll_delta': post_train_metrics['winner_nll'] - base_train_metrics['winner_nll'],
             'improved': (post_train_metrics['accuracy'] > base_train_metrics['accuracy']
                          or post_train_metrics['winner_nll'] < base_train_metrics['winner_nll']),
-            'claim_scope': '64-example training subset only; not generalization evidence',
+            'claim_scope': (
+                f'{len(train_episodes)}-example training subset only; '
+                'not generalization evidence'
+            ),
         }
         reference_count = config.get('reload_examples', 16)
         reference = {key: post_predictions[key] for key in list(post_predictions)[:reference_count]}

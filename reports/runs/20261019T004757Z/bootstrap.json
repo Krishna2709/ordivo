@@ -1,0 +1,15 @@
+{
+  "cpu_acceptance_passed": true,
+  "error_type": "RuntimeError",
+  "finished_utc": "2026-10-19T00:50:37.878622+00:00",
+  "passed": false,
+  "pod_id": "9kn5qy9648dfnl",
+  "python": "3.12.3 (main, Nov  6 2025, 13:44:16) [GCC 13.3.0]",
+  "reused_cpu_environment": "20261019T000332Z",
+  "reused_training_environment": "20261019T000332Z",
+  "run_id": "20261019T004757Z",
+  "source_sha256": "78f350eab814d85c847538963e336757c97be4cd866169ff98fbe3d1ecebef11",
+  "started_utc": "2026-10-19T00:48:18.500659+00:00",
+  "status": "failed",
+  "training_started": false
+}

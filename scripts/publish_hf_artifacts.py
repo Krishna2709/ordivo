@@ -80,7 +80,13 @@ def publish(data_dir, training_dir, source_root, model_repo, dataset_repo, recei
                             commit_message=f'Add run evidence {name}')
 
     expected_data = file_manifest(data_dir)
-    expected_adapter = file_manifest(training_dir / 'adapter')
+    # Trainer emits a generic README inside the adapter directory. Publication
+    # intentionally replaces it with the reviewed model card, so verify the
+    # immutable payload files separately from README.md.
+    expected_adapter = [
+        item for item in file_manifest(training_dir / 'adapter')
+        if item['path'] != 'README.md'
+    ]
     with tempfile.TemporaryDirectory(dir=training_dir) as temp:
         downloaded_data = []
         for item in expected_data:

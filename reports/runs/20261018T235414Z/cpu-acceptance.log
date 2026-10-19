@@ -1,0 +1,83 @@
+Running pip-check; log: /workspace/runs/20261018T235414Z/acceptance/pip-check.log
+Running freeze; log: /workspace/runs/20261018T235414Z/acceptance/freeze.log
+Running environment; log: /workspace/runs/20261018T235414Z/acceptance/environment.log
+Running generate; log: /workspace/runs/20261018T235414Z/acceptance/generate.log
+Running repeat; log: /workspace/runs/20261018T235414Z/acceptance/repeat.log
+Running tokenizer; log: /workspace/runs/20261018T235414Z/acceptance/tokenizer.log
+Running pytest; log: /workspace/runs/20261018T235414Z/acceptance/pytest.log
+........................................................................ [ 58%]
+.........F.........................................                      [100%]
+=================================== FAILURES ===================================
+__________ test_real_tokenizer_prompt_boundary_mask_and_no_label_leak __________
+
+tokenizer = TokenizersBackend(name_or_path='.cache/d1-tokenizer', vocab_size=124893, model_max_length=1000000000000000019884624838...	125016: AddedToken("<|mixed_end|>", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),
+})
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_real_tokenizer_prompt_bou0')
+
+    def test_real_tokenizer_prompt_boundary_mask_and_no_label_leak(tokenizer,tmp_path):
+        generate_dataset(tmp_path/'data',count=40,seed=17)
+        e=next(e for e in load_dataset(tmp_path/'data','train') if e['target']['winner'])
+        row=render_example(e,tokenizer)
+        assert 'raw_scores' not in row['prompt'] and 'target' not in row['prompt']
+        assert row['prompt'].endswith('<|im_start|>assistant\n')
+        assert row['completion'].endswith(tokenizer.eos_token)
+        assert row['supervised_ids']==[row['alias_token_id'], tokenizer.eos_token_id]
+        assert all(v == -100 for v in row['labels'][:-2])
+        assert row['labels'][-2:]==row['supervised_ids']
+        value=next(iter(e['alternatives'][0]['values'].values()))
+        assert repr(value) in row['prompt']  # no rounding-label mismatch
+        changed=deepcopy(e)
+        changed['alternatives'].reverse()
+>       permuted=render_example(changed,tokenizer)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_prompt_format.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/liquid_mcdm/training/rendering.py:22: in render_example
+    validate_episode(episode)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+episode = {'alternatives': [{'id': 'G', 'values': {'criterion_0': 245.61474956865467, 'criterion_1': 0.016262008803871922, 'crit...e': 'criterion_5', 'unit': 'synthetic', 'weight': 0.16666666666666666}], 'episode_id': 'synthetic-v1-17-0-000000', ...}
+
+    def validate_episode(episode):
+        """Recompute labels from unrounded source measurements and validate identities."""
+        criteria, alternatives = episode['criteria'], episode['alternatives']
+        names = [c['name'] for c in criteria]
+        ids = [a['id'] for a in alternatives]
+        if len(set(names)) != len(names) or len(set(ids)) != len(ids):
+            raise ValueError('duplicate criterion or alternative identity')
+        if any(set(a['values']) != set(names) for a in alternatives):
+            raise ValueError('missing or extra criteria')
+        if episode['source'] != 'synthetic_solver':
+            raise ValueError('only synthetic solver provenance may be teacher-validated')
+        params = {'lambda_' if k == 'lambda' else k: v for k, v in episode['method_params'].items()}
+        result = solve([[a['values'][c] for c in names] for a in alternatives],
+                       [c['weight'] for c in criteria], [c['direction'] for c in criteria],
+                       episode['method'], **params)
+        target = episode['target']
+        expected_ranking = [[ids[i] for i in group] for group in result.ranking]
+        expected_winner = ids[result.winner] if result.winner is not None else None
+        if (target['algorithm'] != episode['method'] or target['ranking'] != expected_ranking
+                or target['winner'] != expected_winner or set(target['raw_scores']) != set(ids)
+                or not np.allclose([target['raw_scores'][i] for i in ids], result.scores,
+                                   rtol=1e-12, atol=1e-14)
+                or canonical_json(target['metadata']) != canonical_json(result.metadata)):
+>           raise ValueError('target does not match exact solver')
+E           ValueError: target does not match exact solver
+
+src/liquid_mcdm/data/synthetic.py:104: ValueError
+---------------------------- Captured stderr setup -----------------------------
+[transformers] PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+-- generated xml file: /workspace/runs/20261018T235414Z/acceptance/pytest.xml --
+=========================== short test summary info ============================
+FAILED tests/test_prompt_format.py::test_real_tokenizer_prompt_boundary_mask_and_no_label_leak
+1 failed, 122 passed in 35.84s
+
+Traceback (most recent call last):
+  File "/workspace/source/20261018T235414Z/decision-engines/scripts/verify_remote.py", line 98, in <module>
+    main()
+  File "/workspace/source/20261018T235414Z/decision-engines/scripts/verify_remote.py", line 94, in main
+    run_acceptance(args.output_dir)
+  File "/workspace/source/20261018T235414Z/decision-engines/scripts/verify_remote.py", line 68, in run_acceptance
+    raise RuntimeError(f'{name} failed with exit code {result.returncode}')
+RuntimeError: pytest failed with exit code 1

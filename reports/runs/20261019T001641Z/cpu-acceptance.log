@@ -1,0 +1,6 @@
+Running pip-check; log: /workspace/runs/20261019T001641Z/acceptance/pip-check.log
+Running freeze; log: /workspace/runs/20261019T001641Z/acceptance/freeze.log
+Running environment; log: /workspace/runs/20261019T001641Z/acceptance/environment.log
+Running generate; log: /workspace/runs/20261019T001641Z/acceptance/generate.log
+Running repeat; log: /workspace/runs/20261019T001641Z/acceptance/repeat.log
+Running tokenizer; log: /workspace/runs/20261019T001641Z/acceptance/tokenizer.log

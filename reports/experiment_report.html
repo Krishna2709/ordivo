@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Evidence report for the first LiquidAI d1-3B MCDM LoRA experiment.">
-  <title>Liquid MCDM Lab — Experiment 01</title>
+  <meta name="description" content="Release evidence for the LiquidAI d1-3B MCDM LoRA experiments.">
+  <title>Liquid MCDM Lab — v2 Release Report</title>
   <style>
     :root {
       --ink: #14263d;
@@ -127,6 +127,25 @@
     .metric strong { display: block; margin: 10px 0 5px; font: 500 clamp(2rem, 4vw, 3.25rem)/1 Georgia, serif; letter-spacing: -.04em; }
     .metric em { color: var(--green); font-style: normal; font-size: .83rem; }
 
+    .release-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      margin-top: 18px;
+      border: 2px solid var(--ink);
+      background: var(--sheet);
+    }
+    .release-strip a {
+      display: block;
+      padding: 18px;
+      border-right: 1px solid var(--ink);
+      color: var(--ink);
+      text-decoration: none;
+      font-weight: 800;
+    }
+    .release-strip a:last-child { border-right: 0; }
+    .release-strip a:hover { background: var(--amber); }
+    .release-strip small { display: block; color: var(--muted); font-weight: 500; }
+
     .flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; }
     .flow-step { position: relative; min-height: 180px; padding: 24px 22px; color: white; background: var(--ink); border-right: 1px solid #496073; }
     .flow-step:nth-child(2) { background: #1b3953; }
@@ -211,6 +230,15 @@
     .sample-size { color: var(--muted); font-size: .78rem; }
     .callout { margin-top: 20px; padding: 18px 20px; border-left: 5px solid var(--amber); background: #fff4d9; }
 
+    .version-table td:first-child { font-weight: 800; }
+    .version-table .current { background: #e2f1ea; }
+    .prediction-case { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 18px; }
+    .prediction-case article { padding: 18px; background: #eef1ee; border-top: 4px solid var(--blue); }
+    .prediction-case article.regression { border-top-color: var(--red); }
+    .prediction-case h4 { margin: 0 0 10px; font: 600 1.02rem Georgia, serif; }
+    .prediction-case p { margin: 5px 0; font-size: .84rem; }
+    .prediction-case code { overflow-wrap: anywhere; }
+
     .failure-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
     .failure-card { padding: 26px; border: 1px solid var(--line); background: var(--sheet); }
     .failure-card strong { display: block; margin-bottom: 9px; font: 600 1.35rem Georgia, serif; }
@@ -246,9 +274,12 @@
       .flow { grid-template-columns: 1fr; }
       .flow-step { min-height: auto; border-right: 0; border-bottom: 1px solid #496073; }
       .flow-step::after { display: none; }
-      .setup-grid, .next-run { grid-template-columns: 1fr; }
+      .setup-grid, .next-run, .prediction-case { grid-template-columns: 1fr; }
       .setup-grid article { border-right: 0; border-bottom: 1px solid var(--line); }
       .coverage { border-left: 0; border-top: 2px solid var(--ink); }
+      .release-strip { grid-template-columns: 1fr 1fr; }
+      .release-strip a:nth-child(2) { border-right: 0; }
+      .release-strip a:nth-child(-n+2) { border-bottom: 1px solid var(--ink); }
     }
     @media (max-width: 600px) {
       .shell { width: min(100% - 24px, 1180px); }
@@ -263,6 +294,8 @@
       .bar-row { grid-template-columns: 68px 1fr 46px; }
       th, td { padding: 10px 7px; }
       .coverage ul { columns: 1; }
+      .release-strip { grid-template-columns: 1fr; }
+      .release-strip a { border-right: 0; border-bottom: 1px solid var(--ink); }
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
@@ -279,14 +312,14 @@
 <body>
   <div class="topbar">
     <div class="shell">
-      <div class="mark">Liquid MCDM Lab / Experiment 01</div>
+      <div class="mark">Liquid MCDM Lab / v2 Release</div>
       <nav aria-label="Report sections">
         <a href="#dataset">Dataset</a>
         <a href="#methods">Methods</a>
         <a href="#training">Training</a>
         <a href="#results">Results</a>
         <a href="#failures">Failures</a>
-        <a href="#next">Next run</a>
+        <a href="#release">Release</a>
       </nav>
     </div>
   </div>
@@ -294,13 +327,13 @@
   <header>
     <div class="shell hero">
       <div>
-        <span class="run-label">Run 20261019T002734Z · bounded overfit diagnostic</span>
-        <h1>Can a decision model learn four exact decision rules?</h1>
-        <p class="dek">A 25-step LoRA experiment taught LiquidAI/d1-3B to imitate COPRAS, WASPAS, VIKOR and TOPSIS winners on synthetic multi-criteria choices. It produced a clear learning signal, a small held-out gain, and one unresolved reload failure.</p>
+        <span class="run-label">Release run 20261019T005111Z · passed · publicly available</span>
+        <h1>A decision model learns four exact decision rules.</h1>
+        <p class="dek">The second LiquidAI/d1-3B LoRA experiment scales the original diagnostic from 64 to 512 training examples and from 25 to 400 steps. It reaches 58.6% accuracy on all 87 eligible held-out episodes, publishes every prediction row, and releases the adapter, dataset and evidence.</p>
       </div>
       <aside class="verdict" aria-label="Experiment verdict">
-        <strong>Learning signal confirmed.</strong>
-        <p>Training accuracy rose 39.1 percentage points. This is an overfit check on 64 examples, not evidence of broad generalization or human preference modeling. Release readiness is blocked by probability reload drift.</p>
+        <strong>Release run passed.</strong>
+        <p>Held-out accuracy rose 29.9 percentage points across 87 episodes. All 16 reload decisions were preserved within the declared 0.05 probability tolerance. Exact probability parity is still false, and held-out calibration worsened.</p>
       </aside>
     </div>
   </header>
@@ -308,10 +341,16 @@
   <main class="shell">
     <section aria-label="Key results">
       <div class="ledger">
-        <div class="metric"><span>Training accuracy</span><strong>67.2%</strong><em>from 28.1% · +39.1 pp</em></div>
-        <div class="metric"><span>Held-out accuracy</span><strong>50.0%</strong><em>from 37.5% · +12.5 pp</em></div>
-        <div class="metric"><span>Winner NLL</span><strong>0.993</strong><em>from 1.574 · −36.9%</em></div>
-        <div class="metric"><span>GPU training</span><strong>40.6s</strong><em>25 steps · A40 48 GB</em></div>
+        <div class="metric"><span>Training accuracy</span><strong>93.6%</strong><em>from 32.4% · +61.1 pp</em></div>
+        <div class="metric"><span>Full held-out accuracy</span><strong>58.6%</strong><em>from 28.7% · 87 episodes</em></div>
+        <div class="metric"><span>Original 16-case slice</span><strong>75.0%</strong><em>v1 adapter reached 50.0%</em></div>
+        <div class="metric"><span>GPU training</span><strong>9m 17s</strong><em>400 steps · A40 48 GB</em></div>
+      </div>
+      <div class="release-strip" id="release" aria-label="Public release links">
+        <a href="https://github.com/Krishna2709/liquid-mcdm-lab">GitHub<small>source, docs and reproducibility</small></a>
+        <a href="https://huggingface.co/blackOrder/d1-3b-mcdm-lora">Model<small>LoRA adapter and model card</small></a>
+        <a href="https://huggingface.co/datasets/blackOrder/liquid-mcdm-synthetic">Dataset<small>1,000 episodes and manifest</small></a>
+        <a href="https://wandb.ai/black-order/liquid-mcdm-lab/runs/4vblgw80">W&amp;B<small>400 trainer rows and artifacts</small></a>
       </div>
     </section>
 
@@ -341,7 +380,7 @@
             <div class="train">800 train</div><div class="val">100</div><div class="test">100</div>
           </div>
           <p>Seed 42 · float64 source values · 3–8 alternatives · 2–6 criteria · method, family and weighting factors crossed rather than coupled.</p>
-          <p><strong>Reproduction:</strong> two remote 1,000-episode generations were byte-identical. The manifest binds generator and solver hashes, counts, seed lineage and each JSONL SHA-256.</p>
+          <p><strong>Reproduction:</strong> two remote 1,000-episode generations were byte-identical. The manifest binds generator and solver hashes, counts, seed lineage and each JSONL SHA-256. Hugging Face read-back verified the published dataset.</p>
         </div>
         <div class="panel">
           <h3>Scenario families by split</h3>
@@ -391,7 +430,7 @@
             <tr><td>TOPSIS</td><td class="number">1.0000</td><td class="number">0.0000</td><td>higher</td><td class="winner">A</td></tr>
           </tbody>
         </table>
-        <p class="fineprint">The 124-test remote suite also checked independent library parity, ties, degeneracies, positive rescaling, direction reversal, method disagreement, weight sensitivity and documented rank reversal. Exact-teacher self-consistency was 100% on 85 eligible test episodes; 15 nonunique episodes were excluded.</p>
+        <p class="fineprint">The release run passed 130 remote tests and checked independent library parity, ties, degeneracies, positive rescaling, direction reversal, method disagreement, weight sensitivity and documented rank reversal. The v2 evaluator admitted 87 unique-winner test episodes; nonunique outcomes remain in the published dataset for analysis.</p>
       </div>
     </section>
 
@@ -405,7 +444,7 @@
           <h3>Base model</h3>
           <p><strong>LiquidAI/d1-3B</strong><br>revision <code>051bcc…2432</code></p>
           <span class="tag">BF16</span><span class="tag">no quantization</span><span class="tag">max length 2048</span>
-          <p class="fineprint">LFM Open License v1.0 applies. Redistribution conditions require review before publication.</p>
+          <p class="fineprint">Published LoRA weights: 97,894,520 bytes · SHA-256 <code>691b01da…789c</code>. LFM Open License v1.0 conditions remain attached to the adapter release.</p>
         </article>
         <article>
           <h3>LoRA recipe</h3>
@@ -415,7 +454,7 @@
         </article>
         <article>
           <h3>Optimization</h3>
-          <p>64 examples · 25 steps · batch 1 × accumulation 4 · cosine schedule · LR 2×10⁻⁴</p>
+          <p>512 examples · 400 steps · batch 1 × accumulation 4 · cosine schedule · LR 2×10⁻⁴</p>
           <span class="tag">SFTTrainer</span><span class="tag">checkpointing</span><span class="tag">seed 42</span>
           <p class="fineprint">The real collator supervised exactly two tokens per example: answer alias and EOS.</p>
         </article>
@@ -425,8 +464,8 @@
         <table>
           <tbody>
             <tr><th>Compute</th><td>Secure-cloud NVIDIA A40, 46,068 MiB reported</td><th>Environment</th><td>Python 3.12.3 · Torch 2.9.1+cu128 · CUDA 12.8</td></tr>
-            <tr><th>Throughput</th><td>0.615 steps/s · 2.462 samples/s</td><th>Training loss</th><td>0.72068</td></tr>
-            <tr><th>Compatibility memory</th><td>6.63 GB allocated · 14.24 GB reserved</td><th>Estimated pod cost</th><td>$0.37 over about 0.628 pod-hours</td></tr>
+            <tr><th>Throughput</th><td>0.719 steps/s · 2.875 samples/s</td><th>Mean training loss</th><td>0.48215</td></tr>
+            <tr><th>Compatibility memory</th><td>6.61 GB allocated · 13.46 GB reserved</td><th>Optimization</th><td>3.125 epochs · 1,211,807 tokens observed</td></tr>
           </tbody>
         </table>
       </div>
@@ -434,41 +473,58 @@
 
     <section id="results">
       <div class="section-head">
-        <h2>What changed</h2>
-        <p>The adapter substantially fit the 64 training examples and improved the tiny 16-example held-out diagnostic. Because the held-out denominator is small and drawn from only two scenario families, method-level movements are descriptive rather than stable estimates.</p>
+        <h2>v1 → v2</h2>
+        <p>The release run converts the first learning signal into a larger, reviewable experiment. Its 87-episode test covers every eligible unique-winner case in the frozen synthetic test split. The original 16-case slice is retained only for direct comparison with v1.</p>
+      </div>
+      <div class="panel" style="overflow-x:auto; margin-bottom:28px;">
+        <h3>Two runs, one frozen task</h3>
+        <table class="version-table">
+          <thead><tr><th>Run</th><th>Train / steps</th><th>Train accuracy</th><th>Held-out evidence</th><th>Reload</th><th>Outcome</th></tr></thead>
+          <tbody>
+            <tr><td>v1 · 002734Z</td><td>64 / 25</td><td>28.1% → 67.2%</td><td>37.5% → 50.0% on 16</td><td>4/4 decisions; max Δ 0.03060</td><td>failed 1e−4 probability gate</td></tr>
+            <tr class="current"><td>v2 · 005111Z</td><td>512 / 400</td><td>32.4% → 93.6%</td><td>28.7% → 58.6% on 87; 75.0% on comparison 16</td><td>16/16 decisions; max Δ 0.02147</td><td>passed 0.05 decision-equivalence gate</td></tr>
+          </tbody>
+        </table>
+        <p class="fineprint">The training accuracies use different training subsets, so they describe fit within each run rather than a paired comparison. The 16-case comparison slice is paired and moved from the same 37.5% base to 50.0% with v1 and 75.0% with v2.</p>
       </div>
       <div class="chart-grid">
         <div class="chart">
-          <h3>Accuracy before and after</h3>
+          <h3>v2 accuracy before and after</h3>
           <p>Percentage of unique-winner episodes matching the exact teacher.</p>
-          <div class="bar-row"><span>Train before</span><div class="track"><div class="bar before" style="width:28.125%"></div></div><strong>28.1%</strong></div>
-          <div class="bar-row"><span>Train after</span><div class="track"><div class="bar after" style="width:67.1875%"></div></div><strong>67.2%</strong></div>
-          <div class="bar-row"><span>Test before</span><div class="track"><div class="bar before" style="width:37.5%"></div></div><strong>37.5%</strong></div>
-          <div class="bar-row"><span>Test after</span><div class="track"><div class="bar after" style="width:50%"></div></div><strong>50.0%</strong></div>
+          <div class="bar-row"><span>Train base</span><div class="track"><div class="bar before" style="width:32.4219%"></div></div><strong>32.4%</strong></div>
+          <div class="bar-row"><span>Train v2</span><div class="track"><div class="bar after" style="width:93.5547%"></div></div><strong>93.6%</strong></div>
+          <div class="bar-row"><span>Test base</span><div class="track"><div class="bar before" style="width:28.7356%"></div></div><strong>28.7%</strong></div>
+          <div class="bar-row"><span>Test v2</span><div class="track"><div class="bar after" style="width:58.6207%"></div></div><strong>58.6%</strong></div>
         </div>
         <div class="chart">
-          <h3>Loss and probability quality</h3>
-          <p>Lower is better. NLL is available for train; multiclass Brier for both splits.</p>
-          <div class="bar-row"><span>Train NLL</span><div class="track"><div class="bar before" style="width:78.68%"></div></div><strong>1.574</strong></div>
-          <div class="bar-row"><span>After</span><div class="track"><div class="bar after" style="width:49.66%"></div></div><strong>0.993</strong></div>
-          <div class="bar-row"><span>Test Brier</span><div class="track"><div class="bar before" style="width:75.04%"></div></div><strong>0.750</strong></div>
-          <div class="bar-row"><span>After</span><div class="track"><div class="bar after" style="width:71.09%"></div></div><strong>0.711</strong></div>
-          <p class="fineprint">Held-out ECE moved from 0.031 to 0.312. With only 16 examples, this warns that confidence changed faster than validated correctness; it is not a dependable calibration estimate.</p>
+          <h3>Probability quality & calibration</h3>
+          <p>Lower is better. Brier improves on the full test, while ECE worsens.</p>
+          <div class="bar-row"><span>Train NLL</span><div class="track"><div class="bar before" style="width:78.86%"></div></div><strong>1.577</strong></div>
+          <div class="bar-row"><span>v2 NLL</span><div class="track"><div class="bar after" style="width:10.52%"></div></div><strong>0.210</strong></div>
+          <div class="bar-row"><span>Test Brier</span><div class="track"><div class="bar before" style="width:78.11%"></div></div><strong>0.781</strong></div>
+          <div class="bar-row"><span>v2 Brier</span><div class="track"><div class="bar after" style="width:62.31%"></div></div><strong>0.623</strong></div>
+          <p class="fineprint"><strong>Calibration warning:</strong> full-test ECE rose from 0.118 to 0.239 even as accuracy and Brier improved. On the 16-case comparison it rose from 0.031 to 0.292. The adapter is more often right, but its confidence is less aligned with observed correctness.</p>
         </div>
       </div>
 
       <div class="panel" style="margin-top: 28px; overflow-x: auto;">
-        <h3>Held-out model predictions by method</h3>
+        <h3>Full held-out predictions by method</h3>
         <table class="prediction-table">
           <thead><tr><th>Teacher method</th><th>Episodes</th><th>Before</th><th>After</th><th>Change</th></tr></thead>
           <tbody>
-            <tr><td>COPRAS</td><td>5</td><td>60%</td><td>40%</td><td class="delta-down">−20 pp</td></tr>
-            <tr><td>TOPSIS</td><td>4</td><td>25%</td><td>25%</td><td>0 pp</td></tr>
-            <tr><td>VIKOR</td><td>2</td><td>50%</td><td>100%</td><td class="delta-up">+50 pp</td></tr>
-            <tr><td>WASPAS</td><td>5</td><td>20%</td><td>60%</td><td class="delta-up">+40 pp</td></tr>
+            <tr><td>COPRAS</td><td>25</td><td>40.0%</td><td>56.0%</td><td class="delta-up">+16.0 pp</td></tr>
+            <tr><td>TOPSIS</td><td>25</td><td>28.0%</td><td>56.0%</td><td class="delta-up">+28.0 pp</td></tr>
+            <tr><td>VIKOR</td><td>12</td><td>16.7%</td><td>66.7%</td><td class="delta-up">+50.0 pp</td></tr>
+            <tr><td>WASPAS</td><td>25</td><td>24.0%</td><td>60.0%</td><td class="delta-up">+36.0 pp</td></tr>
           </tbody>
         </table>
-        <div class="callout"><strong>What the run did not record:</strong> the preserved evidence has aggregate accuracies, probabilities-derived metrics and slice counts, but no per-episode model prediction table. Individual prompt, exact winner, predicted winner and option probabilities therefore cannot be shown honestly for this run. The next run must persist those rows and log them as a W&amp;B Table.</div>
+        <div class="callout"><strong>Error movement:</strong> v2 corrected 29 episodes that the base model missed, regressed on 3 that the base model got right, and left 33 wrong. Net improvement: 26 additional correct decisions, from 25/87 to 51/87.</div>
+        <div class="prediction-case" aria-label="Selected prediction records">
+          <article><h4>COPRAS correction</h4><p><code>…000000</code> · teacher A</p><p>Base: C at 51.4%<br><strong>v2: A at 87.7%</strong></p></article>
+          <article><h4>VIKOR correction</h4><p><code>…000002</code> · teacher D</p><p>Base: A at 24.7%<br><strong>v2: D at 98.4%</strong></p></article>
+          <article class="regression"><h4>TOPSIS regression</h4><p><code>…000091</code> · teacher A</p><p>Base: A at 31.6%<br><strong>v2: D at 93.7%</strong></p></article>
+        </div>
+        <p class="fineprint">These are recorded rows, not illustrative examples. The complete 87-row table contains episode ID, method, dimensions, exact teacher, base and adapted predictions, correctness and every option probability.</p>
       </div>
 
       <div class="panel" style="margin-top: 28px; overflow-x: auto;">
@@ -476,46 +532,48 @@
         <table class="prediction-table">
           <thead><tr><th>Slice</th><th>Episodes</th><th>Before</th><th>After</th><th>Reading</th></tr></thead>
           <tbody>
-            <tr><td>Anticorrelated family</td><td>9</td><td>22.2%</td><td>33.3%</td><td class="delta-up">+11.1 pp</td></tr>
-            <tr><td>Near-tie family</td><td>7</td><td>57.1%</td><td>71.4%</td><td class="delta-up">+14.3 pp</td></tr>
-            <tr><td>3 alternatives</td><td>4</td><td>50.0%</td><td>75.0%</td><td class="delta-up">+25 pp</td></tr>
-            <tr><td>4 alternatives</td><td>7</td><td>57.1%</td><td>42.9%</td><td class="delta-down">−14.3 pp</td></tr>
-            <tr><td>5 alternatives</td><td>3</td><td>0.0%</td><td>66.7%</td><td class="delta-up">+66.7 pp</td></tr>
-            <tr><td>6 alternatives</td><td>2</td><td>0.0%</td><td>0.0%</td><td>unchanged</td></tr>
+            <tr><td>Anticorrelated family</td><td>45</td><td>33.3%</td><td>73.3%</td><td class="delta-up">+40.0 pp</td></tr>
+            <tr><td>Near-tie family</td><td>42</td><td>23.8%</td><td>42.9%</td><td class="delta-up">+19.1 pp</td></tr>
+            <tr><td>Non-near-tie episodes</td><td>63</td><td>31.7%</td><td>65.1%</td><td class="delta-up">+33.3 pp</td></tr>
+            <tr><td>Near-tie episodes</td><td>24</td><td>20.8%</td><td>41.7%</td><td class="delta-up">+20.8 pp</td></tr>
+            <tr><td>3 alternatives</td><td>17</td><td>29.4%</td><td>88.2%</td><td class="delta-up">+58.8 pp</td></tr>
+            <tr><td>8 alternatives</td><td>13</td><td>38.5%</td><td>53.8%</td><td class="delta-up">+15.4 pp</td></tr>
           </tbody>
         </table>
+        <p class="fineprint">Accuracy remains weaker on close decisions and larger candidate sets. This is solver imitation on synthetic scenario shifts; it is not evidence of human preference prediction.</p>
       </div>
     </section>
 
     <section id="failures">
       <div class="section-head">
         <h2>Failures are evidence</h2>
-        <p>The final run completed training and saved the adapter, then correctly failed its strict validation. Earlier setup failures also narrowed the supported environment. None should be hidden behind the improved headline metric.</p>
+        <p>v2 passed its stated acceptance contract, but “passed” does not mean every numerical discrepancy vanished. The report keeps environment failures, loader differences, reload drift and calibration risk visible beside the improved accuracy.</p>
       </div>
       <div class="failure-grid">
         <article class="failure-card">
-          <span class="status fixed">Resolved for this run</span>
+          <span class="status fixed">Resolved</span>
           <strong>Optional torchao broke the measured stack</strong>
           <p>The notebook's open-ended <code>torchao&gt;0.16</code> selected 0.18.0, which failed with Torch 2.9.1. Version 0.15 imported, but PEFT 0.21.2 required 0.16 or newer during LoRA injection.</p>
           <p><b>Resolution:</b> omit optional torchao and use the successful non-quantized BF16 path. TRL 1.15's warmup API was also mapped from the configured 0.05 fraction.</p>
         </article>
         <article class="failure-card">
-          <span class="status open">Open blocker</span>
-          <strong>Reloaded probabilities drifted</strong>
-          <p>All 4 reloaded predictions kept the same argmax, yet the maximum absolute probability delta was 0.03060 and the mean was 0.00842. Both exceeded the strict 0.0001 threshold.</p>
-          <div class="code">RuntimeError: Saved adapter reload parity failed<br>argmax agreement = 1.0<br>max |Δ probability| = 0.030595</div>
+          <span class="status fixed">Accepted with bounded drift</span>
+          <strong>Reload is decision-equivalent</strong>
+          <p>All 16 decisions survived save/reload. The maximum probability delta was 0.02147 and the mean was 0.00111, within the declared 0.05 tolerance. Repeated inference and two independent fresh reloads matched exactly.</p>
+          <div class="code">argmax agreement = 16 / 16<br>max |Δ probability| = 0.021474<br>fresh reload vs reload = 0.000000</div>
+          <p><b>Boundary:</b> exact saved-versus-live probability parity is still false. The release claim is decision equivalence within tolerance.</p>
         </article>
         <article class="failure-card">
-          <span class="status open">Needs isolation</span>
+          <span class="status open">Documented limitation</span>
           <strong>Two loader paths were not identical</strong>
           <p>The custom d1 wrapper and the standard image-text loader agreed on 7 of 8 base argmax decisions. Their maximum probability delta was 0.01562.</p>
-          <p><b>Implication:</b> the evaluation path itself can move a borderline decision. Use one pinned path for comparisons and diagnose dtype, cache, tokenizer and construction differences.</p>
+          <p><b>Implication:</b> the evaluation path itself can move a borderline decision. The release comparisons use one pinned standard path; custom-wrapper equivalence is not claimed.</p>
         </article>
         <article class="failure-card">
-          <span class="status open">Statistical limitation</span>
-          <strong>The test set is too small for tuning decisions</strong>
-          <p>Only 16 held-out examples were evaluated: two VIKOR examples, four TOPSIS examples, and five each for COPRAS and WASPAS. A single prediction can move a method metric by 20–50 percentage points.</p>
-          <p><b>Implication:</b> do not tune hyperparameters against these four method percentages. Expand a frozen validation set first.</p>
+          <span class="status open">Open model limitation</span>
+          <strong>Accuracy improved faster than calibration</strong>
+          <p>On the 87-example test, Brier score improved from 0.781 to 0.623, but 10-bin ECE rose from 0.118 to 0.239. Several remaining errors are confident; one recorded TOPSIS regression assigns 93.7% to the wrong option.</p>
+          <p><b>Implication:</b> report probabilities as experimental scores, not calibrated confidence. Temperature scaling requires a separate validation set and evaluation.</p>
         </article>
       </div>
     </section>
@@ -523,70 +581,76 @@
     <section id="wandb">
       <div class="section-head">
         <h2>W&amp;B coverage</h2>
-        <p>Weights &amp; Biases was used, but “everything” would overstate the evidence. The run logged offline on the pod and was then explicitly synced to the cloud.</p>
+        <p>v2 closes the tracking gaps from v1. It logged offline on the pod, attached structured evaluation evidence and artifacts to the same run, then synced the complete run to the public W&amp;B project.</p>
       </div>
       <div class="wandb-band">
         <div>
-          <h3>Run 56i7klyd</h3>
-          <p><strong>Project:</strong> liquid-mcdm-lab<br><strong>SDK:</strong> 0.22.3<br><strong>Status:</strong> synced</p>
-          <p><a href="https://wandb.ai/liquid-mcdm-lab/runs/56i7klyd">Open the W&amp;B run</a></p>
+          <h3>Run 4vblgw80</h3>
+          <p><strong>Entity:</strong> black-order<br><strong>Project:</strong> liquid-mcdm-lab<br><strong>SDK:</strong> 0.22.3<br><strong>Status:</strong> synced</p>
+          <p><a href="https://wandb.ai/black-order/liquid-mcdm-lab/runs/4vblgw80">Open the W&amp;B run</a></p>
         </div>
         <div class="coverage">
-          <strong>Confirmed in the synced training run</strong>
+          <strong>Confirmed in the synced v2 run</strong>
           <ul>
-            <li>step loss, gradient norm and learning rate</li>
-            <li>entropy and mean token accuracy</li>
-            <li>runtime, throughput and final train loss</li>
-            <li>Hugging Face trainer telemetry</li>
+            <li>400 trainer rows with loss, gradient norm and LR</li>
+            <li>entropy, token accuracy, runtime and throughput</li>
+            <li>87-row prediction table with option probabilities</li>
+            <li>config, hashes, outcomes and reload diagnostics</li>
+            <li>dataset artifact: manifest plus three splits</li>
+            <li>model artifact: adapter and tokenizer payload</li>
+            <li>evaluation artifact: JSON evidence and environment</li>
           </ul>
-          <p><strong>Preserved in repository evidence, not proven uploaded to W&amp;B:</strong> aggregate pre/post evaluation JSON, adapter manifest, checksum and remote path.</p>
-          <p><strong>Missing for full auditability:</strong> per-episode prediction rows, W&amp;B Table of errors, the full synthetic dataset as a versioned artifact, and the adapter as a W&amp;B model artifact. These belong in the next run and release workflow.</p>
+          <p><strong>Answer to “did W&amp;B log everything?”</strong> For v2's declared evidence set, yes: trainer history, dataset, model, evaluation JSON and prediction table are present as run data or artifacts. Hugging Face remains the release host; W&amp;B is the experiment ledger.</p>
         </div>
       </div>
     </section>
 
     <section id="next">
       <div class="section-head">
-        <h2>Next experiment</h2>
-        <p>Fix measurement reliability before spending on a larger sweep. Then move from the 64-example diagnostic to a validation-driven 1,000-example run with predictions preserved at episode level.</p>
+        <h2>What remains</h2>
+        <p>The release is a reproducible M3 result, not the end of the research question. The next experiment should test robustness and calibration without using the published test split for model selection.</p>
       </div>
       <div class="next-run">
         <article>
-          <h3>Close the parity gap</h3>
-          <p>Reproduce save/reload from the same local model snapshot, evaluation mode, dtype, device map and tokenizer. Compare logits before softmax and adapter state hashes. Treat cache settings separately; the recorded <code>use_cache=false</code> check did not remove the drift.</p>
+          <h3>Calibrate on validation</h3>
+          <p>Fit temperature scaling on a frozen validation set and report ECE, Brier and accuracy without changing the winner rule. Test whether confidence becomes more reliable on the untouched test set.</p>
         </article>
         <article>
-          <h3>Improve the evidence</h3>
-          <p>Freeze a larger validation split balanced by method, size and family. Persist one row per episode: source hash, teacher scores, exact winner, prompt hash, option probabilities, prediction, correctness and latency. Log the rows as a W&amp;B Table.</p>
+          <h3>Probe invariances</h3>
+          <p>Measure alternative-order permutations, positive scale changes, criterion-direction flips and candidate-set changes at episode level. Compare every learned decision with the exact solver's documented invariant boundary.</p>
         </article>
         <article>
-          <h3>Run a bounded comparison</h3>
-          <p>Train on the 800-example split and select on the 100-example validation split. Compare learning rates 1×10⁻⁴ and 2×10⁻⁴ with the same rank-16 LoRA, fixed batch semantics and at least three seeds. Touch the 100-example test split only after selection.</p>
+          <h3>Establish uncertainty</h3>
+          <p>Repeat the selected configuration across at least three seeds and compare against numerical Set Transformer and LightGBM controls. Report confidence intervals by method, scenario family and candidate count.</p>
         </article>
       </div>
-      <div class="callout"><strong>Release criterion:</strong> deterministic adapter reload within a justified tolerance, complete per-episode evaluation artifacts, performance reported with denominators and uncertainty, and a model card that preserves the LFM Open License conditions. Exact solvers remain the correct tool for computing the formulas; the learned model is an imitation experiment.</div>
+      <div class="callout"><strong>Interpretation boundary:</strong> exact solvers remain the correct tool for computing COPRAS, WASPAS, VIKOR and TOPSIS. This adapter demonstrates learnable imitation under synthetic scenario shift. It does not establish human preference modeling, full-ranking ability or arithmetic superiority over the teachers.</div>
     </section>
 
     <section class="evidence" id="evidence">
       <h2>Evidence map</h2>
-      <p>This page is a readable layer over repository evidence. The numbers above come from these files; no secrets, tokens or private data are embedded.</p>
+      <p>This page is a readable layer over the preserved v1 and v2 evidence. The public links and local receipts below form the release chain; no secrets, tokens or private data are embedded.</p>
       <div class="evidence-grid">
-        <div><a href="../dist/runpod/results-20261019T002734Z/summary.json">Run summary</a> — headline outcome, runtime, cost and reload result</div>
-        <div><a href="../dist/runpod/results-20261019T002734Z/training__run.json">Training record</a> — full config and compatibility evidence</div>
-        <div><a href="../dist/runpod/results-20261019T002734Z/training__base_metrics.json">Base test metrics</a> — pre-training method and slice results</div>
-        <div><a href="../dist/runpod/results-20261019T002734Z/training__post_metrics.json">Post test metrics</a> — post-training method and slice results</div>
-        <div><a href="../dist/runpod/results-20261019T002734Z/training__base_train_metrics.json">Base train metrics</a> — 64-example starting point</div>
-        <div><a href="../dist/runpod/results-20261019T002734Z/training__post_train_metrics.json">Post train metrics</a> — 64-example overfit outcome</div>
+        <div><a href="runs/20261019T005111Z/training/run.json">v2 run record</a> — terminal state, config, runtime and acceptance</div>
+        <div><a href="runs/20261019T005111Z/training/prediction_rows.json">v2 prediction rows</a> — all 87 before/after decisions and probabilities</div>
+        <div><a href="runs/20261019T005111Z/training/base_metrics.json">v2 base metrics</a> — full-test method and slice starting point</div>
+        <div><a href="runs/20261019T005111Z/training/post_metrics.json">v2 adapted metrics</a> — full-test method and slice outcome</div>
+        <div><a href="runs/20261019T005111Z/training/adapter_reload_parity.json">v2 reload evidence</a> — 16-decision parity and probability drift</div>
+        <div><a href="runs/20261019T005111Z/hf_publish_receipt.json">Hugging Face receipt</a> — payload hashes and read-back verification</div>
+        <div><a href="runs/20261019T002734Z/summary.json">v1 summary</a> — original bounded diagnostic for comparison</div>
+        <div><a href="https://github.com/Krishna2709/liquid-mcdm-lab">GitHub release</a> — public source and documentation</div>
+        <div><a href="https://huggingface.co/blackOrder/d1-3b-mcdm-lora">Hugging Face model</a> — published LoRA adapter</div>
+        <div><a href="https://huggingface.co/datasets/blackOrder/liquid-mcdm-synthetic">Hugging Face dataset</a> — published synthetic corpus</div>
         <div><a href="../docs/mathematics.md">Mathematical policy</a> — formulas, ties and VIKOR compromise rules</div>
         <div><a href="../docs/dataset_card.md">Dataset card</a> — provenance, split policy and limitations</div>
         <div><a href="../docs/model_card_draft.md">Model card draft</a> — intended use and release limitations</div>
-        <div><a href="../dist/runpod/results-20261019T002734Z/training__artifact_manifest.json">Artifact manifest</a> — adapter files, sizes and SHA-256 values</div>
+        <div><a href="https://wandb.ai/black-order/liquid-mcdm-lab/runs/4vblgw80">W&amp;B run</a> — trainer history, table and artifacts</div>
       </div>
     </section>
   </main>
 
   <footer class="shell">
-    <p>Prepared from recorded repository evidence on 2026-10-18 (America/Chicago). Run timestamps are UTC. Scope: synthetic exact-solver imitation, single-choice winner prediction.</p>
+    <p>Updated from recorded release evidence on 2026-10-18 (America/Chicago). Run timestamps are UTC. Scope: synthetic exact-solver imitation, single-choice winner prediction.</p>
   </footer>
 
   <script>

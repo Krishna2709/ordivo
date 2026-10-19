@@ -1,0 +1,140 @@
+{
+  "compatibility": {
+    "finite_loss": 0.8057463765144348,
+    "gpu_memory_allocated_bytes": 6606273536,
+    "gpu_memory_reserved_bytes": 13455327232,
+    "supervised_token_ids": [
+      44,
+      124900
+    ],
+    "supervised_tokens_per_example": 2,
+    "trainable_tensors": 332,
+    "trainable_tensors_with_nonzero_gradient": 166
+  },
+  "config": {
+    "comparison_examples": 16,
+    "completion_only_loss": true,
+    "eval_examples": 87,
+    "experiment_name": "d1-3b-mcdm-v2-512x400",
+    "gradient_accumulation_steps": 4,
+    "gradient_checkpointing": true,
+    "inference_loader": "AutoModel",
+    "learning_rate": 0.0002,
+    "lora": {
+      "bias": "none",
+      "exclude_modules": ".*vision_tower.*",
+      "lora_alpha": 32,
+      "lora_dropout": 0.05,
+      "r": 16,
+      "target_modules": [
+        "q_proj",
+        "k_proj",
+        "v_proj",
+        "out_proj",
+        "in_proj",
+        "w1",
+        "w2",
+        "w3"
+      ],
+      "task_type": "CAUSAL_LM"
+    },
+    "lr_scheduler_type": "cosine",
+    "max_length": 2048,
+    "max_steps": 400,
+    "model_id": "LiquidAI/d1-3B",
+    "output_dir": "checkpoints/d1-mcdm-v2",
+    "packing": false,
+    "parity_examples": 8,
+    "per_device_train_batch_size": 1,
+    "prompt_version": "mcdm-choice-v1-full-precision",
+    "quantization": "none",
+    "reload_examples": 16,
+    "reload_probability_tolerance": 0.05,
+    "report_to": "wandb",
+    "revision": "051bcc464b01b9f92942b364d9586b0ef5912432",
+    "save_steps": 100,
+    "save_total_limit": 2,
+    "seed": 42,
+    "shuffle_dataset": true,
+    "status": "approved_v2_runpod_a40",
+    "train_examples": 512,
+    "trainer": "trl.SFTTrainer",
+    "training_loader": "AutoModelForImageTextToText",
+    "wandb_mode": "offline",
+    "wandb_project": "liquid-mcdm-lab",
+    "warmup_ratio": 0.05
+  },
+  "cuda": "12.8",
+  "dataset_manifest_sha256": "1235dd1439935f217ab7fca62746fa7ddf28806ace867810b349abc147e4e1b2",
+  "dtype": "torch.bfloat16",
+  "finished_utc": "2026-10-19T01:04:44.069414+00:00",
+  "held_out_outcome": {
+    "accuracy_delta": 0.375,
+    "base_accuracy": 0.375,
+    "examples": 16,
+    "full_eval_examples": 87,
+    "post_accuracy": 0.75
+  },
+  "lora": {
+    "trainable_parameter_tensors": 332,
+    "vision_trainable_tensors": 0
+  },
+  "model_loaded": true,
+  "overfit_outcome": {
+    "accuracy_delta": 0.611328125,
+    "base_train_accuracy": 0.32421875,
+    "base_train_winner_nll": 1.5772522951074475,
+    "claim_scope": "512-example training subset only; not generalization evidence",
+    "improved": true,
+    "post_train_accuracy": 0.935546875,
+    "post_train_winner_nll": 0.21043262117877212,
+    "winner_nll_delta": -1.3668196739286753
+  },
+  "passed": true,
+  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.39",
+  "python": "3.12.3 (main, Nov  6 2025, 13:44:16) [GCC 13.3.0]",
+  "reload_diagnostics": {
+    "acceptance": {
+      "decision_equivalent": true,
+      "exact_probability_parity": false,
+      "within_probability_tolerance": true
+    },
+    "fresh_reload_vs_reload": {
+      "argmax_agreement": 1.0,
+      "episodes": 16,
+      "max_absolute_probability_delta": 0.0,
+      "mean_absolute_probability_delta": 0.0
+    },
+    "probability_tolerance": 0.05,
+    "repeat_same_model": {
+      "argmax_agreement": 1.0,
+      "episodes": 16,
+      "max_absolute_probability_delta": 0.0,
+      "mean_absolute_probability_delta": 0.0
+    },
+    "saved_vs_reload": {
+      "argmax_agreement": 1.0,
+      "episodes": 16,
+      "max_absolute_probability_delta": 0.02147354871997023,
+      "mean_absolute_probability_delta": 0.0011116283614451118
+    }
+  },
+  "runtime": {
+    "gpu": "NVIDIA A40, 46068 MiB, 580.173.02",
+    "pod_id": "9kn5qy9648dfnl",
+    "provider": "runpod"
+  },
+  "started_utc": "2026-10-19T00:53:18.600846+00:00",
+  "status": "passed",
+  "torch": "2.9.1+cu128",
+  "train_metrics": {
+    "epoch": 3.125,
+    "total_flos": 2.0980060310054496e+16,
+    "train_loss": 0.4821531409025192,
+    "train_runtime": 556.513,
+    "train_samples_per_second": 2.875,
+    "train_steps_per_second": 0.719
+  },
+  "training_started": true,
+  "training_validated": true
+}

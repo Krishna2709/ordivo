@@ -1,0 +1,19 @@
+{
+  "python": "3.12.3",
+  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.39",
+  "packages": {
+    "numpy": "2.2.6",
+    "torch": null,
+    "torchvision": null,
+    "transformers": "5.19.0",
+    "trl": null,
+    "peft": null,
+    "datasets": null,
+    "accelerate": null,
+    "torchao": null,
+    "wandb": "0.22.3"
+  },
+  "gpu": "NVIDIA A40, 46068 MiB, 580.173.02",
+  "training_validated": false,
+  "note": "Hardware/package inventory only; no model forward or backward executed."
+}

@@ -2,14 +2,14 @@
 
 Research prototype for exact COPRAS/WASPAS/VIKOR/TOPSIS teachers and Liquid d1 winner prediction. **All workloads run remotely.** This local workspace is for source and documentation editing only; do not install packages, generate data, run tests or download models locally.
 
-The first bounded Runpod experiment is complete. Run `20261019T002734Z` trained a d1-3B LoRA adapter for 25 steps on an A40 and synced [W&B run 56i7klyd](https://wandb.ai/liquid-mcdm-lab/runs/56i7klyd). The adapter remains on preserved network volume `ngica7qkhd`; small evidence is under `reports/runs/20261019T002734Z`. [de01.ipynb](de01.ipynb) remains the Colab alternative, and the [Hugging Face Jobs runbook](docs/huggingface_jobs.md) remains available.
+The release run `20261019T005111Z` trained a d1-3B LoRA adapter for 400 steps on a remote A40 after a 130-test CPU acceptance suite. Across all 87 eligible held-out episodes, accuracy improved from 28.74% to 58.62%; on the original 16-episode comparison slice it improved from 37.5% to 75.0%. The published adapter, dataset, source, complete evaluation evidence, and W&B telemetry are linked below. [de01.ipynb](de01.ipynb) remains the Colab alternative, and the [Hugging Face Jobs runbook](docs/huggingface_jobs.md) remains available.
 
 Public release destinations:
 
 - Source and experiment report: https://github.com/Krishna2709/liquid-mcdm-lab
 - Synthetic dataset: https://huggingface.co/datasets/blackOrder/liquid-mcdm-synthetic
 - LoRA adapter: https://huggingface.co/blackOrder/d1-3b-mcdm-lora
-- Experiment tracking: https://wandb.ai/liquid-mcdm-lab
+- Release experiment: https://wandb.ai/black-order/liquid-mcdm-lab/runs/4vblgw80
 
 ## What is implemented
 
@@ -20,7 +20,7 @@ Public release destinations:
 - Pinned upstream d1 prompt/readout helper with measured tokenizer, inference, training and adapter-reload checks.
 - Four thin notebooks plus the Colab entry notebook, and a remote-only Runpod training entry point with bounded LoRA training and adapter persistence.
 
-Remote CPU acceptance passed 124 tests with zero skips before GPU training. The 64-example training subset improved from 28.1% to 67.2% accuracy; the 16-example held-out diagnostic moved from 37.5% to 50.0%. These tiny synthetic slices do not establish generalization. See [progress](reports/progress.md) for hashes, metrics, cost, and the adapter-reload limitation.
+Remote CPU acceptance passed 130 tests before the release run. The 512-example training subset improved from 32.42% to 93.55% accuracy. The disjoint-family test result improved from 28.74% to 58.62% over 87 unique-winner episodes. These synthetic results measure exact-teacher imitation and do not establish real-world decision quality. See [progress](reports/progress.md) for hashes, metrics, cost, and reload evidence.
 
 ## Transfer source to your connected Colab runtime
 
@@ -72,7 +72,7 @@ For determinism, generate again to `outputs/repeat-v1` with the same seed/count 
 
 ## Credentials and W&B
 
-The local `.env` is excluded from source bundles. The HF control script reads only a recognized HF token for account/job requests; it never uploads the file. The read-only HF account preflight succeeded. The completed GPU run logged offline and was then synced to [W&B run 56i7klyd](https://wandb.ai/liquid-mcdm-lab/runs/56i7klyd) without printing or bundling the key. For a Colab run, use Colab Secrets without displaying their values:
+The local `.env` is excluded from source bundles. The HF control script reads only a recognized HF token for account/job requests; it never uploads the file. The read-only HF account preflight succeeded. The first GPU run logged step telemetry to [W&B run 56i7klyd](https://wandb.ai/liquid-mcdm-lab/runs/56i7klyd), but its complete post-training evidence remained in repository receipts. The [release run 4vblgw80](https://wandb.ai/black-order/liquid-mcdm-lab/runs/4vblgw80) includes 400 trainer rows, the dataset, adapter, evaluation JSON, environment freeze, configuration, and an 87-row before/after prediction Table as versioned W&B evidence. Both runs were recorded without printing or bundling the key. For a Colab run, use Colab Secrets without displaying their values:
 
 ```python
 from google.colab import userdata
@@ -85,11 +85,11 @@ os.environ['WANDB_MODE'] = 'offline'
 
 Do not print environment variables, embed keys in notebooks, upload `.env`, or capture notebook source in W&B. Choose the W&B entity and inspect project visibility before online logging. For explicit online logging, use `baseline ... --wandb online --entity YOUR_ENTITY`. Offline runs have no cloud URL. After reviewing staged files, `wandb sync PATH_TO_OFFLINE_RUN` uploads them. Uploaded artifacts are sanitized numeric/identity summaries; detailed slices remain in the local-to-Colab result JSON. No raw private dataset is uploaded by default.
 
-## First model experiment and persistence
+## Release model experiment and persistence
 
 Read [ADR0001](docs/decisions/0001-training-boundary.md). The official TRL recipe uses the standard image-text model, not a generic classifier. The final Runpod environment retained Torch 2.9.1+cu128 and omitted optional torchao; `pip check`, imports, BF16 forward/backward, training, saving and reload inference all executed on the A40. Revalidate the dependency dry run before using a different image.
 
-The first approved run verified the pinned checkpoint, actual completion mask, frozen vision tower, finite forward/backward pass, nonzero LoRA gradients, custom/standard readout parity, and zero-shot metrics before executing 25 steps. The saved adapter reload retained argmax decisions on all four checked examples, but its maximum probability delta was 0.03060, so exact reload parity is still open and must be resolved before scaling.
+The release run verified the pinned checkpoint, actual completion mask, frozen vision tower, finite forward/backward pass, nonzero LoRA gradients, custom/standard readout parity, and zero-shot metrics before executing 400 steps. The saved adapter retained every checked decision after reload. Repeated inference and two independent fresh reloads were numerically identical; the in-memory-to-reloaded comparison had maximum probability delta 0.02147 in BF16 and remained below the documented 0.05 tolerance.
 
 Persist checkpoints, config, source snapshot, data manifest and environment freeze to a user-selected Google Drive folder or approved artifact store. A Colab disconnect can delete VM disk. Mounting Drive alone does not copy outputs; explicitly save/copy checkpoints there. Resume requires optimizer/scheduler/trainer state as well as adapter weights and the pinned base snapshot; verify reload predictions before scaling.
 

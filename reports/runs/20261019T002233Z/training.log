@@ -1,0 +1,37 @@
+[INFO] Running in WANDB offline mode
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/707 [00:00<?, ?it/s]Loading weights:  64%|██████▍   | 451/707 [00:00<00:00, 4472.31it/s]Loading weights: 100%|██████████| 707/707 [00:00<00:00, 4099.82it/s]
+Loading weights:   0%|          | 0/707 [00:00<?, ?it/s]Loading weights:   3%|▎         | 21/707 [00:00<00:03, 198.09it/s]Loading weights:   7%|▋         | 46/707 [00:00<00:02, 223.09it/s]Loading weights:  10%|▉         | 69/707 [00:00<00:02, 220.83it/s]Loading weights:  13%|█▎        | 93/707 [00:00<00:02, 224.94it/s]Loading weights:  16%|█▋        | 116/707 [00:00<00:02, 200.58it/s]Loading weights:  20%|█▉        | 139/707 [00:00<00:02, 204.38it/s]Loading weights:  23%|██▎       | 160/707 [00:00<00:02, 204.18it/s]Loading weights:  26%|██▌       | 181/707 [00:00<00:03, 164.91it/s]Loading weights:  29%|██▊       | 202/707 [00:01<00:02, 172.06it/s]Loading weights:  32%|███▏      | 227/707 [00:01<00:02, 190.94it/s]Loading weights:  35%|███▌      | 248/707 [00:01<00:02, 193.58it/s]Loading weights:  39%|███▉      | 274/707 [00:01<00:02, 211.65it/s]Loading weights:  60%|██████    | 427/707 [00:01<00:00, 581.41it/s]Loading weights:  78%|███████▊  | 550/707 [00:01<00:00, 764.88it/s]Loading weights: 100%|██████████| 707/707 [00:01<00:00, 423.39it/s]
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+Traceback (most recent call last):
+  File "/workspace/source/20261019T000332Z/decision-engines/scripts/train_d1_overfit.py", line 372, in <module>
+    main()
+  File "/workspace/source/20261019T000332Z/decision-engines/scripts/train_d1_overfit.py", line 368, in main
+    run(args.config, args.data, args.output)
+  File "/workspace/source/20261019T000332Z/decision-engines/scripts/train_d1_overfit.py", line 287, in run
+    model = get_peft_model(model, peft_config)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venvs/20261019T000332Z/train/lib/python3.12/site-packages/peft/mapping_func.py", line 198, in get_peft_model
+    return MODEL_TYPE_TO_PEFT_MODEL_MAPPING[peft_config.task_type](
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venvs/20261019T000332Z/train/lib/python3.12/site-packages/peft/peft_model.py", line 2082, in __init__
+    super().__init__(model, peft_config, adapter_name, **kwargs)
+  File "/workspace/venvs/20261019T000332Z/train/lib/python3.12/site-packages/peft/peft_model.py", line 177, in __init__
+    self.base_model = cls(model, {adapter_name: peft_config}, adapter_name)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venvs/20261019T000332Z/train/lib/python3.12/site-packages/peft/tuners/tuners_utils.py", line 344, in __init__
+    self.inject_adapter(self.model, adapter_name, low_cpu_mem_usage=low_cpu_mem_usage, state_dict=state_dict)
+  File "/workspace/venvs/20261019T000332Z/train/lib/python3.12/site-packages/peft/tuners/tuners_utils.py", line 978, in inject_adapter
+    self._create_and_replace(
+  File "/workspace/venvs/20261019T000332Z/train/lib/python3.12/site-packages/peft/tuners/lora/model.py", line 389, in _create_and_replace
+    new_module = self._create_new_module(lora_config, adapter_name, target, device_map=device_map, **kwargs)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venvs/20261019T000332Z/train/lib/python3.12/site-packages/peft/tuners/lora/model.py", line 552, in _create_new_module
+    new_module = dispatcher(target, adapter_name, config=lora_config, **kwargs)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venvs/20261019T000332Z/train/lib/python3.12/site-packages/peft/tuners/lora/torchao.py", line 160, in dispatch_torchao
+    if not is_torchao_available():
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/venvs/20261019T000332Z/train/lib/python3.12/site-packages/peft/import_utils.py", line 162, in is_torchao_available
+    raise ImportError(
+ImportError: Found an incompatible version of torchao. Found version 0.15.0, but only versions above 0.16.0 are supported

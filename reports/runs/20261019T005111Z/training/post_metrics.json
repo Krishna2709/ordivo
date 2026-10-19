@@ -1,0 +1,110 @@
+{
+  "accuracy": 0.5862068965517241,
+  "brier_multiclass": 0.6230958081016711,
+  "by_method": {
+    "COPRAS": {
+      "accuracy": 0.56,
+      "eligible": 25
+    },
+    "TOPSIS": {
+      "accuracy": 0.56,
+      "eligible": 25
+    },
+    "VIKOR": {
+      "accuracy": 0.6666666666666666,
+      "eligible": 12
+    },
+    "WASPAS": {
+      "accuracy": 0.6,
+      "eligible": 25
+    }
+  },
+  "ece_10_bins": 0.23937846147110764,
+  "eligible": 87,
+  "excluded_nonunique": 0,
+  "prediction_tie_break": "first_option",
+  "slices": {
+    "alternatives_count": {
+      "3": {
+        "accuracy": 0.8823529411764706,
+        "eligible": 17
+      },
+      "4": {
+        "accuracy": 0.6842105263157895,
+        "eligible": 19
+      },
+      "5": {
+        "accuracy": 0.3684210526315789,
+        "eligible": 19
+      },
+      "6": {
+        "accuracy": 0.4,
+        "eligible": 15
+      },
+      "7": {
+        "accuracy": 0.75,
+        "eligible": 4
+      },
+      "8": {
+        "accuracy": 0.5384615384615384,
+        "eligible": 13
+      }
+    },
+    "criteria_count": {
+      "2": {
+        "accuracy": 0.5625,
+        "eligible": 16
+      },
+      "3": {
+        "accuracy": 0.7058823529411765,
+        "eligible": 17
+      },
+      "4": {
+        "accuracy": 0.65,
+        "eligible": 20
+      },
+      "5": {
+        "accuracy": 0.3333333333333333,
+        "eligible": 15
+      },
+      "6": {
+        "accuracy": 0.631578947368421,
+        "eligible": 19
+      }
+    },
+    "near_tie": {
+      "False": {
+        "accuracy": 0.6507936507936508,
+        "eligible": 63
+      },
+      "True": {
+        "accuracy": 0.4166666666666667,
+        "eligible": 24
+      }
+    },
+    "scenario_family": {
+      "anticorrelated": {
+        "accuracy": 0.7333333333333333,
+        "eligible": 45
+      },
+      "near_tie": {
+        "accuracy": 0.42857142857142855,
+        "eligible": 42
+      }
+    },
+    "weighting_scheme": {
+      "dirichlet": {
+        "accuracy": 0.5357142857142857,
+        "eligible": 28
+      },
+      "equal": {
+        "accuracy": 0.6129032258064516,
+        "eligible": 31
+      },
+      "sparse": {
+        "accuracy": 0.6071428571428571,
+        "eligible": 28
+      }
+    }
+  }
+}

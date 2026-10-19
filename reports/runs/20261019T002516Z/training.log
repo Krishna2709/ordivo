@@ -1,0 +1,16 @@
+[INFO] Running in WANDB offline mode
+Loading weights:   0%|          | 0/707 [00:00<?, ?it/s]Loading weights:  79%|███████▉  | 557/707 [00:00<00:00, 5548.67it/s]Loading weights: 100%|██████████| 707/707 [00:00<00:00, 5393.34it/s]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/707 [00:00<?, ?it/s]Loading weights:   3%|▎         | 21/707 [00:00<00:03, 199.45it/s]Loading weights:   7%|▋         | 46/707 [00:00<00:02, 223.73it/s]Loading weights:  10%|▉         | 69/707 [00:00<00:02, 223.65it/s]Loading weights:  13%|█▎        | 92/707 [00:00<00:02, 225.39it/s]Loading weights:  16%|█▋        | 115/707 [00:00<00:02, 204.73it/s]Loading weights:  19%|█▉        | 136/707 [00:00<00:02, 202.77it/s]Loading weights:  22%|██▏       | 157/707 [00:00<00:02, 202.58it/s]Loading weights:  25%|██▌       | 178/707 [00:00<00:03, 170.01it/s]Loading weights:  28%|██▊       | 200/707 [00:01<00:02, 182.81it/s]Loading weights:  31%|███       | 220/707 [00:01<00:02, 184.93it/s]Loading weights:  34%|███▍      | 241/707 [00:01<00:02, 186.43it/s]Loading weights:  37%|███▋      | 264/707 [00:01<00:02, 196.43it/s]Loading weights:  60%|█████▉    | 423/707 [00:01<00:00, 588.86it/s]Loading weights:  83%|████████▎ | 585/707 [00:01<00:00, 877.36it/s]Loading weights: 100%|██████████| 707/707 [00:01<00:00, 437.23it/s]
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+Traceback (most recent call last):
+  File "/workspace/source/20261019T000332Z/decision-engines/scripts/train_d1_overfit.py", line 372, in <module>
+    main()
+  File "/workspace/source/20261019T000332Z/decision-engines/scripts/train_d1_overfit.py", line 368, in main
+    run(args.config, args.data, args.output)
+  File "/workspace/source/20261019T000332Z/decision-engines/scripts/train_d1_overfit.py", line 294, in run
+    sft_config = build_sft_config(config, output, dtype)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/source/20261019T000332Z/decision-engines/scripts/train_d1_overfit.py", line 158, in build_sft_config
+    raise RuntimeError(f'TRL SFTConfig compatibility failure: unsupported fields {unsupported}')
+RuntimeError: TRL SFTConfig compatibility failure: unsupported fields ['warmup_ratio']

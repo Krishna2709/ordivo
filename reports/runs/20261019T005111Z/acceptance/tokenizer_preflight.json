@@ -1,0 +1,29 @@
+{
+  "model": "LiquidAI/d1-3B",
+  "revision": "051bcc464b01b9f92942b364d9586b0ef5912432",
+  "prompt_version": "mcdm-choice-v1-full-precision",
+  "source_receipt": {
+    "model": "LiquidAI/d1-3B",
+    "revision": "051bcc464b01b9f92942b364d9586b0ef5912432",
+    "sha256": {
+      "tokenizer.json": "8096ecb9f54599d756c8de728a598a340bc1e43c0deb77ddd62456c38349fcee",
+      "tokenizer_config.json": "ef6770d12dd9ac58d334e979bf160c5cdfd41f13d205fd5d5516857645feb0ea",
+      "config.json": "0cbac0f580bd8036ef94ac83aa632a57a170e66d20f381ef47c3f6486c9a3e8c",
+      "chat_template.jinja": "86f4770449a4797c9b4212d110b0cc70fb993c1ce960095bcfb12eea22f61cca"
+    },
+    "weights_downloaded": false
+  },
+  "eligible_by_split": {
+    "train": 706,
+    "val": 83,
+    "test": 87
+  },
+  "excluded_nonunique": 124,
+  "max_tokens": 1351,
+  "checked_examples": 876,
+  "alias_eos_boundary_passed": true,
+  "reference_labels_prompt_masked": true,
+  "trl_collator_executed": false,
+  "model_loaded": false,
+  "training_validated": false
+}

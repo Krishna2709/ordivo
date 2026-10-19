@@ -1,0 +1,12 @@
+[INFO] Running in WANDB offline mode
+Traceback (most recent call last):
+  File "/workspace/source/20261019T004757Z/decision-engines/scripts/train_d1_overfit.py", line 523, in <module>
+    main()
+  File "/workspace/source/20261019T004757Z/decision-engines/scripts/train_d1_overfit.py", line 519, in main
+    run(args.config, args.data, args.output)
+  File "/workspace/source/20261019T004757Z/decision-engines/scripts/train_d1_overfit.py", line 337, in run
+    test_episodes = eligible(load_dataset(data_dir, 'test'), eval_examples)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/source/20261019T004757Z/decision-engines/scripts/train_d1_overfit.py", line 41, in eligible
+    raise RuntimeError(f'Need {count} unique-winner episodes; found {len(rows)}')
+RuntimeError: Need 128 unique-winner episodes; found 87

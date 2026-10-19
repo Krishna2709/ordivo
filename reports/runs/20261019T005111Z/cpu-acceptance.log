@@ -1,0 +1,34 @@
+Running pip-check; log: /workspace/runs/20261019T005111Z/acceptance/pip-check.log
+Running freeze; log: /workspace/runs/20261019T005111Z/acceptance/freeze.log
+Running environment; log: /workspace/runs/20261019T005111Z/acceptance/environment.log
+Running generate; log: /workspace/runs/20261019T005111Z/acceptance/generate.log
+Running repeat; log: /workspace/runs/20261019T005111Z/acceptance/repeat.log
+Running tokenizer; log: /workspace/runs/20261019T005111Z/acceptance/tokenizer.log
+Running pytest; log: /workspace/runs/20261019T005111Z/acceptance/pytest.log
+Running baseline; log: /workspace/runs/20261019T005111Z/acceptance/baseline.log
+{
+  "runtime": {
+    "provider": "runpod",
+    "pod_id": "9kn5qy9648dfnl",
+    "gpu": "NVIDIA A40, 46068 MiB, 580.173.02"
+  },
+  "passed": true,
+  "status": "passed",
+  "model_loaded": false,
+  "training_validated": false,
+  "completed_steps": [
+    "pip-check",
+    "freeze",
+    "environment",
+    "generate",
+    "repeat",
+    "tokenizer",
+    "pytest",
+    "baseline"
+  ],
+  "started_utc": "2026-10-19T00:51:16.904111+00:00",
+  "lock_sha256": "fc38c858fe0246ddb4d722868b25ee2aa57ccbddf81d98371e231696a0775f71",
+  "active_step": null,
+  "two_run_byte_identity": true,
+  "test_count": 130
+}

@@ -38,7 +38,13 @@ split hashes, source hashes, seed lineage, generator settings, and counts.
 
 Splits are assigned by scenario family before sampling. The generator crosses
 method, scenario family, and weighting scheme instead of coupling them. The
-published release contains 1,000 episodes generated with root seed 42.
+published release contains 1,000 episodes generated with root seed 42: 800
+training, 100 validation, and 100 test episodes. The test families
+(`anticorrelated`, `near_tie`) do not occur in training. Of the 100 test
+records, 87 have a unique admissible winner for single-choice evaluation.
+
+The manifest SHA-256 used by release run `20261019T005111Z` is
+`1235dd1439935f217ab7fca62746fa7ddf28806ace867810b349abc147e4e1b2`.
 
 ## Intended use
 
