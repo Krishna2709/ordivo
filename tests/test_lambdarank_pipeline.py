@@ -6,9 +6,10 @@ import pytest
 from liquid_mcdm.evaluation.ranking import evaluate_ranking
 from liquid_mcdm.models.lambdarank import fit_ranker, predict_ranker
 from liquid_mcdm.models.ranking_baselines import FeatureState, lexical_scores, random_scores
+from scripts.benchmark_behavioral import _revision, validate_candidate_pool_scope
 
 
-POLICY = {"prediction_event": "booking_bool", "context_features": [],
+POLICY = {"prediction_event": "combined_click_booking_relevance", "context_features": [],
           "alternative_features": ["price_usd", "hotel_class"],
           "numeric_features": ["alternative.price_usd"],
           "categorical_features": ["alternative.hotel_class"]}
@@ -85,3 +86,22 @@ def test_lexical_baseline_keeps_source_judgments_out_of_projection():
     scores = lexical_scores(e, {"context_features": ["query"],
                                 "alternative_features": ["product_title"]})
     assert scores["a"] > scores["b"]
+
+
+def test_runner_accepts_only_source_specific_candidate_pool_scopes():
+    validate_candidate_pool_scope("amazon_esci", "source_task1_reduced_candidate_list",
+                                  "source_task1_reduced_candidate_list")
+    validate_candidate_pool_scope("expedia_personalized_sort_2013", "source_exposed_candidates",
+                                  "source_exposed_candidates")
+    with pytest.raises(ValueError, match="candidate pool scope"):
+        validate_candidate_pool_scope("amazon_esci", "source_exposed_candidates",
+                                      "source_task1_reduced_candidate_list")
+
+
+def test_runner_archive_revision_requires_controller_env(monkeypatch):
+    monkeypatch.delenv("ORDIVO_SOURCE_COMMIT", raising=False)
+    with pytest.raises(ValueError, match="ORDIVO_SOURCE_COMMIT"):
+        _revision()
+    commit = "a" * 40
+    monkeypatch.setenv("ORDIVO_SOURCE_COMMIT", commit)
+    assert _revision() == commit

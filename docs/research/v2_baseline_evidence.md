@@ -37,16 +37,21 @@ Input fields pass the data contract's inference allowlist. The fit API accepts
 train and model-selection validation only. The remote runner reads a separate
 calibration split for integrity counts but never uses its labels, and reserves
 test for final scoring. Expedia's inference policy explicitly names
-`prediction_event: booking_bool`; click and booking remain separate evaluated
-endpoints. Its LambdaRank training objective is the declared combined 0/1/5
-gain, so the ranking score is not a booking probability. No probability
-temperature or calibration claim exists.
+`prediction_event: combined_click_booking_relevance` for the declared 0/1/5
+LambdaRank objective. Click and booking remain separate evaluated endpoints;
+the ranking score is not a booking probability. A future exactly-one-booking
+probability model must name `conditional_booking_choice` instead. No
+probability temperature or calibration claim exists.
 
 The runner calls `require_remote_gpu()`, writes bundles and complete per-query
 scores to `/workspace`, and emits a sanitized aggregate file without raw query
 IDs. Real source rows, fitted models, and complete per-query records stay in
 the permitted remote storage scope. The pinned dependency list is a candidate
 until versions and wheels are verified by a remote acceptance run.
+The runner requires the operations controller's `ORDIVO_SOURCE_COMMIT` from a
+SHA-verified git archive; that receipt must be reconciled against controller
+provenance. Candidate-pool scope is checked per source: exposed hotels for
+Expedia and the official reduced Task 1 candidate list for ESCI.
 
 ## Evidence ledger
 
