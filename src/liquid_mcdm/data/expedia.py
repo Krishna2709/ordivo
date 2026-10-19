@@ -30,12 +30,18 @@ def _number(value: str | None) -> int | float | None:
 def iter_episodes(path: Path, policy: dict) -> Iterator[DecisionEpisode]:
     path = Path(path)
     source_hash = file_sha256(path)
+    profile = policy["source_profile"] = {"raw_rows": 0, "selected_rows": 0, "omitted_by_reason": {}}
     with path.open(newline="", encoding="utf-8") as handle:
         reader = csv.DictReader(handle)
         required = {"srch_id", "prop_id", "click_bool", "booking_bool", "random_bool", "position"} | set(CONTEXT_FIELDS) | set(FEATURE_FIELDS)
         if not required <= set(reader.fieldnames or []):
             raise ValueError(f"missing Expedia fields: {sorted(required - set(reader.fieldnames or []))}")
-        with grouped_rows(reader, group_key="srch_id", row_key="prop_id", temp_dir=policy.get("temp_dir")) as groups:
+        def counted_rows():
+            for row in reader:
+                profile["raw_rows"] += 1
+                profile["selected_rows"] += 1
+                yield row
+        with grouped_rows(counted_rows(), group_key="srch_id", row_key="prop_id", temp_dir=policy.get("temp_dir")) as groups:
             for group_id, rows in groups:
                 first = rows[0]
                 context = {name: _number(first[name]) for name in CONTEXT_FIELDS}

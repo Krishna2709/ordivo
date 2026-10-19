@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from typing import Any, TypedDict
+from typing import Any, NotRequired, TypedDict
 
 SCHEMA_VERSION = "ordivo-behavioral-v1"
 TASK_TYPES = {"observed_choice", "stated_choice", "graded_relevance", "explicit_ranking"}
@@ -33,6 +33,7 @@ class DecisionEpisode(TypedDict):
 
 class DecisionInput(TypedDict):
     task_type: str
+    prediction_event: NotRequired[str]
     context: dict[str, Any]
     criteria: list[dict[str, Any]]
     constraints: list[dict[str, Any]]
@@ -149,7 +150,16 @@ def inference_input(episode: DecisionEpisode, feature_policy: dict[str, Any]) ->
             "features": _approved(candidate["features"], feature_names, "alternative"),
             "available": candidate.get("available", True),
         })
-    return {
+    event = feature_policy.get("prediction_event")
+    if episode["task_type"] == "observed_choice" and event not in ("combined_click_booking_relevance", "conditional_booking_choice"):
+        raise ValueError("observed choice requires a declared versioned prediction_event objective")
+    if event == "conditional_booking_choice":
+        bookings = sum(int(events["booking_bool"]) for events in episode["supervision"]["outcomes_by_id"].values())
+        if bookings != 1:
+            raise ValueError("conditional booking choice requires exactly one booking in the complete group")
+    if episode["task_type"] != "observed_choice" and event is not None:
+        raise ValueError("prediction_event applies only to observed choice")
+    projection = {
         "task_type": episode["task_type"],
         "context": _approved(episode["context"], context_names, "context"),
         "criteria": _safe_declared(episode["criteria"]),
@@ -157,6 +167,9 @@ def inference_input(episode: DecisionEpisode, feature_policy: dict[str, Any]) ->
         "preferences": _safe_declared(episode["preferences"]),
         "alternatives": alternatives,
     }
+    if event is not None:
+        projection["prediction_event"] = event
+    return projection
 
 
 def validate_scores(episode: DecisionEpisode, scores: CandidateScores) -> None:

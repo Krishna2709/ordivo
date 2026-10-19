@@ -18,7 +18,12 @@ unjudged is never a zero grade. Explicit ranking uses ordered tie groups and
 explicit `unranked_ids`. Unavailable positive choices fail validation.
 
 `inference_input(episode, feature_policy)` requires `context_features` and
-`alternative_features` allowlists. Its output contains only task type, approved
+`alternative_features` allowlists. Observed-choice policies also declare
+`prediction_event`: `combined_click_booking_relevance` for the 0/1/5 ranking
+objective, or `conditional_booking_choice` for a group with exactly one
+booking. The latter is a categorical choice task; an unconditioned rank score
+is not a calibrated booking probability. Its output contains task type, the
+declared prediction event, approved
 context, actual criteria/constraints/preferences, and alternatives with
 `{id, features, available}`. IDs are score keys; neural prompts must replace
 them with per-query aliases. Source/group/episode IDs, outcomes, judgments,
@@ -34,7 +39,7 @@ that could have been retrieved or considered.
 
 | Source | Primary reference | Labels and fields | Terms evidence | Status |
 |---|---|---|---|---|
-| Expedia Personalized Sort | [official Kaggle data dictionary](https://www.kaggle.com/c/expedia-personalized-sort/data) | `srch_id` search, `prop_id` hotel, click and booking flags; position and `random_bool` are exposure | [competition rules](https://www.kaggle.com/c/expedia-personalized-sort/rules) require account review | Adapter implemented; no authenticated acquisition receipt |
+| Expedia Personalized Sort | [official Kaggle data dictionary](https://www.kaggle.com/c/expedia-personalized-sort/data) | `srch_id` search, `prop_id` hotel, click and booking flags; position and `random_bool` are exposure | [competition rules](https://www.kaggle.com/c/expedia-personalized-sort/rules) require account review | Adapter and authenticated official-CLI acquisition implemented; no download receipt yet |
 | Amazon ESCI | [official Amazon Science repository](https://github.com/amazon-science/esci-data) | Task 1 uses `small_version=1`, E/S/C/I judgments, `split`, product join on `(product_locale, product_id)` | [Apache-2.0](https://github.com/amazon-science/esci-data/blob/main/LICENSE) and [NOTICE](https://github.com/amazon-science/esci-data/blob/main/NOTICE) | Remote acquisition and full ingestion pending |
 | Swissmetro | [official Biogeme source data](https://github.com/michelbierlaire/biogeme/blob/master/src/biogeme/data/data/swissmetro.dat) and [example loader](https://biogeme.epfl.ch/sphinx/_modules/biogeme/data/swissmetro.html) | Stated `CHOICE`, respondent `ID`, `TRAIN_AV`/`SM_AV`/`CAR_AV`, times/costs/headways; `CHOICE=0` excluded as in the example | [Biogeme data page](https://biogeme.epfl.ch/) makes data available for research and education; source-specific redistribution terms still require confirmation | Adapter implemented; remote acquisition and full ingestion pending |
 
@@ -77,9 +82,15 @@ as test. Split assignment happens before target filtering or augmentation.
 Adapters spool arbitrary row order to a temporary SQLite table on disk, sort by
 source group and row identity, and only hold one completed group in Python
 memory. Duplicate row keys, conflicting context and missing products fail.
-The writer fails on an existing output directory, records source SHA-256 hashes,
-split file hashes, counts, missing feature counts, singleton and positive-label
-diagnostics. It does not fit a transform; encoding/imputation must be fitted
+The writer stages split files in a temporary sibling and atomically renames the
+directory only after full validation, hashes, and manifest creation succeed;
+failed builds remove the stage. It fails on an existing output directory.
+The manifest reconciles raw source rows = selected + omitted by reason, selected
+rows = retained source rows, and all retained groups to four split counts.
+`candidate_rows` separately counts mode alternatives when one Swissmetro survey
+row expands to three mode candidates. It records source SHA-256 hashes, split
+file hashes, missing feature counts, singleton and positive-label diagnostics.
+It does not fit a transform; encoding/imputation must be fitted
 on `train.jsonl` only by the modeling pipeline.
 
 On the approved remote runtime, run `scripts/acquire_v2_sources.py esci --output
@@ -88,9 +99,15 @@ official Git revision, streams only requested files, and writes
 `acquisition.json` with revision, size, SHA-256 and rights reference. Then run
 `scripts/acquire_v2_sources.py build-esci --input <remote-dir>/repo --output
 <dataset-dir>` or `build-swissmetro --input <remote-dir>/swissmetro.dat --output
-<dataset-dir>`. `build-expedia` accepts an official authenticated labeled CSV.
-The acquisition command for Expedia deliberately requires a separate official
-Kaggle access path and does not use a mirror. Raw source data and JSONL derived
+<dataset-dir>`. For Expedia, the official Kaggle CLI accepts a scoped
+`KAGGLE_API_TOKEN` as documented in its [current authentication guide](https://github.com/Kaggle/kaggle-cli/blob/main/docs/README.md).
+`scripts/acquire_v2_sources.py expedia --output <remote-dir>` requests only the
+competition's `data.zip`, streams its `train.csv` member to disk, hashes both
+archive and training file, then deletes the archive to limit retained copies.
+It does not accept competition rules on behalf of the account holder. Then
+`build-expedia --input <remote-dir>/train.csv --output <dataset-dir>` creates
+the four-way materialization. Authentication or a rules-denied response must
+be reported as a blocker; there is no mirror fallback. Raw source data and JSONL derived
 records remain in the approved remote storage scope.
 
 ## Remaining evidence gates
@@ -99,5 +116,13 @@ The remote receipts must include the exact executed code commit, acquisition
 revision, file hashes/sizes, source terms, raw and retained rows/groups,
 duplicate/missingness/choice diagnostics, split counts and hashes, group
 integrity checks, and test results. The Swissmetro data-specific rights check
-and Expedia authenticated access are open. The first release comparison needs
+and Expedia authenticated download result are open. The first release comparison needs
 actual held-out scored groups; passing adapter tests alone is insufficient.
+
+For a third future real domain, the [SUSHI author page](https://www.kamishima.net/sushi/)
+explicitly permits research use and prohibits redistribution. Its corrected
+`sushi3-2016.zip` archive and ranking order files support a respondent-disjoint
+explicit-ranking adapter; this adapter and its receipts are still future work.
+The [official MSLR page](https://www.microsoft.com/en-us/research/project/mslr/)
+requires acceptance of an online agreement before use, so an MSLR download
+cannot be presumed authorized from a public URL alone.

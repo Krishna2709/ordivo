@@ -40,6 +40,7 @@ def iter_episodes(examples: Path, products: Path, policy: dict) -> Iterator[Deci
     examples, products = Path(examples), Path(products)
     batch_size = int(policy.get("batch_size", 4096))
     source_hashes = {"examples_sha256": file_sha256(examples), "products_sha256": file_sha256(products)}
+    profile = policy["source_profile"] = {"raw_rows": 0, "selected_rows": 0, "omitted_by_reason": {"outside_task1_reduced": 0}}
     with tempfile.TemporaryDirectory(dir=policy.get("temp_dir")) as directory:
         connection = sqlite3.connect(str(Path(directory) / "products.sqlite3"))
         try:
@@ -54,8 +55,11 @@ def iter_episodes(examples: Path, products: Path, policy: dict) -> Iterator[Deci
             columns = ["example_id", "query", "query_id", "product_id", "product_locale", "esci_label", "small_version", "split"]
             def selected_rows() -> Iterator[dict]:
                 for row in _rows(examples, columns, batch_size):
+                    profile["raw_rows"] += 1
                     if str(row["small_version"]) not in ("1", "True", "true"):
+                        profile["omitted_by_reason"]["outside_task1_reduced"] += 1
                         continue
+                    profile["selected_rows"] += 1
                     row = dict(row)
                     row["_group"] = f"{row['product_locale']}:{row['query_id']}"
                     yield row
