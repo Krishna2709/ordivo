@@ -1,0 +1,23 @@
+{
+  "schema_version": "ordivo.verification-run.v1",
+  "code_commit": "3e981b66c5f478e5a3fd2d531930af418488ba03",
+  "created_utc": "2026-10-19T02:45:47.668674+00:00",
+  "runtime": {
+    "provider": "runpod",
+    "pod_id": "r722brg4d1z8tr",
+    "gpu": "NVIDIA A40, 46068 MiB, 580.159.04"
+  },
+  "tests_passed": 155,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "test_seconds": 10.016,
+  "junit_sha256": "82917d1fb45eab828d474bf002edba80f90ae730e6f900b78571836f8996591b",
+  "training_started": false,
+  "training_validated": false,
+  "v2_model_created": false,
+  "mode": "online",
+  "wandb_run_id": "scg4z0ud",
+  "wandb_url": "https://wandb.ai/black-order/liquid-mcdm-lab/runs/scg4z0ud",
+  "wandb_artifact": "black-order/liquid-mcdm-lab/ordivo-v2-verifier-evidence:v0"
+}

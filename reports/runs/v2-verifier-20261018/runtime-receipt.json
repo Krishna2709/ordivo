@@ -1,0 +1,16 @@
+{
+  "actual_billed_usd": null,
+  "cost_per_hour": 0.59,
+  "created_utc": "2026-10-19T02:37:22.931792+00:00",
+  "deleted_utc": "2026-10-19T02:48:03.589780+00:00",
+  "deletion_verified": true,
+  "elapsed_seconds": 640.657988,
+  "estimated_compute_usd": 0.10499672581111112,
+  "max_runtime_seconds": 3600,
+  "network_volume_created": false,
+  "network_volume_id": null,
+  "pod_id": "r722brg4d1z8tr",
+  "purpose": "v2 numerical verification and compatibility",
+  "reaper_pid": 23902,
+  "status": "pod_deleted"
+}

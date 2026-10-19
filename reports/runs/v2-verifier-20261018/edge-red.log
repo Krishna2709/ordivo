@@ -1,0 +1,19 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_unknown_constraint_is_unverifiable_not_known_violation __________
+
+    def test_unknown_constraint_is_unverifiable_not_known_violation():
+        spec = {
+            'scope': 'example', 'criteria': [{'id': 'cost', 'direction': 'min'}],
+            'alternatives': [{'id': 'A', 'values': {'cost': None}}],
+            'constraints': [{'criterion': 'cost', 'op': '<=', 'value': 10}],
+            'weights': None, 'method': 'TOPSIS',
+        }
+        result = verify_decision(spec, {'decision': 'A'})
+>       assert result['checks']['constraints_satisfied'] is None
+E       assert False is None
+
+tests/test_decision_provenance_edges.py:13: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_decision_provenance_edges.py::test_unknown_constraint_is_unverifiable_not_known_violation
+1 failed in 0.31s

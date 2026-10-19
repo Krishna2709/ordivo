@@ -1,0 +1,38 @@
+{
+  "baseline.xml": {
+    "bytes": 16342,
+    "sha256": "7aa3b4b7ca9664c8e2f93424d16f071157909d21c7edda9cf783a9b0fdcd26a2"
+  },
+  "edge-red.log": {
+    "bytes": 1037,
+    "sha256": "60b2e8cb5e6ea173cf46bab38bd6d4cce5967d674bbd8a9fb5652b36b7917fb8"
+  },
+  "pip-freeze.txt": {
+    "bytes": 1688,
+    "sha256": "a62a70d8ec9db2b9306796fea294306a9709bdc82359c4ebe21c8bf8e8ab919a"
+  },
+  "pytest.log": {
+    "bytes": 342,
+    "sha256": "5788e2eb0ee8d89aa454c6f2d7647d6b797f6aa17d48555dc273a92016c31548"
+  },
+  "pytest.xml": {
+    "bytes": 19527,
+    "sha256": "82917d1fb45eab828d474bf002edba80f90ae730e6f900b78571836f8996591b"
+  },
+  "red.log": {
+    "bytes": 936,
+    "sha256": "5f7fb3542c78b592a52fb6148dae6016b7a311bc170f1ab034c7aa7d3c74808e"
+  },
+  "runtime-receipt.json": {
+    "bytes": 508,
+    "sha256": "5fcf8c9a3eaac74fbac6ae4b67f7df90892173e2763599ba7b739602961f4fbe"
+  },
+  "tokenizer.json": {
+    "bytes": 1011,
+    "sha256": "5eb3660ce06c67b7e1852089cf8584b7c50bc7ce421add53a8b4eaaf1a3791c9"
+  },
+  "verification.json": {
+    "bytes": 773,
+    "sha256": "1d6b14aa4b3dbdb09713e4fd4cfc3d928ce26c6dc38e7b7147976314ce16c4ee"
+  }
+}

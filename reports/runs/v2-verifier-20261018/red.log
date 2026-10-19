@@ -1,0 +1,16 @@
+
+==================================== ERRORS ====================================
+_____________ ERROR collecting tests/test_decision_verification.py _____________
+ImportError while importing test module '/workspace/source/tests/test_decision_verification.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_decision_verification.py:6: in <module>
+    from liquid_mcdm.decision import resolve_weights, verify_decision
+E   ModuleNotFoundError: No module named 'liquid_mcdm.decision'
+=========================== short test summary info ============================
+ERROR tests/test_decision_verification.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.12s
