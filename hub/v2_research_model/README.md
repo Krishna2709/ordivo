@@ -62,7 +62,7 @@ mean of source validation losses fell 2.6071312→2.2937011; Swissmetro
 3.2179395→3.1262991 (70/100 selected validation searches eligible; 30 had
 no exactly-one-booking supervised event). ESCI training excluded 4/1,000
 selected groups for prompt overflow; Expedia training excluded 315/1,000
-selected groups for the target event. The metadata-only pilot receipt SHA-256 is
+selected groups for the target event. The [metadata-only pilot receipt](https://github.com/Krishna2709/ordivo/blob/47000cd8bf30318d60912efd863a8e2b18f551d0/reports/runs/v2-s0b-20261019/pilot-receipt.json) SHA-256 is
 `85426d547c1fbc88cc52cf9c4fc9c9bfac99fb3bfbd7b256b177c3f069e24565`.
 The S0b Expedia source is the predeclared bounded 20k/2k/2k/5k grouped
 sample (manifest SHA-256
@@ -82,7 +82,7 @@ held-out probe follows below.
 ### S0b bounded paired held-out probe
 
 A separate, exploratory paired probe compared base d1 and the S0b best-step-90
-adapter on the same selected units within each source. Exact aggregate SHA-256:
+adapter on the same selected units within each source. Exact [sanitized aggregate](https://github.com/Krishna2709/ordivo/blob/47000cd8bf30318d60912efd863a8e2b18f551d0/reports/runs/v2-s0b-20261019/heldout-aggregate.json) SHA-256:
 `86753c1356cdf8524a3ea28a2f5b4ff31fb4ef20afaf3f96d6db1cb0fd4b086d`;
 executed evaluation source `10232089368296680c75461da2dffe5254ae7590`,
 config SHA-256 `b4d889f639cdeaafd46fb24e9b2dccb078e5958178d1553f03acc4a9573594c1`.
@@ -108,7 +108,7 @@ small cohorts, while Expedia NLL worsened. The old S0 ESCI probe scored only 27/
 intersection confirms all 27 are in the new 50. On those same 27, base NDCG@10
 was 0.778290 in both, old S0 0.752276 and S0b 0.787842. The 23 newly
 admitted groups change the 50-group mean, so do not directly compare the old
-27-group mean with the new 50-group mean. Intersection receipt SHA-256 is
+27-group mean with the new 50-group mean. [Intersection receipt](https://github.com/Krishna2709/ordivo/blob/47000cd8bf30318d60912efd863a8e2b18f551d0/reports/runs/v2-s0b-20261019/esci-old27-match.json) SHA-256 is
 `494a1a0a6f2795a3c4f9962fc58f6194a7508f3aa5e9a7cc9ad24cde17479672`. No intervals, calibration fit, multiple seeds or
 entire-domain transfer were measured. This is not a protected release test or
 a general improvement claim. Expedia is conditional booking within its bounded
@@ -225,6 +225,29 @@ SHA-256 `831fb319d8a2144ef26ed86a7c985ed3ca4b9662180ced32e28b6f4c469c612c`.
 These are fixture-specific outputs, not benchmark accuracy or calibrated
 real-world event probabilities. The unavailable car remains in the complete
 prompt but receives probability zero.
+
+For an authorized S0b inspection, use the **separate** verified private
+checkpoint parameters below with the same pinned d1 base and the run's
+`effective_config.yaml` and source-specific `feature_policy`. No numeric
+fixture output has been verified for S0b, so the S0 scores above are not
+expected S0b scores:
+
+```python
+S0B_HUB_REVISION = "df6405c575629dfaf9083f7b068ab8ef34b6eeb3"
+S0B_RUN = "supervised-s0b/20261019T030009Z/s0b-945fe6e"
+S0B_ADAPTER_DIRECTORY_SHA256 = "e9bc879b31a32e5546d238345babd7d9fc5eedad7e015510804e03fde8a77c50"
+```
+
+For Expedia, the S0b pilot receipt specifies
+`prediction_event=conditional_booking_choice`, context features
+`srch_length_of_stay`, `srch_booking_window`, `srch_adults_count`,
+`srch_children_count`, `srch_room_count`, `srch_saturday_night_bool`, and
+alternative features `price_usd`, `prop_starrating`, `prop_review_score`,
+`prop_location_score1`, `prop_location_score2`. That event's output is a
+conditional distribution only over an exposed complete search group eligible
+under the exactly-one-booking policy; it is not a marginal booking rate. The
+S0b readout was evaluated on the bounded held-out groups above, but this
+illustrative S0 request was not rerun with S0b.
 
 ## Use and distribution
 
