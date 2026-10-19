@@ -177,10 +177,25 @@ account and competition terms; it does not establish public redistribution or
 derivative-weight rights. The first release comparison needs
 actual held-out scored groups; passing adapter tests alone is insufficient.
 
-For a third future real domain, the [SUSHI author page](https://www.kamishima.net/sushi/)
+The first official Expedia grouped build exposed literal `NULL` in an optional
+numeric field. A full remote scan of the 9,917,530 labeled training rows found
+`NULL` only in `prop_location_score2` (2,178,380 rows) and
+`prop_review_score` (14,630 rows) among the eleven approved numeric input
+fields; no blank, nonfinite, or other nonnumeric sentinel occurred in those
+fields. The scan receipt is
+`/Users/krishna/Desktop/apex-7/ordivo-v2-operations/reports/runs/v2-swarm-20261019T030009Z/expedia-numeric-sentinels.json`
+(SHA-256 `1d3fe19c4e011de2146f80c8d1cee647a3fc7761e5c19b215730b8255e3baade`).
+The adapter preserves these optional values as missing `null`, distinct from
+numeric zero, and rejects missing IDs or binary outcomes. The failed build
+left no finalized dataset under the atomic materializer; a rebuild from the
+same frozen CSV is pending remote validation.
+
+For a third research/evaluation control, the [SUSHI author page](https://www.kamishima.net/sushi/)
 explicitly permits research use and prohibits redistribution. Its corrected
 `sushi3-2016.zip` archive and ranking order files support a respondent-disjoint
-explicit-ranking adapter; this adapter and its receipts are still future work.
+explicit-ranking adapter; source inventory, adapter, and receipts are pending.
+No raw/derived data may be redistributed, and derivative-weight rights remain
+unresolved, so SUSHI is excluded from neural training configuration.
 The [official MSLR page](https://www.microsoft.com/en-us/research/project/mslr/)
 requires acceptance of an online agreement before use, so an MSLR download
 cannot be presumed authorized from a public URL alone.
