@@ -1,8 +1,8 @@
 # Separate exploratory S0b proposal. Frozen validation token audit: ESCI
-# 92/100 <=4096; Expedia exactly-one booking 70/100, all 70 <=4096.
+# 100/100 <=6144; Expedia exactly-one booking 70/100, all 70 <=4096.
 # Longest ESCI 6118-token A40 backward used 38,118/46,068 MiB allocated;
 # arbitrary 8192-token training safety is unproven. Exclude full groups
-# exceeding 4096 tokens; never truncate candidates.
+# exceeding 6144 tokens; never truncate candidates.
 # No matched claim versus S0 or conditional-booking comparison to Expedia
 # combined click/booking LambdaRank baseline.
 model_id: LiquidAI/d1-3B
@@ -15,11 +15,11 @@ max_validation_groups: 100
 max_train_episodes: 10000
 max_validation_episodes: 1000
 validation_interval: 30
-max_length: 4096
+max_length: 6144
 learning_rate: 0.00003
 train_candidate_permutation: true
 wandb_project: liquid-mcdm-lab
-wandb_mode: offline
+wandb_mode: online
 publish_model_artifacts: false
 lora:
   r: 8
