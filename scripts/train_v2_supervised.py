@@ -302,9 +302,15 @@ def run(config_path, output):
     cursors = {source: 0 for source in training}
     for items in training.values():
         random.shuffle(items)
+    base_by_source, base_macro = _validate(
+        model, tokenizer, validation, 'cuda', started + config['max_runtime_seconds'])
+    run.log({'validation/base_macro_source_loss': base_macro,
+             **{f'validation/base_{key}_query_loss': value
+                for key, value in base_by_source.items()}}, step=0)
     best = float('inf')
     best_step = 0
     best_probe_loss = None
+    best_by_source = None
     try:
         for step in range(1, config['max_steps'] + 1):
             if time.monotonic() - started > config['max_runtime_seconds']:
@@ -332,6 +338,7 @@ def run(config_path, output):
                         step=step)
                 if macro < best:
                     best, best_step = macro, step
+                    best_by_source = dict(by_source)
                     model.eval()
                     with torch.no_grad():
                         best_probe_loss = float(_loss(model, tokenizer, validation[list(validation)[0]][0], 'cuda'))
@@ -361,7 +368,10 @@ def run(config_path, output):
                    'source_identity': source_identity,
                    'seed': config['seed'], 'best_step': best_step,
                    'nonzero_lora_update': observed_update,
+                   'base_validation_macro_source_loss': base_macro,
+                   'base_validation_by_source_loss': base_by_source,
                    'best_validation_macro_source_loss': best,
+                   'best_validation_by_source_loss': best_by_source,
                    'source_provenance': provenance,
                    'wall_seconds': time.monotonic() - started,
                    'reload_probe_loss': after,
