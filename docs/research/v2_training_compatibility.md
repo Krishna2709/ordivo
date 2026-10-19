@@ -54,6 +54,9 @@ disjointness, then selects whole groups by a fixed seed/hash before rendering.
 Each config binds a friendly run name to a canonical `expected_source`; the
 trainer checks manifest source, split policy, candidate pool scope, target
 policy, every episode's source, and distinct manifests across domains.
+The standalone pilot receipt records source archive commit/SHA-256, config
+SHA-256, exact effective nonsecret hyperparameters, prompt version, realized
+optimizer steps and updates by source, alongside base/best validation losses.
 Defaults cap selection at 1,000 train and 100 validation split units per source;
 panel respondents remain intact. It records source totals, selected counts and
 digests, and loss exclusions including zero/no event and prompt overflow. Actual
