@@ -1,0 +1,21 @@
+{
+  "archive_bytes": 434573097,
+  "archive_sha256": "f16b9622a73c015e2693284a5939a82817417f23f284bfd69081f1f35cdd0602",
+  "competition": "expedia-personalized-sort",
+  "extraction_status": "blocked_python_zipfile_deflate64",
+  "members": [
+    {
+      "compressed_bytes": 166204780,
+      "compression_method": 9,
+      "name": "test.csv",
+      "uncompressed_bytes": 1496916672
+    },
+    {
+      "compressed_bytes": 268368109,
+      "compression_method": 9,
+      "name": "train.csv",
+      "uncompressed_bytes": 2358114793
+    }
+  ],
+  "source": "kaggle_official_cli_after_user_terms_confirmation"
+}

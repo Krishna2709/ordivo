@@ -11,8 +11,9 @@ or behavioral performance evidence. The remote/local metadata SHA-256 is
 `2a9500911f60cf50635c31277b8994c8cebef92ab455174d12b9dea6f6317406`.
 An actual [W&B cloud run](https://wandb.ai/black-order/liquid-mcdm-lab/runs/2f8r8pwf)
 holds aggregate research telemetry. A Hugging Face research repository named
-`blackOrder/Ordivo-v2-research` was created **private**; its existence is not a
-v2 model publication or evidence that an adapter checkpoint has been trained.
+`blackOrder/Ordivo-v2-research` is **private** and has a readback-verified
+22-artifact allowlisted classical evidence bundle. It is not a public v2 model
+publication or evidence that a neural adapter checkpoint has been trained.
 
 ## Intended system
 
