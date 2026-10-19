@@ -15,7 +15,7 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
 | Differentiable d1 readout and training compatibility | Bounded remote check passed | Exact integrated commit `22707ed3`; one fixed A40 BF16 forward/backward, finite loss/gradients and reload parity. No optimizer step in this compatibility check. |
 | V2 SFT and direct calibration baselines | Preliminary two-domain SFT pilot completed; calibration and matched controls pending | Pilot source `854de087`, 40 steps, private best adapter and selected-validation receipt below; S0/C0/C1 held-out conclusions pending. |
 | RLCD/GRPO experiments and DPO pairs | Pending | Experiment R0/G0/G1/P0 |
-| Final model, held-out evaluation and release | Pending | Preliminary weights retained privately with SHA readback; no public v2 model or held-out neural claim |
+| Final model, held-out evaluation and release | Exploratory paired probe measured; protected release evidence pending | Preliminary weights retained privately. Adapted pilot scored below base on Swissmetro accuracy and ESCI NDCG@10 on admitted held-out groups; no public v2 model or release claim. |
 
 ## Verification chronology
 
@@ -118,7 +118,24 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   plus manifest passed forced SHA readback. W&B pilot
   [run bnsgv73p](https://wandb.ai/black-order/liquid-mcdm-lab/runs/bnsgv73p)
   finished at step 40. Paired held-out neural evaluation, calibration, public
-  weight rights and release remain pending.
+  weight rights and release were pending at this point.
+- Exploratory paired held-out probe at the same executed source commit
+  `854de0877c8e7e380b7353a578e95ba9865d4e25` compared base d1 with the
+  frozen best pilot adapter. Swissmetro: 450 selected and scored scenarios from
+  50 held-out respondents, base accuracy 306/450=0.68 versus adapted
+  297/450=0.66; base/adapted NLL 0.805878/0.758958 and Brier
+  0.459254/0.462190. ESCI: 50 selected held-out groups, 23 complete-group
+  prompt overflows, 27 scored by each model; base/adapted NDCG@10
+  0.778290/0.752276. No scoring failures after admission. The [sanitized
+  aggregate](../../reports/runs/v2-neural-heldout-20261019/aggregate.json)
+  has SHA-256 `a735c1db8810f9d9955152bbe16651e690c921e7330596cedc117d2358a19c8a`,
+  evaluation config SHA-256 `524bfe7cde8135132417ed029a8fb2738bd5ffd068f9190d081c6246aaaadc06`,
+  and source-manifest hashes. The [W&B probe run](https://wandb.ai/black-order/liquid-mcdm-lab/runs/3zdzt6ik)
+  was read back as sanitized aggregate telemetry; eight probe artifacts are
+  retained in private Hub folder `heldout-probe/20261019T030009Z/paired-854de/`.
+  This is a bounded exploratory probe, not the protected final release test;
+  intervals, multi-seed, calibration and entire-held-out-domain transfer remain
+  pending.
 
 No local workload was executed. The integrated suite proves source behavior,
 not real-data neural efficacy or release readiness. Initial GitHub CPU runs were superseded by the

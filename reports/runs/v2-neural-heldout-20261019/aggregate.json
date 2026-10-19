@@ -1,0 +1,85 @@
+{
+  "base_model": "LiquidAI/d1-3B",
+  "by_source": {
+    "esci": {
+      "admitted_queries": 27,
+      "excluded": {
+        "fewer_than_two_available": 0,
+        "not_exactly_one_booking": 0,
+        "prompt_overflow": 23
+      },
+      "failed_queries": 0,
+      "manifest_sha256": "9fd4065fc0db4586453a412123eb9ef393b1750cd8196bb11cad794d020f07cc",
+      "metrics": {
+        "ndcg@10": {
+          "adapted": 0.7522758603838556,
+          "adapted_minus_base": -0.026014581742018324,
+          "base": 0.7782904421258741,
+          "eligible": 27,
+          "excluded_zero_ideal_gain": 0
+        }
+      },
+      "schema_version": "ordivo-neural-heldout-v1",
+      "scored_adapted": 27,
+      "scored_base": 27,
+      "selected_episodes": 50,
+      "selected_units": 50,
+      "selected_units_sha256": "f4af35cfddaa544cdac993014d4e131e80814b2daeb0e713579fa2132181d15a",
+      "source": "amazon_esci"
+    },
+    "swissmetro": {
+      "admitted_queries": 450,
+      "excluded": {
+        "fewer_than_two_available": 0,
+        "not_exactly_one_booking": 0,
+        "prompt_overflow": 0
+      },
+      "failed_queries": 0,
+      "manifest_sha256": "dd3dc4b0713506f1664149993ca11022614a3ee850c335944ae37b5525af592a",
+      "metrics": {
+        "choice_accuracy@1": {
+          "adapted": 0.66,
+          "adapted_minus_base": -0.02,
+          "base": 0.68,
+          "eligible": 450,
+          "excluded_zero_ideal_gain": 0
+        },
+        "choice_brier": {
+          "adapted": 0.4621899098474436,
+          "adapted_minus_base": 0.0029358796436363293,
+          "base": 0.4592540302038073,
+          "eligible": 450,
+          "excluded_zero_ideal_gain": 0
+        },
+        "choice_nll": {
+          "adapted": 0.758958304264402,
+          "adapted_minus_base": -0.046919499890531007,
+          "base": 0.8058778041549332,
+          "eligible": 450,
+          "excluded_zero_ideal_gain": 0
+        }
+      },
+      "schema_version": "ordivo-neural-heldout-v1",
+      "scored_adapted": 450,
+      "scored_base": 450,
+      "selected_episodes": 450,
+      "selected_units": 50,
+      "selected_units_sha256": "c546c7af44ce27b4cfb8988d6621222cbd230881fd68f32bfa9b2356843f97dc",
+      "source": "swissmetro"
+    }
+  },
+  "claim_scope": "exploratory_bounded_probe_not_protected_release_test",
+  "elapsed_seconds": 84.75974306371063,
+  "evaluation_config_sha256": "524bfe7cde8135132417ed029a8fb2738bd5ffd068f9190d081c6246aaaadc06",
+  "paired_interpretation": "small_bounded_heldout_probe_no_calibration",
+  "pilot_best_step": 40,
+  "pilot_config_sha256": "c152e64d839082531d4ece9e66d330fa35ffddfbc442685742b9fd171de5462b",
+  "revision": "051bcc464b01b9f92942b364d9586b0ef5912432",
+  "schema_version": "ordivo-neural-heldout-run-v1",
+  "seed": 42,
+  "source_identity": {
+    "archive_sha256": "38454c8d667183d57c9c48ed0bcc3d3b32f214e2485c6bdb6bf99f6af0204faa",
+    "commit": "854de0877c8e7e380b7353a578e95ba9865d4e25"
+  },
+  "status": "complete"
+}

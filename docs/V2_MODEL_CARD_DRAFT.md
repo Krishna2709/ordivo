@@ -1,6 +1,6 @@
 # Ordivo v2 model card — draft, unreleased
 
-**Research status:** a preliminary two-domain v2 adapter exists in a **private** research repository; no held-out neural performance or public release claim is established here. This is the intended public card template; replace remaining pending fields with immutable receipts before publication. [Release criteria](V2_RELEASE_CRITERIA.md) control promotion. `blackOrder/Ordivo-v1` and its [synthetic-only results](../reports/V2_RESEARCH_AUDIT.md) are a separate historical model.
+**Research status:** a preliminary two-domain v2 adapter exists in a **private** research repository; one bounded held-out neural probe measured negative/mixed results, while no public release claim is established here. This is the intended public card template; replace remaining pending fields with immutable receipts before publication. [Release criteria](V2_RELEASE_CRITERIA.md) control promotion. `blackOrder/Ordivo-v1` and its [synthetic-only results](../reports/V2_RESEARCH_AUDIT.md) are a separate historical model.
 
 A bounded remote compatibility check at integrated source commit
 `22707ed34fd125e96aade9123f9baaf34cd64a18` completed one A40 BF16
@@ -25,8 +25,14 @@ Its best checkpoint was step 40; selection-validation loss decreased on both
 domains, and the reload probe delta was zero. ESCI prompt overflow removed
 29 of 100 selected validation groups and 325 of 1,000 selected training groups
 from neural loss. The [receipt](../hub/v2_research_model/README.md) is a
-training-selection diagnostic only; held-out neural accuracy, NDCG and
-calibration remain pending. Its [W&B pilot run](https://wandb.ai/black-order/liquid-mcdm-lab/runs/bnsgv73p)
+training-selection diagnostic only. A later bounded held-out probe measured
+lower adapted Swissmetro accuracy (0.66 versus base 0.68 on 450 scenarios) and
+lower adapted ESCI NDCG@10 (0.752276 versus base 0.778290 on 27 admitted of
+50 selected query groups); 23 ESCI groups overflowed. Swissmetro NLL improved
+(0.805878→0.758958), while Brier worsened (0.459254→0.462190). This is mixed
+and partly negative preliminary evidence, not a protected release test or a
+generality claim. The [sanitized aggregate](../reports/runs/v2-neural-heldout-20261019/aggregate.json)
+records exact denominators and hashes; calibration remains pending. Its [W&B pilot run](https://wandb.ai/black-order/liquid-mcdm-lab/runs/bnsgv73p)
 is private research telemetry.
 
 ## Intended system
@@ -56,7 +62,7 @@ Output: one finite score per eligible candidate keyed by ID, explicit unavailabl
 | Train/selection/calibration/final-test counts by domain and group | Pending |
 | Full candidate-set and context overflow accounting | Pending |
 | W&B/offline run, hardware, wall time and billed cost | Pending |
-| Held-out within-domain and unseen-domain results | Pending |
+| Held-out within-domain and unseen-domain results | Bounded paired within-domain probe measured negative/mixed results; protected full within-domain, entire-domain transfer, intervals and multiple seeds pending. |
 | Reload, permutation, verifier and failure-case receipts | Pending |
 
 Required comparisons include exact math reference, domain-appropriate classical and heuristic baselines, base d1, frozen v1 transfer, matched behavioral-only training, and MCDM-pretrained continuation with equal downstream conditions. An extra-training control is needed before attributing a gain to MCDM content. A public shared-model generality claim requires at least three real domains covering choice and relevance and actual entire-domain holdout evidence; a two-domain baseline is preliminary. Final comparisons use multiple matched seeds and paired group intervals. Calibration uses an independent held-out calibration set and specifies the event population. ESCI/MSLR results describe source-sampled judged candidate pools, not all possible products or pages. Report violations, unknowns and failed queries with denominators. See the [experiment matrix](EXPERIMENT_MATRIX.md).
