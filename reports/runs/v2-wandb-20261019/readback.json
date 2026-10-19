@@ -1,0 +1,20 @@
+{
+  "cloud_readback_confirmed": true,
+  "cloud_summary": {
+    "baseline/swissmetro_conditional_logit_accuracy_at_1": 0.6245210727969349,
+    "baseline/swissmetro_conditional_logit_ndcg_at_10": 0.8521414383483942,
+    "baseline/swissmetro_test_queries": 1044,
+    "data/esci_groups": 48300,
+    "data/swissmetro_groups": 10719,
+    "failures/expedia_download_http_403": 1,
+    "tests/base_passed": 155,
+    "tests/data_passed": 19,
+    "tests/integrated_passed": 214,
+    "tests/release_passed": 7,
+    "tests/skipped": 0
+  },
+  "run_path": "black-order/liquid-mcdm-lab/2f8r8pwf",
+  "run_url": "https://wandb.ai/black-order/liquid-mcdm-lab/runs/2f8r8pwf",
+  "source_archive_sha256": "183d5cc9dcb8edf1788369e1fe11383249458d84a637f3a9229b7c1941673d9c",
+  "source_commit": "b26d9f8ed782cdd45e18f40b5921a6ac1b3cd49d"
+}

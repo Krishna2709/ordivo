@@ -58,7 +58,8 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   1,118,011 candidate rows across 48,300 groups. Four partitions contain
   30,372 train, 1,688 selection, 1,744 calibration, and 14,496 official-test
   groups. This is a source-defined judged candidate pool, not retrieval recall.
-  Explicit split-overlap/official-test audit was pending at this build.
+  Subsequent source-bound audit confirmed zero query-and-locale overlap and
+  official test isolation, with all four split hashes identical old/new.
   Receipt: `v2-swarm-20261019T030009Z/esci_source`.
 - ESCI classical benchmark at exact evaluator `22707ed3` scored all 14,496
   expected official-test query groups, zero failures and zero zero-ideal
@@ -70,8 +71,9 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   top-ten scores change under tie averaging; no superiority or uncertainty
   claim follows. Sanitized [aggregate](../../reports/runs/v2-esci-20261019/aggregate.json)
   and [readback](../../reports/runs/v2-esci-20261019/readback.json) retain
-  source/hash evidence. A later source-bound manifest must be split-hash
-  reconciled before comparing its runs to this one.
+  source/hash evidence. The later source-bound manifest's four split hashes
+  were reconciled exactly against the old manifest in the
+  [remote audit](../../reports/runs/v2-source-audit-20261019/audit.json).
 - D1 option-readout/training compatibility at integrated `22707ed3` exited 0
   on A40 BF16: one fixed prompt, finite loss 0.57594, 166 trainable tensors
   with nonzero gradients, option-readout parity maximum delta 2.98e-8,
@@ -79,6 +81,12 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   training occurred. Remote/local metadata SHA-256 matches
   `2a9500911f60cf50635c31277b8994c8cebef92ab455174d12b9dea6f6317406`.
   Receipt: `v2-swarm-20261019T030009Z/gpu_compat_22707`.
+- [W&B cloud run 2f8r8pwf](https://wandb.ai/black-order/liquid-mcdm-lab/runs/2f8r8pwf)
+  was read back with aggregate test/data and Swissmetro baseline telemetry;
+  sanitized [cloud receipt](../../reports/runs/v2-wandb-20261019/readback.json)
+  has SHA-256 `b5074afd5532054c7a1b06f080f2042cf7654c6389fb5b490876344aec244d7f`.
+  It is not a trained-model artifact. A Hugging Face v2 research repo exists
+  privately; no public v2 model has been created.
 
 No local workload was executed. The v2 worker branches have not yet passed a
 single integrated remote suite. Initial GitHub CPU runs were superseded by the
