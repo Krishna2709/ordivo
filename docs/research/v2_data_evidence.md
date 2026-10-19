@@ -39,7 +39,7 @@ that could have been retrieved or considered.
 
 | Source | Primary reference | Labels and fields | Terms evidence | Status |
 |---|---|---|---|---|
-| Expedia Personalized Sort | [official Kaggle data dictionary](https://www.kaggle.com/c/expedia-personalized-sort/data) | `srch_id` search, `prop_id` hotel, click and booking flags; position and `random_bool` are exposure | [competition rules](https://www.kaggle.com/c/expedia-personalized-sort/rules) require account review | Adapter implemented; official file listing succeeded but data.zip download returned HTTP 403, so no source acquired |
+| Expedia Personalized Sort | [official Kaggle data dictionary](https://www.kaggle.com/c/expedia-personalized-sort/data) | `srch_id` search, `prop_id` hotel, click and booking flags; position and `random_bool` are exposure | [competition rules](https://www.kaggle.com/c/expedia-personalized-sort/rules) require account review | Official archive acquired after user accepted rules; four-way group build pending |
 | Amazon ESCI | [official Amazon Science repository](https://github.com/amazon-science/esci-data) | Task 1 uses `small_version=1`, E/S/C/I judgments, `split`, product join on `(product_locale, product_id)` | [Apache-2.0](https://github.com/amazon-science/esci-data/blob/main/LICENSE) and [NOTICE](https://github.com/amazon-science/esci-data/blob/main/NOTICE) | Remote acquisition and full ingestion pending |
 | Swissmetro | [official Biogeme source data](https://github.com/michelbierlaire/biogeme/blob/master/src/biogeme/data/data/swissmetro.dat) and [example loader](https://biogeme.epfl.ch/sphinx/_modules/biogeme/data/swissmetro.html) | Stated `CHOICE`, respondent `ID`, `TRAIN_AV`/`SM_AV`/`CAR_AV`, times/costs/headways; `CHOICE=0` excluded as in the example | [Biogeme data page](https://biogeme.epfl.ch/) makes data available for research and education; source-specific redistribution terms still require confirmation | Adapter implemented; remote acquisition and full ingestion pending |
 
@@ -123,6 +123,16 @@ records remain in the approved remote storage scope.
 
 ### Executed source receipts (RunPod, 2026-10-19 UTC)
 
+The official Kaggle CLI downloaded Expedia `data.zip` after the account holder
+accepted competition rules. The retained archive is 434,573,097 bytes with
+SHA-256 `f16b9622a73c015e2693284a5939a82817417f23f284bfd69081f1f35cdd0602`.
+Remote 7-Zip 23.01 streamed its Deflate64 `train.csv` member (2,358,114,793
+bytes, SHA-256 `84a53139ea92df1e9400f84852facbd78f3136f366a08440f4ab4518e71a49a9`).
+The sanitized acquisition receipt SHA-256 is
+`ad43012124f073b6b9ee925555a2b40c2b207638b4a9baea149c93ca90edcb44`.
+The competition's `test.csv` lacks outcomes and is not used for training or
+held-out metrics. Full group materialization is still pending.
+
 The official ESCI acquisition pinned Amazon revision
 `7916cdf6ab75a462e77f20ab40428a10923998d5`; examples Parquet SHA-256
 `4a735b693b4a424a6fc67f5be6e4c811495c488bbf66d02a602d308b2744263a`
@@ -160,11 +170,11 @@ The remote receipts must include the exact executed code commit, acquisition
 revision, file hashes/sizes, source terms, raw and retained rows/groups,
 duplicate/missingness/choice diagnostics, split counts and hashes, group
 integrity checks, and test results. The Swissmetro data-specific rights check
-is open. On the scoped official Kaggle CLI, `competitions files` listed
-`data.zip` (434,573,097 bytes), but `DownloadDataFile` returned HTTP 403
-Forbidden. No archive or training CSV was acquired, and automation accepted
-no new rules. The 403 does not identify the exact account-side cause; a user
-must review access in Kaggle if Expedia remains required. The first release comparison needs
+is open. The first official Kaggle download attempt returned HTTP 403 after
+file listing; after the user accepted competition rules, the official CLI
+download succeeded. This sequence establishes access only for the current
+account and competition terms; it does not establish public redistribution or
+derivative-weight rights. The first release comparison needs
 actual held-out scored groups; passing adapter tests alone is insufficient.
 
 For a third future real domain, the [SUSHI author page](https://www.kamishima.net/sushi/)
