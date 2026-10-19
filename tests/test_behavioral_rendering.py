@@ -77,3 +77,25 @@ def test_observed_event_is_visible_and_target_is_not(renderer):
     click = renderer(observed, CharacterTokenizer(), policy)
     assert booking['prompt'] != click['prompt']
     assert 'click' in click['prompt']
+
+
+def test_supervised_labels_respect_event_population_and_unjudged_mask():
+    from scripts.train_v2_supervised import _label
+
+    ids = ['a', 'b', 'c']
+    available = [True, True, True]
+    booking = {'task_type': 'observed_choice', 'supervision': {'outcomes_by_id': {
+        'a': {'booking_bool': 1, 'click_bool': 1},
+        'b': {'booking_bool': 0, 'click_bool': 1},
+        'c': {'booking_bool': 0, 'click_bool': 0}}}}
+    kind, target, mask = _label(booking, ids, available,
+                                {'prediction_event': 'conditional_booking_choice'})
+    assert kind == 'choice' and target.item() == 0 and mask.tolist() == available
+    booking['supervision']['outcomes_by_id']['b']['booking_bool'] = 1
+    assert _label(booking, ids, available,
+                  {'prediction_event': 'conditional_booking_choice'}) is None
+    relevance = {'task_type': 'graded_relevance', 'supervision': {
+        'grades_by_id': {'a': 'E', 'b': 'I'}, 'unjudged_ids': ['c']}}
+    kind, target, mask = _label(relevance, ids, available, {})
+    assert kind == 'ranking' and target.tolist() == [1., 0., 0.]
+    assert mask.tolist() == [True, True, False]
