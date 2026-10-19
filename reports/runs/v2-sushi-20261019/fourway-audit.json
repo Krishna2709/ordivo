@@ -1,0 +1,24 @@
+{
+  "alternatives_sorted_by_item_id": true,
+  "candidate_set_equals_ranked_set": true,
+  "episodes_unique": 10000,
+  "manifest_sha256": "bd6a19be2715ee3c43b45607b4c0177bd318c124f4c17dab082a14d3f866b6fa",
+  "paired_a_b_once_each": true,
+  "rank_order_equal_sorted_alternatives_incidental_count": 1,
+  "respondent_split_disjoint": true,
+  "respondents_unique": 5000,
+  "source_commit": "5b14f0d0e9ad97f3569bf6d78d389077e21899b7",
+  "split_counts": {
+    "calibration": 586,
+    "test": 984,
+    "train": 7912,
+    "validation": 518
+  },
+  "split_sha256": {
+    "calibration": "8cab930759b366215690028febffcd6e2c2b2302a5d7cb0fd87773bc6206a1b1",
+    "test": "1539a41a78fcf195f1db395ce1d3deb733ae64acb2e0ed30fd02090e71bafbac",
+    "train": "9782220cb7dfad71e25050d5fca57fbcc05158d361955aa6eb1c2e722a458c8a",
+    "validation": "c16b07d1327de84813b16eb383a8d9df041b2ea7bc58464de8c2dd76bc9e3392"
+  },
+  "ten_distinct_available_original_candidates_each": true
+}

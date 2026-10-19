@@ -6,7 +6,7 @@
 
 The pilot uses `LiquidAI/d1-3B` at immutable revision `051bcc464b01b9f92942b364d9586b0ef5912432`, with a PEFT LoRA `best_adapter` selected on the **model-selection validation** groups. The executed source commit is `854de0877c8e7e380b7353a578e95ba9865d4e25`; source archive SHA-256 is `38454c8d667183d57c9c48ed0bcc3d3b32f214e2485c6bdb6bf99f6af0204faa`; config SHA-256 is `c152e64d839082531d4ece9e66d330fa35ffddfbc442685742b9fd171de5462b`. Prompt contract `behavioral-choice-v1` lives in `liquid_mcdm.training.behavioral_rendering`; option readout lives in `liquid_mcdm.training.option_policy` and the pinned `liquid_mcdm._vendor.d1_prompt`. The base model, project code, tokenizer, and adapter are all required. This is an answer-slot candidate scorer, not a generated-text decision assistant.
 
-Input is a complete `ordivo-behavioral-v1` episode with task type, declared context/criteria/constraints/preferences, and all candidates with typed source features and `available` masks. The rendering path uses a source-specific `feature_policy` allowlist. Candidate IDs are output keys; only positional aliases reach the model. Labels, exposure/position, provenance, source/group identifiers, and original row order must not be predictor features. The label-free research renderer accepts only an exact predictor envelope and frozen feature-policy allowlist, without supervision, exposure or provenance. Its scoped/full source tests passed; a production serving API and end-to-end inference playthrough remain pending.
+Input is a complete `ordivo-behavioral-v1` episode with task type, declared context/criteria/constraints/preferences, and all candidates with typed source features and `available` masks. The rendering path uses a source-specific `feature_policy` allowlist. Candidate IDs are output keys; only positional aliases reach the model. Labels, exposure/position, provenance, source/group identifiers, and original row order must not be predictor features. The label-free research renderer accepts only an exact predictor envelope and frozen feature-policy allowlist, without supervision, exposure or provenance. Its scoped/full source tests and one private-adapter illustrative inference playthrough passed. A production serving API remains pending.
 
 For `stated_choice`, output is a conditional distribution over **the supplied available alternatives**. For ESCI `graded_relevance`, the current option distribution is a single-choice relevance probe over the **source Task 1 reduced judged candidate list**; it is not product retrieval recall, purchase probability, a calibrated confidence, or a universal utility scale. If an `observed_choice` source is added, `prediction_event` must distinguish `conditional_booking_choice` from `combined_click_booking_relevance`; a conditional booking distribution applies only to exposed groups with exactly one booking. Unavailable options are masked, and no complete candidate group may be truncated to fit the prompt.
 
@@ -79,8 +79,9 @@ PYTHONPATH=src python private_v2_probe.py
 
 Save the Python block below as `private_v2_probe.py` in that checkout. The
 remote source test suite used the same `PYTHONPATH=src` import boundary. The
-exact illustrative inference playthrough and its environment inventory are
-being verified; no example output is claimed yet.
+illustrative inference playthrough was verified with the pinned source, base,
+private adapter and environment inventory. This constructed input is a fixture,
+not a row from a benchmark or a measurement of prediction quality.
 
 ```python
 from pathlib import Path
@@ -138,7 +139,17 @@ with torch.inference_mode():
 scores_by_candidate_id = dict(zip(rendered["candidate_ids"], probabilities.cpu().tolist()))
 ```
 
-This softmax is conditional on this candidate group and rendering policy. It is not calibrated real-world event probability. The unavailable car remains in the complete prompt but receives probability zero. No expected prediction is asserted for the illustrative input without an independently checked inference receipt.
+The remote A40 playthrough produced `train: 0.24508503079414368`,
+`swissmetro: 0.7549149990081787`, and unavailable `car: 0.0` for this
+constructed request. It rendered all three candidates in 345 input tokens;
+all scores were finite and summed to one. The metadata-only receipt SHA-256 is
+`9f9832eddaf39df94079cd82a9458839ed4be28e13cde70727943e42c25c3137`
+at exact project source `bd24814429211ad4dad4e9a58ba0137daa0bc76b`,
+base revision above, private Hub adapter revision above, and adapter directory
+SHA-256 `831fb319d8a2144ef26ed86a7c985ed3ca4b9662180ced32e28b6f4c469c612c`.
+These are fixture-specific outputs, not benchmark accuracy or calibrated
+real-world event probabilities. The unavailable car remains in the complete
+prompt but receives probability zero.
 
 ## Use and distribution
 

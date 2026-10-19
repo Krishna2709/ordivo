@@ -40,8 +40,17 @@ and the four-role [ADR 0009](../decisions/0009-v2-four-role-splits.md).
   a scoped predictor suite passed 16 tests. A later direct command-path
   diagnostic fix at `a19d32d275db0012cecb50aafff84f4a125fbf7a` passed
   its focused 10-test remote check and exact help invocation. These are source
-  and boundary checks; an end-to-end private Hub adapter inference playthrough
-  has not yet been recorded. Receipts:
+  and boundary checks. A later end-to-end private Hub adapter inference
+  playthrough passed at the same integrated source, pinned base and adapter:
+  the constructed three-mode request rendered 345 tokens and returned train
+  0.24508503, Swissmetro 0.75491500, unavailable car 0.0, finite and summing
+  to one. This is a fixture-only mechanics check, not measured accuracy or
+  calibrated probability. Sanitized receipt SHA-256:
+  `9f9832eddaf39df94079cd82a9458839ed4be28e13cde70727943e42c25c3137`.
+  The source-suite tokenizer fixtures require the verified pinned tokenizer
+  cache at `.cache/d1-tokenizer`; a fresh archive lacking that cache skipped
+  three fixtures. Operations is rerunning with the pinned cache, so that
+  diagnostic is not a model failure or a new zero-skip result. Receipts:
   `v2-swarm-20261019T030009Z/full_suite_bd248`,
   `candidate_predictor_tests_bd248_retry`, and `candidate_direct_green_a19d`.
 - V2 behavioral data reviewer-fix tests at `2f417cbe28e77e7303d3c7fbfdf3d3d80bcf720f`

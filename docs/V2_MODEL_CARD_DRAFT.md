@@ -56,9 +56,13 @@ source tests passed at `bd24814429211ad4dad4e9a58ba0137daa0bc76b` (244
 tests, zero skips; archive SHA-256
 `778a3689f90c44afa572fc4ecd968a8853e53f5c5bb81e3356338485dd57c2a0`).
 The [private research card](../hub/v2_research_model/README.md) gives an
-illustrative label-free request and pinned PEFT loading path. An end-to-end
-private adapter inference receipt for that example is still pending; this is
-not a production serving API.
+illustrative label-free request and pinned PEFT loading path. Its verified
+private-adapter fixture playthrough returned train 0.24508503, Swissmetro
+0.75491500 and unavailable car 0.0 (345 input tokens, finite scores summing
+to one; metadata receipt SHA-256
+`9f9832eddaf39df94079cd82a9458839ed4be28e13cde70727943e42c25c3137`).
+These constructed-input scores do not measure benchmark quality or calibration;
+this is not a production serving API.
 
 Output: one finite score per eligible candidate keyed by ID, explicit unavailable/failed status, and task-specific probability only where a named event and normalization are defined. Ranking a score vector is not proof of listwise training. The deterministic decision report separately records weight source, feasibility, exact method and parameters, computed score/trace, uncertainty or sensitivity, and verification status. A failed or truncated group is an error, not a reduced successful prediction.
 
