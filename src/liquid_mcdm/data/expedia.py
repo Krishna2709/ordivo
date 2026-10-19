@@ -45,7 +45,9 @@ def iter_episodes(path: Path, policy: dict) -> Iterator[DecisionEpisode]:
                 # competitor/history fields.
                 yield {name: row[name] for name in required}
         with grouped_rows(counted_rows(), group_key="srch_id", row_key="prop_id", temp_dir=policy.get("temp_dir")) as groups:
+            completed_groups = 0
             for group_id, rows in groups:
+                completed_groups += 1
                 first = rows[0]
                 context = {name: _number(first[name]) for name in CONTEXT_FIELDS}
                 random_bool = _binary(first["random_bool"])
@@ -70,6 +72,9 @@ def iter_episodes(path: Path, policy: dict) -> Iterator[DecisionEpisode]:
                 }
                 validate_episode(episode)
                 yield episode
+            profile["raw_groups"] = completed_groups
+            profile["selected_groups"] = completed_groups
+            profile["omitted_groups_by_reason"] = {}
 
 
 def _binary(value: str | None) -> int:

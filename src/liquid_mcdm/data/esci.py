@@ -41,6 +41,8 @@ def iter_episodes(examples: Path, products: Path, policy: dict) -> Iterator[Deci
     batch_size = int(policy.get("batch_size", 4096))
     source_hashes = {"examples_sha256": file_sha256(examples), "products_sha256": file_sha256(products)}
     profile = policy["source_profile"] = {"raw_rows": 0, "selected_rows": 0, "omitted_by_reason": {"outside_task1_reduced": 0}}
+    raw_groups: set[str] = set()
+    selected_groups: set[str] = set()
     with tempfile.TemporaryDirectory(dir=policy.get("temp_dir")) as directory:
         connection = sqlite3.connect(str(Path(directory) / "products.sqlite3"))
         try:
@@ -56,12 +58,15 @@ def iter_episodes(examples: Path, products: Path, policy: dict) -> Iterator[Deci
             def selected_rows() -> Iterator[dict]:
                 for row in _rows(examples, columns, batch_size):
                     profile["raw_rows"] += 1
+                    group_id = f"{row['product_locale']}:{row['query_id']}"
+                    raw_groups.add(group_id)
                     if str(row["small_version"]) not in ("1", "True", "true"):
                         profile["omitted_by_reason"]["outside_task1_reduced"] += 1
                         continue
                     profile["selected_rows"] += 1
+                    selected_groups.add(group_id)
                     row = dict(row)
-                    row["_group"] = f"{row['product_locale']}:{row['query_id']}"
+                    row["_group"] = group_id
                     yield row
             with grouped_rows(selected_rows(), group_key="_group", row_key="example_id", temp_dir=policy.get("temp_dir")) as groups:
                 for group_id, rows in groups:
@@ -96,5 +101,8 @@ def iter_episodes(examples: Path, products: Path, policy: dict) -> Iterator[Deci
                     }
                     validate_episode(episode)
                     yield episode
+                profile["raw_groups"] = len(raw_groups)
+                profile["selected_groups"] = len(selected_groups)
+                profile["omitted_groups_by_reason"] = {"outside_task1_reduced": len(raw_groups - selected_groups)}
         finally:
             connection.close()
