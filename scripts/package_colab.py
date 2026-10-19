@@ -3,9 +3,10 @@ from pathlib import Path
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-DIRECTORIES = ('src', 'configs', 'notebooks', 'scripts', 'tests', 'docs')
+DIRECTORIES = ('src', 'configs', 'notebooks', 'scripts', 'tests', 'docs', 'hub')
 FILES = ('pyproject.toml', 'requirements-cpu.lock', 'requirements-colab-candidate.txt',
-         'uv.lock', 'reports/progress.md', 'research/upstream_models.json', 'ARCHITECTURE.md', 'README.md', 'PROJECT_BRIEF.md', 'de01.ipynb')
+         'uv.lock', 'reports/progress.md', 'research/upstream_models.json', 'ARCHITECTURE.md',
+         'README.md', 'PROJECT_BRIEF.md', 'de01.ipynb', 'LICENSE', 'NOTICE')
 
 
 def source_paths():
