@@ -14,11 +14,17 @@ def frozen_bundle(tmp_path):
                        'calibration': ['s:c', 's:d'], 'test': ['s:e']}.items():
         content = ''.join(json.dumps({'episode_id': id_, 'source': 's',
                                       'group_id': id_.split(':')[1],
-                                      'supervision': {}}) + '\n' for id_ in ids).encode()
+                                      'task_type': 'observed_choice',
+                                      'alternatives': [{'id': 'a', 'available': True},
+                                                       {'id': 'b', 'available': True}],
+                                      'supervision': {'outcomes_by_id': {
+                                          'a': {'booking_bool': 1}, 'b': {'booking_bool': 0}}}})
+                          + '\n' for id_ in ids).encode()
         (tmp_path / f'{split}.jsonl').write_bytes(content)
         hashes[split] = hashlib.sha256(content).hexdigest()
     manifest = tmp_path / 'manifest.json'
-    manifest.write_text(json.dumps({'split_sha256': hashes}))
+    manifest.write_text(json.dumps({'split_sha256': hashes,
+                                    'candidate_pool_scope': 'source_exposed_candidates'}))
     return manifest
 
 
@@ -62,5 +68,5 @@ def test_manifest_hash_and_split_overlap_guard(tmp_path):
     data['split_sha256']['test'] = hashlib.sha256((tmp_path / 'test.jsonl').read_bytes()).hexdigest()
     manifest.write_text(json.dumps(data))
     with pytest.raises(ValueError, match='group overlap'):
-        load_calibration_evidence(manifest, event='stated_choice',
-                                  candidate_population='eligible_stated_choice_group')
+        load_calibration_evidence(manifest, event='conditional_booking_choice',
+                                  candidate_population='exactly_one_booking_exposed_group')
