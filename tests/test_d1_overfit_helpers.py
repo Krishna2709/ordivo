@@ -52,3 +52,36 @@ def test_custom_prediction_uses_schema_mapping_across_remote_code_boundary(monke
 
     result = training.predict_custom(Model(), [episode])
     assert result == {'one': {'A': .8, 'B': .2}}
+
+
+def test_training_limits_accept_v2_and_reject_unbounded_runs():
+    training.validate_training_limits({'max_steps': 400, 'train_examples': 512,
+                                       'eval_examples': 128})
+    with pytest.raises(RuntimeError, match='max_steps'):
+        training.validate_training_limits({'max_steps': 501, 'train_examples': 512,
+                                           'eval_examples': 128})
+    with pytest.raises(RuntimeError, match='train_examples'):
+        training.validate_training_limits({'max_steps': 400, 'train_examples': 1001,
+                                           'eval_examples': 128})
+
+
+def test_prediction_rows_keep_teacher_and_before_after_probabilities():
+    episodes = [{'episode_id': 'one', 'method': 'TOPSIS',
+                 'criteria': [{'name': 'c'}],
+                 'alternatives': [{'id': 'A'}, {'id': 'B'}],
+                 'target': {'winner': 'B'}}]
+    rows = training.prediction_rows(
+        episodes, {'one': {'A': .6, 'B': .4}}, {'one': {'A': .2, 'B': .8}})
+    assert rows == [{'episode_id': 'one', 'method': 'TOPSIS', 'teacher': 'B',
+                     'base_prediction': 'A', 'post_prediction': 'B',
+                     'base_correct': False, 'post_correct': True,
+                     'alternatives_count': 2, 'criteria_count': 1,
+                     'base_probabilities': '{"A": 0.6, "B": 0.4}',
+                     'post_probabilities': '{"A": 0.2, "B": 0.8}'}]
+
+
+def test_reload_decision_acceptance_separates_argmax_from_exact_probabilities():
+    report = {'argmax_agreement': 1.0, 'max_absolute_probability_delta': .03}
+    result = training.reload_decision_acceptance(report, probability_tolerance=.05)
+    assert result == {'decision_equivalent': True, 'within_probability_tolerance': True,
+                      'exact_probability_parity': False}

@@ -41,3 +41,14 @@ def test_candidate_install_cannot_replace_cuda_stack(tmp_path):
     report.write_text(json.dumps({'install': [{'metadata': {'name': 'torch'}}]}))
     with pytest.raises(RuntimeError, match='CUDA stack'):
         bootstrap.reject_torch_replacement(report)
+
+
+def test_reused_python_requires_safe_existing_environment(tmp_path):
+    python = tmp_path / 'venvs' / 'prior-run' / 'train' / 'bin' / 'python'
+    python.parent.mkdir(parents=True)
+    python.write_text('')
+    assert bootstrap.reused_python(tmp_path, 'prior-run', 'train') == python
+    with pytest.raises(RuntimeError, match='Unsafe'):
+        bootstrap.reused_python(tmp_path, '../escape', 'train')
+    with pytest.raises(RuntimeError, match='unavailable'):
+        bootstrap.reused_python(tmp_path, 'missing', 'cpu')

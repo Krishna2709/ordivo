@@ -7,10 +7,13 @@
   "image_name": "runpod/pytorch:1.0.3-cu1281-torch291-ubuntu2404",
   "container_disk_gb": 50,
   "network_volume_gb": 20,
+  "existing_network_volume_id": "ngica7qkhd",
+  "reuse_venv_run_id": "20261019T000332Z",
+  "training_config": "configs/d1_3b_lora_v2.yaml",
   "volume_mount_path": "/workspace",
   "ports": ["22/tcp"],
   "max_runtime_seconds": 7200,
-  "max_training_steps": 25,
+  "max_training_steps": 400,
   "max_hourly_usd": 0.59,
   "wandb_mode": "offline"
 }

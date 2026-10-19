@@ -53,11 +53,29 @@ def reject_torch_replacement(report_path):
         raise RuntimeError(f'Candidate dependencies would replace the image CUDA stack: {sorted(set(forbidden))}')
 
 
+def reused_python(workspace, run_id, environment):
+    if not run_id:
+        return None
+    if not re.fullmatch(r'[A-Za-z0-9_-]+', run_id):
+        raise RuntimeError('Unsafe reused environment run ID')
+    if environment not in {'cpu', 'train'}:
+        raise RuntimeError('Unknown reused environment')
+    path = Path(workspace) / 'venvs' / run_id / environment / 'bin' / 'python'
+    if not path.is_file():
+        raise RuntimeError(f'Requested reused {environment} environment is unavailable')
+    return path
+
+
 def main():
     pod_id = os.environ.get('RUNPOD_POD_ID', '')
     run_id = os.environ.get('RUNPOD_RUN_ID', '')
+    reuse_run_id = os.environ.get('RUNPOD_REUSE_VENV_RUN_ID', '')
+    training_config = os.environ.get('RUNPOD_TRAINING_CONFIG', 'configs/d1_3b_lora.yaml')
     if not re.fullmatch(r'[A-Za-z0-9_-]+', pod_id) or not re.fullmatch(r'[A-Za-z0-9_-]+', run_id):
         raise RuntimeError('Runpod identifiers are required; do not run this bootstrap locally')
+    if (PurePosixPath(training_config).is_absolute() or '..' in PurePosixPath(training_config).parts
+            or not training_config.startswith('configs/')):
+        raise RuntimeError('Unsafe training config path')
     workspace = Path('/workspace')
     source_archive = workspace / 'incoming' / run_id / 'source.zip'
     result = workspace / 'runs' / run_id
@@ -90,13 +108,17 @@ def main():
 
         state['status'] = 'cpu_environment'
         checkpoint()
-        cpu_python = workspace / 'venvs' / run_id / 'cpu' / 'bin' / 'python'
-        cpu_python.parent.parent.mkdir(parents=True, exist_ok=False)
-        run_logged([sys.executable, '-m', 'venv', str(cpu_python.parent.parent)],
-                   result / 'cpu-venv.log')
-        run_logged([str(cpu_python), '-m', 'pip', 'install', '--require-hashes',
-                    '--only-binary=:all:', '--no-cache-dir', '-r',
-                    str(root / 'requirements-cpu.lock')], result / 'cpu-install.log', env=env)
+        cpu_python = reused_python(workspace, reuse_run_id, 'cpu')
+        if cpu_python is None:
+            cpu_python = workspace / 'venvs' / run_id / 'cpu' / 'bin' / 'python'
+            cpu_python.parent.parent.mkdir(parents=True, exist_ok=False)
+            run_logged([sys.executable, '-m', 'venv', str(cpu_python.parent.parent)],
+                       result / 'cpu-venv.log')
+            run_logged([str(cpu_python), '-m', 'pip', 'install', '--require-hashes',
+                        '--only-binary=:all:', '--no-cache-dir', '-r',
+                        str(root / 'requirements-cpu.lock')], result / 'cpu-install.log', env=env)
+        else:
+            state['reused_cpu_environment'] = reuse_run_id
         state['status'] = 'cpu_acceptance'
         checkpoint()
         run_logged([str(cpu_python), str(root / 'scripts' / 'verify_remote.py'),
@@ -109,9 +131,13 @@ def main():
 
         state['status'] = 'training_environment'
         checkpoint()
-        train_python = workspace / 'venvs' / run_id / 'train' / 'bin' / 'python'
-        run_logged([sys.executable, '-m', 'venv', '--system-site-packages',
-                    str(train_python.parent.parent)], result / 'train-venv.log', env=env)
+        train_python = reused_python(workspace, reuse_run_id, 'train')
+        if train_python is None:
+            train_python = workspace / 'venvs' / run_id / 'train' / 'bin' / 'python'
+            run_logged([sys.executable, '-m', 'venv', '--system-site-packages',
+                        str(train_python.parent.parent)], result / 'train-venv.log', env=env)
+        else:
+            state['reused_training_environment'] = reuse_run_id
         dry_run = result / 'candidate-install-report.json'
         run_logged([str(train_python), '-m', 'pip', 'install', '--dry-run', '--report', str(dry_run),
                     '-r', str(root / 'requirements-colab-candidate.txt')],
@@ -125,7 +151,7 @@ def main():
         state['status'] = 'gpu_compatibility_and_training'
         checkpoint()
         run_logged([str(train_python), str(root / 'scripts' / 'train_d1_overfit.py'),
-                    '--config', str(root / 'configs' / 'd1_3b_lora.yaml'),
+                    '--config', str(root / training_config),
                     '--data', str(result / 'acceptance' / 'data'),
                     '--output', str(result / 'training')],
                    result / 'training.log', cwd=root, env=env)

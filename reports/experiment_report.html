@@ -532,16 +532,15 @@
           <p><a href="https://wandb.ai/liquid-mcdm-lab/runs/56i7klyd">Open the W&amp;B run</a></p>
         </div>
         <div class="coverage">
-          <strong>Recorded and preserved</strong>
+          <strong>Confirmed in the synced training run</strong>
           <ul>
             <li>step loss, gradient norm and learning rate</li>
             <li>entropy and mean token accuracy</li>
             <li>runtime, throughput and final train loss</li>
-            <li>run configuration and adapter manifest</li>
-            <li>aggregate pre/post evaluation JSON</li>
-            <li>adapter checksum and remote path</li>
+            <li>Hugging Face trainer telemetry</li>
           </ul>
-          <p><strong>Missing for full auditability:</strong> per-episode prediction rows, W&amp;B Table of errors, the full synthetic dataset as a versioned artifact, and proof that every model file was uploaded to W&amp;B. These belong in the next run and release workflow.</p>
+          <p><strong>Preserved in repository evidence, not proven uploaded to W&amp;B:</strong> aggregate pre/post evaluation JSON, adapter manifest, checksum and remote path.</p>
+          <p><strong>Missing for full auditability:</strong> per-episode prediction rows, W&amp;B Table of errors, the full synthetic dataset as a versioned artifact, and the adapter as a W&amp;B model artifact. These belong in the next run and release workflow.</p>
         </div>
       </div>
     </section>

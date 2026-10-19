@@ -2,8 +2,8 @@
 license: cc-by-4.0
 pretty_name: Liquid MCDM Synthetic Decision Episodes
 task_categories:
-- text-classification
-- ranking
+- multiple-choice
+- text-ranking
 tags:
 - decision-making
 - mcdm

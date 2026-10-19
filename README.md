@@ -2,7 +2,14 @@
 
 Research prototype for exact COPRAS/WASPAS/VIKOR/TOPSIS teachers and Liquid d1 winner prediction. **All workloads run remotely.** This local workspace is for source and documentation editing only; do not install packages, generate data, run tests or download models locally.
 
-The first bounded Runpod experiment is complete. Run `20261019T002734Z` trained a d1-3B LoRA adapter for 25 steps on an A40 and synced [W&B run 56i7klyd](https://wandb.ai/liquid-mcdm-lab/runs/56i7klyd). The adapter remains on preserved network volume `ngica7qkhd`; small local evidence is under `dist/runpod/results-20261019T002734Z`. [de01.ipynb](de01.ipynb) remains the Colab alternative, and the [Hugging Face Jobs runbook](docs/huggingface_jobs.md) remains available.
+The first bounded Runpod experiment is complete. Run `20261019T002734Z` trained a d1-3B LoRA adapter for 25 steps on an A40 and synced [W&B run 56i7klyd](https://wandb.ai/liquid-mcdm-lab/runs/56i7klyd). The adapter remains on preserved network volume `ngica7qkhd`; small evidence is under `reports/runs/20261019T002734Z`. [de01.ipynb](de01.ipynb) remains the Colab alternative, and the [Hugging Face Jobs runbook](docs/huggingface_jobs.md) remains available.
+
+Public release destinations:
+
+- Source and experiment report: https://github.com/Krishna2709/liquid-mcdm-lab
+- Synthetic dataset: https://huggingface.co/datasets/blackOrder/liquid-mcdm-synthetic
+- LoRA adapter: https://huggingface.co/blackOrder/d1-3b-mcdm-lora
+- Experiment tracking: https://wandb.ai/liquid-mcdm-lab
 
 ## What is implemented
 

@@ -118,3 +118,39 @@ def test_price_guard_deletes_pod_but_preserves_volume(control, monkeypatch):
     assert saved['network_volume_preserved'] is True
     assert ('DELETE', '/pods/pod-1') in calls
     assert ('DELETE', '/networkvolumes/volume-1') not in calls
+
+
+def test_launch_reuses_configured_network_volume(control, monkeypatch):
+    control.STAGE.mkdir()
+    (control.STAGE / 'source.zip').write_bytes(b'source')
+    (control.STAGE / 'runpod_bootstrap.py').write_bytes(b'bootstrap')
+    config = {'name_prefix': 'test', 'network_volume_gb': 20,
+              'existing_network_volume_id': 'existing-volume',
+              'data_center_ids': ['CA-MTL-1'], 'cloud_type': 'SECURE',
+              'gpu_type_id': 'NVIDIA A40', 'gpu_count': 1, 'image_name': 'image',
+              'container_disk_gb': 50, 'volume_mount_path': '/workspace',
+              'ports': ['22/tcp'], 'wandb_mode': 'offline', 'max_hourly_usd': .59,
+              'max_runtime_seconds': 7200}
+    control.CONFIG.write_text(json.dumps(config))
+    source_files = {'x': 'y'}
+    (control.STAGE / 'prepared.json').write_text(json.dumps({
+        'config': config, 'source_sha256': control.digest(control.STAGE / 'source.zip'),
+        'bootstrap_sha256': control.digest(control.STAGE / 'runpod_bootstrap.py'),
+        'source_files': source_files}))
+    monkeypatch.setattr(control, 'source_identity', lambda: source_files)
+    monkeypatch.setattr(control, 'preflight', lambda: {})
+    monkeypatch.setattr(control, 'load_api_key', lambda: 'secret')
+    monkeypatch.setattr(control, 'start_reaper', lambda config, state: 12345)
+    calls = []
+
+    def request(method, path, **kwargs):
+        calls.append((method, path, kwargs.get('body')))
+        assert path != '/networkvolumes'
+        return {'id': 'pod-1', 'costPerHr': .59}
+
+    monkeypatch.setattr(control, 'request', request)
+    control.launch()
+    saved = json.loads((control.STAGE / 'launch.json').read_text())
+    assert saved['network_volume_id'] == 'existing-volume'
+    assert saved['network_volume_reused'] is True
+    assert calls[0][2]['networkVolumeId'] == 'existing-volume'

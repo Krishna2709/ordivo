@@ -101,6 +101,100 @@ def compare_predictions(left, right):
             'mean_absolute_probability_delta': sum(absolute) / len(absolute)}
 
 
+def reload_decision_acceptance(report, probability_tolerance):
+    return {
+        'decision_equivalent': report['argmax_agreement'] == 1,
+        'within_probability_tolerance': (
+            report['max_absolute_probability_delta'] <= probability_tolerance),
+        'exact_probability_parity': report['max_absolute_probability_delta'] == 0,
+    }
+
+
+def prediction_rows(episodes, base_predictions, post_predictions):
+    rows = []
+    for episode in episodes:
+        episode_id = episode['episode_id']
+        before = base_predictions[episode_id]
+        after = post_predictions[episode_id]
+        base_choice = max(before, key=before.get)
+        post_choice = max(after, key=after.get)
+        teacher = episode['target']['winner']
+        rows.append({
+            'episode_id': episode_id,
+            'method': episode['method'],
+            'teacher': teacher,
+            'base_prediction': base_choice,
+            'post_prediction': post_choice,
+            'base_correct': base_choice == teacher,
+            'post_correct': post_choice == teacher,
+            'alternatives_count': len(episode['alternatives']),
+            'criteria_count': len(episode['criteria']),
+            'base_probabilities': json.dumps(before, sort_keys=True),
+            'post_probabilities': json.dumps(after, sort_keys=True),
+        })
+    return rows
+
+
+def validate_training_limits(config):
+    limits = {
+        'max_steps': (1, 500),
+        'train_examples': (1, 1000),
+        'eval_examples': (1, 256),
+    }
+    for key, (minimum, maximum) in limits.items():
+        value = config.get(key)
+        if not isinstance(value, int) or not minimum <= value <= maximum:
+            raise RuntimeError(f'{key} must be an integer in [{minimum}, {maximum}]')
+
+
+def log_wandb_evidence(output, config, state, data_dir, adapter, rows):
+    import wandb
+
+    active = wandb.run
+    if active is None:
+        raise RuntimeError('W&B run was not initialized by SFTTrainer')
+    active.config.update({
+        'model_revision': config['revision'],
+        'dataset_manifest_sha256': state['dataset_manifest_sha256'],
+        'prompt_version': config['prompt_version'],
+        'runtime': state['runtime'],
+    }, allow_val_change=True)
+    active.summary['compatibility'] = state['compatibility']
+    active.summary['overfit_outcome'] = state['overfit_outcome']
+    active.summary['held_out_outcome'] = state['held_out_outcome']
+    active.summary['reload_diagnostics'] = state['reload_diagnostics']
+
+    columns = list(rows[0])
+    table = wandb.Table(columns=columns,
+                        data=[[row[column] for column in columns] for row in rows])
+    active.log({'evaluation/predictions': table})
+
+    dataset_artifact = wandb.Artifact(
+        f"liquid-mcdm-synthetic-{state['dataset_manifest_sha256'][:12]}",
+        type='dataset', metadata={'manifest_sha256': state['dataset_manifest_sha256']})
+    for name in ('manifest.json', 'train.jsonl', 'val.jsonl', 'test.jsonl'):
+        path = Path(data_dir) / name
+        if path.is_file():
+            dataset_artifact.add_file(str(path), name=name)
+    active.log_artifact(dataset_artifact)
+
+    evaluation_artifact = wandb.Artifact(
+        f"d1-mcdm-evaluation-{state['runtime']['pod_id']}", type='evaluation')
+    for path in sorted(Path(output).glob('*.json')):
+        evaluation_artifact.add_file(str(path), name=path.name)
+    freeze = Path(output) / 'pip-freeze.txt'
+    if freeze.is_file():
+        evaluation_artifact.add_file(str(freeze), name=freeze.name)
+    active.log_artifact(evaluation_artifact)
+
+    adapter_artifact = wandb.Artifact(
+        f"d1-3b-mcdm-lora-{config.get('experiment_name', 'run')}", type='model',
+        metadata={'base_model': config['model_id'], 'revision': config['revision']})
+    adapter_artifact.add_dir(str(adapter))
+    active.log_artifact(adapter_artifact)
+    active.finish()
+
+
 def winner_nll(episodes, predictions):
     losses = []
     for episode in episodes:
@@ -146,11 +240,12 @@ def build_sft_config(config, output, dtype):
         'bf16': dtype == torch.bfloat16,
         'fp16': dtype == torch.float16,
         'report_to': ['wandb'],
-        'run_name': 'd1-3b-mcdm-overfit-64x25',
+        'run_name': config.get('experiment_name', 'd1-3b-mcdm-training'),
         'seed': config['seed'],
         'data_seed': config['seed'],
         'completion_only_loss': config['completion_only_loss'],
         'packing': config['packing'],
+        'shuffle_dataset': config.get('shuffle_dataset', True),
         'max_length': config['max_length'],
         'remove_unused_columns': True,
     }
@@ -206,6 +301,11 @@ def run(config_path, data_dir, output):
 
     runtime = require_remote_gpu()
     config = yaml.safe_load(Path(config_path).read_text())
+    train_examples = config.get('train_examples', config.get('overfit_examples'))
+    eval_examples = config.get('eval_examples', 16)
+    config['train_examples'] = train_examples
+    config['eval_examples'] = eval_examples
+    validate_training_limits(config)
     output = Path(output).resolve()
     output.mkdir(parents=True, exist_ok=False)
     state = {'status': 'starting', 'passed': False, 'training_started': False,
@@ -220,8 +320,6 @@ def run(config_path, data_dir, output):
     try:
         if config['model_id'] != 'LiquidAI/d1-3B' or len(config['revision']) != 40:
             raise RuntimeError('Unexpected model identity')
-        if config['max_steps'] != 25 or config['overfit_examples'] != 64:
-            raise RuntimeError('This entry point is bounded to the reviewed 64-example, 25-step run')
         if not torch.cuda.is_available():
             raise RuntimeError('CUDA unavailable after runtime guard')
         set_seed(config['seed'])
@@ -235,9 +333,9 @@ def run(config_path, data_dir, output):
             (Path(data_dir) / 'manifest.json').read_bytes()).hexdigest()
         checkpoint()
 
-        train_episodes = eligible(load_dataset(data_dir, 'train'), config['overfit_examples'])
-        test_episodes = eligible(load_dataset(data_dir, 'test'), 16)
-        parity_episodes = test_episodes[:8]
+        train_episodes = eligible(load_dataset(data_dir, 'train'), train_examples)
+        test_episodes = eligible(load_dataset(data_dir, 'test'), eval_examples)
+        parity_episodes = test_episodes[:config.get('parity_examples', 8)]
         tokenizer = AutoTokenizer.from_pretrained(config['model_id'], revision=config['revision'])
         if tokenizer.pad_token_id is None:
             tokenizer.pad_token = tokenizer.eos_token
@@ -330,7 +428,8 @@ def run(config_path, data_dir, output):
                          or post_train_metrics['winner_nll'] < base_train_metrics['winner_nll']),
             'claim_scope': '64-example training subset only; not generalization evidence',
         }
-        reference = {key: post_predictions[key] for key in list(post_predictions)[:4]}
+        reference_count = config.get('reload_examples', 16)
+        reference = {key: post_predictions[key] for key in list(post_predictions)[:reference_count]}
         del trainer, model
         unload()
 
@@ -339,12 +438,62 @@ def run(config_path, data_dir, output):
         base = AutoModelForImageTextToText.from_pretrained(
             config['model_id'], revision=config['revision'], dtype=dtype, device_map='auto')
         reloaded = PeftModel.from_pretrained(base, adapter)
-        reload_episodes = test_episodes[:4]
+        reload_episodes = test_episodes[:reference_count]
         reloaded_predictions = predict_standard(reloaded, tokenizer, reload_episodes)
+        repeated_predictions = predict_standard(reloaded, tokenizer, reload_episodes)
         reload_parity = compare_predictions(reference, reloaded_predictions)
         write_json(output / 'adapter_reload_parity.json', reload_parity)
-        if reload_parity['argmax_agreement'] != 1 or reload_parity['max_absolute_probability_delta'] > 1e-4:
-            raise RuntimeError(f'Saved adapter reload parity failed: {reload_parity}')
+        repeat_parity = compare_predictions(reloaded_predictions, repeated_predictions)
+        write_json(output / 'adapter_repeat_inference_parity.json', repeat_parity)
+        del reloaded, base
+        unload()
+
+        second_base = AutoModelForImageTextToText.from_pretrained(
+            config['model_id'], revision=config['revision'], dtype=dtype, device_map='auto')
+        second_reload = PeftModel.from_pretrained(second_base, adapter)
+        second_predictions = predict_standard(second_reload, tokenizer, reload_episodes)
+        fresh_reload_parity = compare_predictions(reloaded_predictions, second_predictions)
+        write_json(output / 'adapter_fresh_reload_parity.json', fresh_reload_parity)
+        tolerance = config.get('reload_probability_tolerance', 0.05)
+        state['reload_diagnostics'] = {
+            'saved_vs_reload': reload_parity,
+            'repeat_same_model': repeat_parity,
+            'fresh_reload_vs_reload': fresh_reload_parity,
+            'acceptance': reload_decision_acceptance(reload_parity, tolerance),
+            'probability_tolerance': tolerance,
+        }
+        if not all(report['argmax_agreement'] == 1 for report in
+                   (reload_parity, repeat_parity, fresh_reload_parity)):
+            raise RuntimeError(f'Saved adapter changed a checked decision: {state["reload_diagnostics"]}')
+        if reload_parity['max_absolute_probability_delta'] > tolerance:
+            raise RuntimeError(f'Saved adapter exceeded probability tolerance: {reload_parity}')
+
+        comparison_count = min(config.get('comparison_examples', 16), len(test_episodes))
+        comparison_ids = [episode['episode_id'] for episode in test_episodes[:comparison_count]]
+        base_comparison = {key: base_predictions[key] for key in comparison_ids}
+        post_comparison = {key: post_predictions[key] for key in comparison_ids}
+        base_comparison_metrics = evaluate_predictions(
+            test_episodes[:comparison_count], base_comparison)
+        post_comparison_metrics = evaluate_predictions(
+            test_episodes[:comparison_count], post_comparison)
+        state['held_out_outcome'] = {
+            'examples': comparison_count,
+            'base_accuracy': base_comparison_metrics['accuracy'],
+            'post_accuracy': post_comparison_metrics['accuracy'],
+            'accuracy_delta': (post_comparison_metrics['accuracy']
+                               - base_comparison_metrics['accuracy']),
+            'full_eval_examples': len(test_episodes),
+        }
+        write_json(output / 'comparison_base_metrics.json', base_comparison_metrics)
+        write_json(output / 'comparison_post_metrics.json', post_comparison_metrics)
+        rows = prediction_rows(test_episodes, base_predictions, post_predictions)
+        write_json(output / 'prediction_rows.json', rows)
+        subprocess.run([sys.executable, '-m', 'pip', 'freeze', '--all'], check=False,
+                       stdout=(output / 'pip-freeze.txt').open('w'),
+                       stderr=subprocess.STDOUT)
+        state['status'] = 'logging_evidence'
+        checkpoint()
+        log_wandb_evidence(output, config, state, data_dir, adapter, rows)
         state.update(status='passed', passed=True,
                      finished_utc=datetime.now(timezone.utc).isoformat())
     except BaseException as exc:

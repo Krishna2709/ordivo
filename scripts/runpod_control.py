@@ -127,8 +127,14 @@ def preflight():
     volumes = _items(request('GET', '/networkvolumes', token=token))
     catalog = request('GET', CATALOG, absolute=True, token=token)
     prefix = config['name_prefix']
+    existing_volume_id = config.get('existing_network_volume_id')
+    selected_volume = next((item for item in volumes
+                            if item.get('id') == existing_volume_id), None)
+    if existing_volume_id and selected_volume is None:
+        raise RuntimeError('Configured existing network volume is unavailable')
     collisions = [item.get('id') for item in [*pods, *volumes]
-                  if str(item.get('name', '')).startswith(prefix)]
+                  if (str(item.get('name', '')).startswith(prefix)
+                      and item.get('id') != existing_volume_id)]
     if collisions:
         raise RuntimeError(f'Existing project resources require reconciliation: {collisions}')
     selected = _a40_catalog_summary(catalog, config)
@@ -136,7 +142,8 @@ def preflight():
                'selected': selected, 'max_runtime_seconds': config['max_runtime_seconds'],
                'reviewed_compute_ceiling_usd':
                    config['max_hourly_usd'] * config['max_runtime_seconds'] / 3600,
-               'network_volume_gb': config['network_volume_gb']}
+               'network_volume_gb': config['network_volume_gb'],
+               'existing_network_volume_id': existing_volume_id}
     print(json.dumps(summary, indent=2))
     return summary
 
@@ -183,17 +190,25 @@ def launch():
     config = receipt['config']
     run_id = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
     name = f"{config['name_prefix']}-{run_id.lower()}"
-    state = {'status': 'creating_network_volume', 'run_id': run_id, 'name': name,
+    existing_volume_id = config.get('existing_network_volume_id')
+    state = {'status': ('attaching_network_volume' if existing_volume_id
+                        else 'creating_network_volume'),
+             'run_id': run_id, 'name': name,
              'source_sha256': receipt['source_sha256'], 'pod_id': None, 'network_volume_id': None,
              'created_utc': datetime.now(timezone.utc).isoformat(),
              'max_runtime_seconds': config['max_runtime_seconds']}
     with (STAGE / 'launch.json').open('x') as stream:
         stream.write(json.dumps(state, indent=2, sort_keys=True) + '\n')
 
-    volume = request('POST', '/networkvolumes', token=token, body={
-        'name': name, 'size': config['network_volume_gb'],
-        'dataCenterId': config['data_center_ids'][0]})
-    state['network_volume_id'] = volume['id']
+    if existing_volume_id:
+        state['network_volume_id'] = existing_volume_id
+        state['network_volume_reused'] = True
+    else:
+        volume = request('POST', '/networkvolumes', token=token, body={
+            'name': name, 'size': config['network_volume_gb'],
+            'dataCenterId': config['data_center_ids'][0]})
+        state['network_volume_id'] = volume['id']
+        state['network_volume_reused'] = False
     state['status'] = 'creating_pod'
     write_json(STAGE / 'launch.json', state)
     pod = request('POST', '/pods', token=token, body={
@@ -316,9 +331,12 @@ def start_remote():
                     f'root@{host}:{incoming}/source.zip'], check=True)
     subprocess.run([*common, str(STAGE / 'runpod_bootstrap.py'),
                     f'root@{host}:{incoming}/runpod_bootstrap.py'], check=True)
+    config = prepared['config']
     remote = ['env', f"RUNPOD_POD_ID={state['pod_id']}",
               f"RUNPOD_RUN_ID={state['run_id']}",
               f"MCDM_SOURCE_SHA256={state['source_sha256']}",
+              f"RUNPOD_REUSE_VENV_RUN_ID={config.get('reuse_venv_run_id', '')}",
+              f"RUNPOD_TRAINING_CONFIG={config.get('training_config', 'configs/d1_3b_lora.yaml')}",
               'PYTHONUNBUFFERED=1', 'nohup', 'python', f'{incoming}/runpod_bootstrap.py']
     command = (f"{shlex.join(remote)} > {shlex.quote(incoming + '/driver.log')} 2>&1 "
                f"< /dev/null & echo $!")
@@ -386,8 +404,11 @@ def retry_failed_remote():
                     f'root@{host}:{incoming}/source.zip'], check=True)
     subprocess.run([*common, str(STAGE / 'runpod_bootstrap.py'),
                     f'root@{host}:{incoming}/runpod_bootstrap.py'], check=True)
+    config = prepared['config']
     remote = ['env', f"RUNPOD_POD_ID={state['pod_id']}", f"RUNPOD_RUN_ID={state['run_id']}",
               f"MCDM_SOURCE_SHA256={state['source_sha256']}", 'PYTHONUNBUFFERED=1',
+              f"RUNPOD_REUSE_VENV_RUN_ID={config.get('reuse_venv_run_id', '')}",
+              f"RUNPOD_TRAINING_CONFIG={config.get('training_config', 'configs/d1_3b_lora.yaml')}",
               'nohup', 'python', f'{incoming}/runpod_bootstrap.py']
     command = (f"{shlex.join(remote)} > {shlex.quote(incoming + '/driver.log')} 2>&1 "
                f"< /dev/null & echo $!")

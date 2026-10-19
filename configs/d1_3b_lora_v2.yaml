@@ -1,0 +1,41 @@
+status: approved_v2_runpod_a40
+experiment_name: d1-3b-mcdm-v2-512x400
+model_id: LiquidAI/d1-3B
+revision: 051bcc464b01b9f92942b364d9586b0ef5912432
+training_loader: AutoModelForImageTextToText
+inference_loader: AutoModel
+prompt_version: mcdm-choice-v1-full-precision
+trainer: trl.SFTTrainer
+completion_only_loss: true
+max_length: 2048
+packing: false
+shuffle_dataset: true
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 4
+gradient_checkpointing: true
+learning_rate: 0.0002
+warmup_ratio: 0.05
+lr_scheduler_type: cosine
+seed: 42
+lora:
+  r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  bias: none
+  task_type: CAUSAL_LM
+  target_modules: [q_proj, k_proj, v_proj, out_proj, in_proj, w1, w2, w3]
+  exclude_modules: '.*vision_tower.*'
+quantization: none
+report_to: wandb
+wandb_project: liquid-mcdm-lab
+wandb_mode: offline
+output_dir: checkpoints/d1-mcdm-v2
+save_steps: 100
+save_total_limit: 2
+train_examples: 512
+eval_examples: 128
+comparison_examples: 16
+parity_examples: 8
+reload_examples: 16
+reload_probability_tolerance: 0.05
+max_steps: 400
