@@ -323,3 +323,38 @@ def test_pilot_rejects_duplicate_domain_specs():
         _validate_source_specs([
             {'name': 'a', 'expected_source': 'swissmetro', 'directory': '/tmp/a'},
             {'name': 'b', 'expected_source': 'swissmetro', 'directory': '/tmp/b'}])
+
+
+def test_bounded_expedia_requires_exact_parent_and_complete_label_free_sample():
+    from scripts.train_v2_supervised import _validate_manifest_contract
+
+    manifest = {'source': 'expedia_personalized_sort_2013',
+                'split_policy_id': 'expedia-2013-split-v2-calibration:bounded-hash-v1',
+                'candidate_pool_scope': 'source_exposed_candidates',
+                'target_policy_id': 'expedia-click-booking-v1',
+                'sampling': {'parent_manifest_sha256': 'a' * 64,
+                             'policy': 'sha256_smallest_source_split_episode_id_v1',
+                             'seed': 42, 'label_independent_selection': True,
+                             'complete_groups_preserved': True}}
+    content = json.dumps(manifest).encode()
+    spec = {'expected_source': 'expedia_personalized_sort_2013',
+            'expected_manifest_sha256': hashlib.sha256(content).hexdigest(),
+            'expected_parent_manifest_sha256': 'a' * 64}
+    _validate_manifest_contract(spec, manifest, content, seed=42)
+    for change in ('parent', 'manifest', 'selection', 'completeness', 'seed', 'target'):
+        bad_manifest = json.loads(json.dumps(manifest))
+        bad_spec = dict(spec)
+        if change == 'parent':
+            bad_spec['expected_parent_manifest_sha256'] = 'b' * 64
+        elif change == 'manifest':
+            bad_spec['expected_manifest_sha256'] = 'b' * 64
+        elif change == 'selection':
+            bad_manifest['sampling']['label_independent_selection'] = False
+        elif change == 'completeness':
+            bad_manifest['sampling']['complete_groups_preserved'] = False
+        elif change == 'seed':
+            bad_manifest['sampling']['seed'] = 43
+        else:
+            bad_manifest['target_policy_id'] = 'wrong'
+        with pytest.raises(ValueError, match='source contract'):
+            _validate_manifest_contract(bad_spec, bad_manifest, content, seed=42)
